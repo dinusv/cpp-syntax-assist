@@ -1,28 +1,27 @@
-#ifndef REXCEPTION_HPP
-#define REXCEPTION_HPP
+#ifndef CSAEXCEPTION_HPP
+#define CSAEXCEPTION_HPP
 
 #include <exception>
 #include <string>
 
-namespace sh{
+namespace csa{
 
-class RException : public std::exception{
-
-private:
-    std::string _message;
+class CSAException : public std::exception{
 
 public:
-    RException( const std::string& message );
-    virtual ~RException() throw() {}
+    CSAException( const std::string& message );
+    virtual ~CSAException() throw() {}
 
-    virtual const std::string& Message() const throw();
+    virtual const std::string& message() const throw();
 
+private:
+    std::string m_message;
 };
 
-inline const std::string& RException::Message() const throw(){
-    return _message;
+inline const std::string& CSAException::message() const throw(){
+    return m_message;
 }
 
 }// namespace
 
-#endif // !REXCEPTION_HPP
+#endif // !CSAEXCEPTION_HPP
