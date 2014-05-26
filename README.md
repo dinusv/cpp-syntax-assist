@@ -10,7 +10,7 @@ Libclang is used to parse the c++ code and create the hooks, while a javascript 
 
 Given a file *csaexception.h* :
 
-```
+```C++
 #include <exception>
 #include <string>
 
@@ -37,7 +37,7 @@ inline const std::string& CSAException::message() const throw(){
 
 Within c++ snippet assist, the following hooks will be created : 
 
-```
+```C++
 // HOOK_FILE_BEGIN
 #include <exception>
 #include <string>
