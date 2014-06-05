@@ -38,8 +38,6 @@ public:
 signals:
     void selectedChanged();
 
-//public slots:
-
 protected:
 
 private:
@@ -51,8 +49,6 @@ private:
 
     int       m_codebaseSelected;
 };
-
-
 
 inline int SyntaxTreeModel::rowCount(const QModelIndex &) const{
     return m_items.count();
