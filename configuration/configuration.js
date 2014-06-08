@@ -136,36 +136,3 @@ var csafile = {
         }
     }
 };
-
-//csa.add.namespace('ns');
-//csa.select.namespace("demo");
-
-//("evaluated");
-
-// Instruction to array
-/*
-
-cas.add({
-    "qmacro"  : "alksdmla"
-    "public"  : "get/set"
-    "private" : ""
-});
-
-Internal
-Position pos = map[strIndex]
-Reverse position to not influence
-
-
-each object has position flags
-class position flags { 
-    "qmacro", "public", "protected", "private", "implementation", "cursor"
-}
-namespace position flags {
-    "cursor", "end", "start"
-}
-file position flags{
-    "start", "end"
-}
-
-
-*/
