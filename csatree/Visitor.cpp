@@ -19,49 +19,53 @@
 #include "TokenClassifier.hpp"
 #include "AnnotatedTokenSet.hpp"
 #include "SourceLocation.hpp"
-#include "CSANode.hpp"
-#include "CSANamespace.hpp"
-#include "CSAClass.hpp"
-#include "CSAAccessSpecifier.hpp"
-#include "CSAField.hpp"
-#include "CSAMethod.hpp"
-#include "CSAConstructor.hpp"
-#include "CSADestructor.hpp"
+#include "QASTNode.hpp"
+#include "QASTNamespace.hpp"
+#include "QASTClass.hpp"
+#include "QASTAccessSpecifier.hpp"
+#include "QASTField.hpp"
+#include "QASTMethod.hpp"
+#include "QASTConstructor.hpp"
+#include "QASTDestructor.hpp"
 
 #include <QDebug>
 
 namespace csa{
 using namespace ast;
 
+
+
 class VisitorClientData{
 
 public:
-    VisitorClientData( TokenClassifier* classifier, CSANode* node )
+    VisitorClientData( TokenClassifier* classifier, QASTNode* node )
         : m_node(node)
         , m_classifier(classifier){
     }
 
-    void     setNode(CSANode* node){ m_node = node; }
-    CSANode* node(){ return m_node; }
+    void     setNode(QASTNode* node){ m_node = node; }
+    QASTNode* node(){ return m_node; }
     TokenClassifier* classifier(){ return m_classifier; }
 
 private:
-    CSANode*         m_node;
+    QASTNode*         m_node;
     TokenClassifier* m_classifier;
 
 };
 
+
+
 Visitor::Visitor(){
 }
 
-void Visitor::createCSANodeTree(const CXCursor &rootCursor, CSANode *root, TokenClassifier *classifier){
+void Visitor::createCSANodeTree(const CXCursor &rootCursor, QASTNode *root, TokenClassifier *classifier){
     VisitorClientData* data = new VisitorClientData(classifier, root);
     clang_visitChildren(rootCursor, Visitor::callback, (CXClientData)data);
     delete data;
 }
 
 CXChildVisitResult Visitor::callback(CXCursor cursor, CXCursor, CXClientData data){
-    CSANode* csanode            = static_cast<VisitorClientData*>(data)->node();
+    QASTNode* csanode            = static_cast<VisitorClientData*>(data)->node();
     TokenClassifier* classifier = static_cast<VisitorClientData*>(data)->classifier();
 
     CXSourceLocation loc = clang_getCursorLocation(cursor);
@@ -86,25 +90,62 @@ CXChildVisitResult Visitor::callback(CXCursor cursor, CXCursor, CXClientData dat
         }
         break;
     case CXCursor_Namespace :
-        csanode = new CSANamespace(cursorTokenSet, new SourceLocation(loc), new SourceLocation(locStart), new SourceLocation(locEnd), csanode);
+        csanode = new QASTNamespace(
+                    cursorTokenSet,
+                    new SourceLocation(loc),
+                    new SourceLocation(locStart),
+                    new SourceLocation(locEnd),
+                    csanode);
         break;
     case CXCursor_ClassDecl :
-        csanode = new CSAClass(cursorTokenSet, new SourceLocation(loc), new SourceLocation(locStart), new SourceLocation(locEnd), csanode);
+        csanode = new QASTClass(
+                    cursorTokenSet,
+                    new SourceLocation(loc),
+                    new SourceLocation(locStart),
+                    new SourceLocation(locEnd),
+                    csanode);
         break;
     case CXCursor_CXXAccessSpecifier :
-        csanode = new CSAAccessSpecifier(cursorTokenSet, new SourceLocation(loc), new SourceLocation(locStart), new SourceLocation(locEnd), csanode);
+        csanode = new QASTAccessSpecifier(
+                    cursorTokenSet,
+                    new SourceLocation(loc),
+                    new SourceLocation(locStart),
+                    new SourceLocation(locEnd),
+                    csanode);
         break;
     case CXCursor_FieldDecl :
-        csanode = new CSAField(cursorTokenSet, new SourceLocation(loc), new SourceLocation(locStart), new SourceLocation(locEnd), csanode);
+        csanode = new QASTField(
+                    cursorTokenSet,
+                    new SourceLocation(loc),
+                    new SourceLocation(locStart),
+                    new SourceLocation(locEnd),
+                    csanode);
         break;
     case CXCursor_Constructor :
-        csanode = new CSAConstructor(cursorTokenSet, classifier, new SourceLocation(loc), new SourceLocation(locStart), new SourceLocation(locEnd), csanode);
+        csanode = new QASTConstructor(
+                    cursorTokenSet,
+                    classifier,
+                    new SourceLocation(loc),
+                    new SourceLocation(locStart),
+                    new SourceLocation(locEnd),
+                    csanode);
         break;
     case CXCursor_Destructor :
-        csanode = new CSADestructor(cursorTokenSet, new SourceLocation(loc), new SourceLocation(locStart), new SourceLocation(locEnd), csanode);
+        csanode = new QASTDestructor(
+                    cursorTokenSet,
+                    new SourceLocation(loc),
+                    new SourceLocation(locStart),
+                    new SourceLocation(locEnd),
+                    csanode);
         break;
     case CXCursor_CXXMethod :
-        csanode = new CSAMethod(cursorTokenSet, classifier, new SourceLocation(loc), new SourceLocation(locStart), new SourceLocation(locEnd), csanode);
+        csanode = new QASTMethod(
+                    cursorTokenSet,
+                    classifier,
+                    new SourceLocation(loc),
+                    new SourceLocation(locStart),
+                    new SourceLocation(locEnd),
+                    csanode);
         break;
     default:
         break;

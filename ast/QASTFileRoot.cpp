@@ -15,33 +15,20 @@
 ****************************************************************************/
 
 
-#ifndef CSADESTRUCTOR_HPP
-#define CSADESTRUCTOR_HPP
-
-#include "CSANode.hpp"
+#include "CSAFileRoot.hpp"
+#include "SourceLocation.hpp"
+#include "TokenClassifier.hpp"
 
 namespace csa{ namespace ast{
 
-class CSADestructor : public CSANode{
+QASTFile::QASTFile(const std::string& file, SourceLocation *endOfFile)
+    : QASTNode("file",
+              new SourceLocation(file, 0, 0, 0),
+              new SourceLocation(file, 0, 0, 0),
+              endOfFile, 0)
+    , m_identifier(file){
 
-public:
-    CSADestructor(AnnotatedTokenSet* tokenSet, SourceLocation* cursorLocation, SourceLocation* rangeStartLocation, SourceLocation* rangeEndLocation, CSANode* parent = 0);
 
-    std::string content() const;
-    std::string identifier() const;
-
-private:
-    std::string m_identifier;
-};
-
-inline std::string CSADestructor::identifier() const{
-    return m_identifier;
 }
 
-inline std::string CSADestructor::content() const{
-    return m_identifier;
-}
-
-}}// namespace
-
-#endif // CSADESTRUCTOR_HPP
+}}//namespace

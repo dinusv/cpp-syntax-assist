@@ -15,27 +15,38 @@
 ****************************************************************************/
 
 
-#ifndef VISITOR_HPP
-#define VISITOR_HPP
+#ifndef CSAFIELD_HPP
+#define CSAFIELD_HPP
 
-#include "clang-c/Index.h"
+#include "QASTNode.hpp"
 
-namespace csa{
+namespace csa{ namespace ast{
 
-class TokenClassifier;
-namespace ast{ class QASTNode; }
-
-
-class Visitor{
+class QASTField : public QASTNode{
 
 public:
-    Visitor();
+    QASTField(
+            AnnotatedTokenSet* tokenSet,
+            SourceLocation* cursorLocation,
+            SourceLocation* rangeStartLocation,
+            SourceLocation* rangeEndLocation,
+            QASTNode* parent = 0);
 
-    static void createCSANodeTree(const CXCursor& rootCursor, ast::QASTNode* root, TokenClassifier* classifier );
-    static CXChildVisitResult callback(CXCursor cursor, CXCursor, CXClientData data);
+    std::string content() const;
+    std::string identifier() const;
 
+private:
+    std::string m_identifier;
 };
 
-}// namespace
+inline std::string QASTField::identifier() const{
+    return m_identifier;
+}
 
-#endif // VISITOR_HPP
+inline std::string QASTField::content() const{
+    return m_identifier;
+}
+
+}}// namespace
+
+#endif // CSAFIELD_HPP

@@ -15,17 +15,17 @@
 ****************************************************************************/
 
 
-#ifndef CSAFIELD_HPP
-#define CSAFIELD_HPP
+#ifndef CSAFILEROOT_HPP
+#define CSAFILEROOT_HPP
 
 #include "CSANode.hpp"
 
 namespace csa{ namespace ast{
 
-class CSAField : public CSANode{
+class QASTFile : public QASTNode{
 
 public:
-    CSAField(AnnotatedTokenSet* tokenSet, SourceLocation* cursorLocation, SourceLocation* rangeStartLocation, SourceLocation* rangeEndLocation, CSANode* parent = 0);
+    QASTFile(const std::string& file, SourceLocation* endOfFile);
 
     std::string content() const;
     std::string identifier() const;
@@ -34,14 +34,14 @@ private:
     std::string m_identifier;
 };
 
-inline std::string CSAField::identifier() const{
+inline std::string QASTFile::content() const{
+    return std::string("file \"") + m_identifier + "\"";
+}
+
+inline std::string QASTFile::identifier() const{
     return m_identifier;
 }
 
-inline std::string CSAField::content() const{
-    return m_identifier;
-}
+}}//namespace
 
-}}// namespace
-
-#endif // CSAFIELD_HPP
+#endif // CSAFILEROOT_HPP

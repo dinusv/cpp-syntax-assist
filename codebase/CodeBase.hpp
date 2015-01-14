@@ -25,7 +25,7 @@ namespace csa{
     class TokenClassifier;
     class SourceLocation;
     namespace ast{
-        class CSANode;
+        class QASTNode;
     }
 }
 
@@ -42,7 +42,7 @@ public:
             SyntaxTreeModel*   treeModel,
             QObject*           parent = 0);
 
-    csa::ast::CSANode* selected();
+    csa::ast::QASTNode* selected();
 
     void reparse();
     void propagateUserCursor(int offset, const QString& file);
@@ -56,14 +56,14 @@ public slots:
     QString nodeIdentifier() const;
 
 private:
-    csa::ast::CSANode* m_root;
-    csa::ast::CSANode* m_current;
+    csa::ast::QASTNode* m_root;
+    csa::ast::QASTNode* m_current;
 
     SyntaxTreeModel*      m_treeModel;
     csa::TokenClassifier* m_classifier;
  };
 
-inline csa::ast::CSANode *CodeBase::selected(){
+inline csa::ast::QASTNode *CodeBase::selected(){
     return m_current;
 }
 

@@ -15,35 +15,33 @@
 ****************************************************************************/
 
 
-#ifndef CSACLASS_HPP
-#define CSACLASS_HPP
+#ifndef CSANAMESPACE_HPP
+#define CSANAMESPACE_HPP
 
-#include "CSANode.hpp"
+#include "QASTNode.hpp"
 
-namespace csa{ namespace ast{
+namespace csa{
+class AnnotatedTokenSet;
 
-class CSAClass : public CSANode{
+namespace ast{
+
+class QASTNamespace : public QASTNode{
 
 public:
     enum OffsetId{
         BEGIN = 0,
         END,
-        QPROPERTY,
-        PUBLIC,
-        PROTECTED,
-        PRIVATE,
-        IMPLEMENTATION,
         CURSOR
     };
 
 public:
-    CSAClass(
+    QASTNamespace(
             AnnotatedTokenSet* tokenSet,
             SourceLocation* cursorLocation,
             SourceLocation* rangeStartLocation,
             SourceLocation* rangeEndLocation,
-            CSANode* parent = 0);
-    virtual ~CSAClass();
+            QASTNode* parent = 0);
+    virtual ~QASTNamespace();
 
     virtual std::string content() const;
     virtual std::string identifier() const;
@@ -51,28 +49,25 @@ public:
     virtual const SourceLocation* location(const std::string& id) const;
     virtual const SourceLocation* location(int id) const;
 
-    void setChildLocation(OffsetId id, const SourceLocation& location);
-
-    virtual CSANode* propagateUserCursor(const SourceLocation &location);
+    virtual QASTNode* propagateUserCursor(const SourceLocation &location);
 
 private:
     std::string        m_identifier;
-    CSANode::OffsetMap m_offsets;
-    OffsetId           m_lastSet;
-    bool               m_offsetsBeginSet;
+    QASTNode::OffsetMap m_offsets;
 
-    static const CSANode::OffsetKeyMap OFFSET_KEYS;
-    static const CSANode::OffsetKeyMap createOffsetKeys();
+    static const QASTNode::OffsetKeyMap OFFSET_KEYS;
+    static const QASTNode::OffsetKeyMap createOffsetKeys();
 };
 
-inline std::string CSAClass::content() const{
-    return typeString() + m_identifier;
+inline std::string QASTNamespace::content() const{
+    return typeString() + identifier();
 }
 
-inline std::string CSAClass::identifier() const{
+inline std::string QASTNamespace::identifier() const{
     return m_identifier;
 }
 
+
 }}// namespace
 
-#endif // CSACLASS_HPP
+#endif // CSANAMESPACE_HPP

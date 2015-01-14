@@ -24,20 +24,20 @@
 
 namespace csa{ namespace ast{
 
-const CSANode::OffsetKeyMap CSANamespace::OFFSET_KEYS = CSANamespace::createOffsetKeys();
+const QASTNode::OffsetKeyMap QASTNamespace::OFFSET_KEYS = QASTNamespace::createOffsetKeys();
 
-CSANamespace::CSANamespace(
+QASTNamespace::QASTNamespace(
         AnnotatedTokenSet *tokenSet,
         SourceLocation* cursorLocation,
         SourceLocation* rangeStartLocation,
         SourceLocation* rangeEndLocation,
-        CSANode *parent)
-    : CSANode("namespace", cursorLocation, rangeStartLocation, rangeEndLocation, parent ){
+        QASTNode *parent)
+    : QASTNode("namespace", cursorLocation, rangeStartLocation, rangeEndLocation, parent ){
 
     // Set default offsets
-    m_offsets[CSANamespace::BEGIN]  = new SourceLocation(*rangeStartLocation);
-    m_offsets[CSANamespace::END]    = new SourceLocation(*rangeEndLocation);
-    m_offsets[CSANamespace::CURSOR] = 0;
+    m_offsets[QASTNamespace::BEGIN]  = new SourceLocation(*rangeStartLocation);
+    m_offsets[QASTNamespace::END]    = new SourceLocation(*rangeEndLocation);
+    m_offsets[QASTNamespace::CURSOR] = 0;
 
     // Find '{' and '}' in token set
     for ( AnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
@@ -48,11 +48,11 @@ CSANamespace::CSANamespace(
             std::string tokenStdString     = clang_getCString(tokenString);
             CXSourceLocation tokenLocation = clang_getTokenLocation(tokenSet->translationUnit(), *it);
             if ( tokenStdString == "{" ){
-                SourceLocation* sl = m_offsets[CSANamespace::BEGIN];
+                SourceLocation* sl = m_offsets[QASTNamespace::BEGIN];
                 sl->assign(tokenLocation);
                 sl->assign(sl->offset() + 1, tokenSet->translationUnit());
             } else if ( tokenStdString == "}" ){
-                SourceLocation* sl = m_offsets[CSANamespace::END];
+                SourceLocation* sl = m_offsets[QASTNamespace::END];
                 sl->assign(tokenLocation);
             }
             clang_disposeString(tokenString);
@@ -65,43 +65,43 @@ CSANamespace::CSANamespace(
     clang_disposeString(name);
 }
 
-CSANamespace::~CSANamespace(){
-    for ( CSANode::OffsetMap::iterator it = m_offsets.begin(); it != m_offsets.end(); ++it ){
+QASTNamespace::~QASTNamespace(){
+    for ( QASTNode::OffsetMap::iterator it = m_offsets.begin(); it != m_offsets.end(); ++it ){
         delete it->second;
     }
     m_offsets.clear();
 }
 
-const SourceLocation *CSANamespace::location(const std::string &id) const{
-    CSANode::OffsetKeyMap::const_iterator it = OFFSET_KEYS.find(id);
+const SourceLocation *QASTNamespace::location(const std::string &id) const{
+    QASTNode::OffsetKeyMap::const_iterator it = OFFSET_KEYS.find(id);
     if ( it == OFFSET_KEYS.end() )
         return 0;
-    return CSANamespace::location(it->second);
+    return QASTNamespace::location(it->second);
 }
 
-const SourceLocation *CSANamespace::location(int id) const{
-    CSANode::OffsetMap::const_iterator it = m_offsets.find(id);
+const SourceLocation *QASTNamespace::location(int id) const{
+    QASTNode::OffsetMap::const_iterator it = m_offsets.find(id);
     if ( it == m_offsets.end() )
         return 0;
     return it->second;
 }
 
-CSANode *CSANamespace::propagateUserCursor(const SourceLocation &location){
-    CSANode* base = this;
+QASTNode *QASTNamespace::propagateUserCursor(const SourceLocation &location){
+    QASTNode* base = this;
     if ( rangeStartLocation().offset() <= location.offset() && rangeEndLocation().offset() >= location.offset() ){
-        m_offsets[CSANamespace::CURSOR] = new SourceLocation(location);
-        CSANode* result = CSANode::propagateUserCursor(location);
+        m_offsets[QASTNamespace::CURSOR] = new SourceLocation(location);
+        QASTNode* result = QASTNode::propagateUserCursor(location);
         if ( result != 0 )
             base = result;
     }
     return base;
 }
 
-const CSANode::OffsetKeyMap CSANamespace::createOffsetKeys(){
-    CSANode::OffsetKeyMap base;
-    base["BEGIN"]  = CSANamespace::BEGIN;
-    base["END"]    = CSANamespace::END;
-    base["CURSOR"] = CSANamespace::CURSOR;
+const QASTNode::OffsetKeyMap QASTNamespace::createOffsetKeys(){
+    QASTNode::OffsetKeyMap base;
+    base["BEGIN"]  = QASTNamespace::BEGIN;
+    base["END"]    = QASTNamespace::END;
+    base["CURSOR"] = QASTNamespace::CURSOR;
     return base;
 }
 

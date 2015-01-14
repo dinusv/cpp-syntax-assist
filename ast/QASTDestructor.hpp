@@ -15,21 +15,22 @@
 ****************************************************************************/
 
 
-#ifndef CSAMETHOD_HPP
-#define CSAMETHOD_HPP
+#ifndef CSADESTRUCTOR_HPP
+#define CSADESTRUCTOR_HPP
 
-#include "CSANode.hpp"
+#include "QASTNode.hpp"
 
-namespace csa{
+namespace csa{ namespace ast{
 
-class TokenClassifier;
-
-namespace ast{
-
-class CSAMethod : public CSANode{
+class QASTDestructor : public QASTNode{
 
 public:
-    CSAMethod(AnnotatedTokenSet* tokenSet, TokenClassifier* classifier, SourceLocation* cursorLocation, SourceLocation* rangeStartLocation, SourceLocation* rangeEndLocation, CSANode* parent = 0);
+    QASTDestructor(
+            AnnotatedTokenSet* tokenSet,
+            SourceLocation* cursorLocation,
+            SourceLocation* rangeStartLocation,
+            SourceLocation* rangeEndLocation,
+            QASTNode* parent = 0);
 
     std::string content() const;
     std::string identifier() const;
@@ -38,14 +39,14 @@ private:
     std::string m_identifier;
 };
 
-inline std::string CSAMethod::identifier() const{
+inline std::string QASTDestructor::identifier() const{
     return m_identifier;
 }
 
-inline std::string CSAMethod::content() const{
+inline std::string QASTDestructor::content() const{
     return m_identifier;
 }
 
 }}// namespace
 
-#endif // CSAMETHOD_HPP
+#endif // CSADESTRUCTOR_HPP

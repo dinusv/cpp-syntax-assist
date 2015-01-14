@@ -15,17 +15,27 @@
 ****************************************************************************/
 
 
-#ifndef CSAFILEROOT_HPP
-#define CSAFILEROOT_HPP
+#ifndef CSACONSTRUCTOR_HPP
+#define CSACONSTRUCTOR_HPP
 
-#include "CSANode.hpp"
+#include "QASTNode.hpp"
 
-namespace csa{ namespace ast{
+namespace csa{
 
-class CSAFileRoot : public CSANode{
+class TokenClassifier;
+
+namespace ast{
+
+class QASTConstructor : public QASTNode{
 
 public:
-    CSAFileRoot(const std::string& file, SourceLocation* endOfFile);
+    QASTConstructor(
+            AnnotatedTokenSet* tokenSet,
+            TokenClassifier* classifier,
+            SourceLocation* cursorLocation,
+            SourceLocation* rangeStartLocation,
+            SourceLocation* rangeEndLocation,
+            QASTNode* parent = 0);
 
     std::string content() const;
     std::string identifier() const;
@@ -34,14 +44,14 @@ private:
     std::string m_identifier;
 };
 
-inline std::string CSAFileRoot::content() const{
-    return std::string("file \"") + m_identifier + "\"";
-}
-
-inline std::string CSAFileRoot::identifier() const{
+inline std::string QASTConstructor::identifier() const{
     return m_identifier;
 }
 
-}}//namespace
+inline std::string QASTConstructor::content() const{
+    return m_identifier;
+}
 
-#endif // CSAFILEROOT_HPP
+}}// namespace
+
+#endif // CSACONSTRUCTOR_HPP

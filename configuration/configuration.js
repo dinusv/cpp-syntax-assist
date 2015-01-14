@@ -72,10 +72,10 @@ var csaclass = {
 
             var methodDecl =
                     '\t' + (isReference ? 'const ' : '') + typeName +
-                    (isReference ? '& '   : '') + varName  +
+                    (isReference ? '& '   : ' ') + varName  +
                     '() const;\n' +
 
-                    '\tvoid Set' + varName + '(' +
+                    '\tvoid set' + capitaliseFirstLetter(varName) + '(' +
                     (isReference ? 'const ' : '') +
                     typeName +
                     (isReference ? '& ' : ' ') +

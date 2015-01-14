@@ -86,7 +86,7 @@ CodeBase::CodeBase(
     CXFile   clangFile    = clang_getFile(transUnit, file.toStdString().c_str());
 
     m_classifier = new TokenClassifier(transUnit, file.toStdString().c_str());
-    m_root       = new CSAFileRoot(
+    m_root       = new QASTFile(
                 file.toStdString(),
                 new SourceLocation(clang_getLocationForOffset(transUnit, clangFile, TokenClassifier::getFileSize(file.toStdString().c_str()))));
     m_current    = m_root;
@@ -134,7 +134,7 @@ void CodeBase::propagateUserCursor(int line, int column, const QString &file){
 }
 
 void CodeBase::propagateUserCursor(const SourceLocation &location){
-    CSANode* deepest = m_root->propagateUserCursor(location);
+    QASTNode* deepest = m_root->propagateUserCursor(location);
     if ( deepest != 0 ){
         std::string dump;
         deepest->dump(dump);
@@ -151,7 +151,7 @@ bool CodeBase::select(const QString &typeString, const QString &name){
             m_treeModel->setSelected(m_current);
         return true;
     } else if ( typeString == "up" ){
-        CSANode* result = m_current->parent();
+        QASTNode* result = m_current->parent();
         if ( result ){
             m_current = result;
             if ( m_treeModel )
@@ -159,7 +159,7 @@ bool CodeBase::select(const QString &typeString, const QString &name){
             return true;
         }
     } else {
-        CSANode* result = m_current->find(typeString.toStdString(), name.toStdString());
+        QASTNode* result = m_current->find(typeString.toStdString(), name.toStdString());
         if ( result ){
             m_current = result;
             if ( m_treeModel )

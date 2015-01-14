@@ -27,7 +27,7 @@ class SyntaxTreeItem{
 public:
     int      indent;
     int      line;
-    CSANode* node;
+    QASTNode* node;
     QString  identifier;
     QString  type;
 
@@ -55,14 +55,14 @@ void SyntaxTreeModel::clear(){
     m_items.clear();
 }
 
-void SyntaxTreeModel::parse(CSANode *root){
+void SyntaxTreeModel::parse(QASTNode *root){
     beginResetModel();
     clear();
     recursiveParse(root, 0);
     endResetModel();
 }
 
-void SyntaxTreeModel::recursiveParse(CSANode *node, int indent){
+void SyntaxTreeModel::recursiveParse(QASTNode *node, int indent){
 
     SyntaxTreeItem* item = new SyntaxTreeItem;
     item->identifier   = node->identifier().c_str();
@@ -71,7 +71,7 @@ void SyntaxTreeModel::recursiveParse(CSANode *node, int indent){
     item->type   = node->typeString().c_str();
     item->line   = node->rangeStartLocation().line();
     m_items.append(item);
-    for ( CSANode::Iterator it = node->childrenBegin(); it != node->childrenEnd(); ++it ){
+    for ( QASTNode::Iterator it = node->childrenBegin(); it != node->childrenEnd(); ++it ){
         recursiveParse(*it, indent + 1);
     }
 }
@@ -88,7 +88,7 @@ QVariant SyntaxTreeModel::data(const QModelIndex &index, int role) const{
     return QVariant();
 }
 
-void SyntaxTreeModel::setSelected(csa::ast::CSANode *node){
+void SyntaxTreeModel::setSelected(csa::ast::QASTNode *node){
     for ( int i = 0; i < m_items.size(); ++i ){
         SyntaxTreeItem* item = m_items[i];
         if ( item->node == node ){

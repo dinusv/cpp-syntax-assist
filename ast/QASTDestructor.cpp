@@ -22,14 +22,14 @@
 
 namespace csa{ namespace ast{
 
-CSADestructor::CSADestructor(
+QASTDestructor::QASTDestructor(
         AnnotatedTokenSet *tokenSet,
         SourceLocation* cursorLocation,
         SourceLocation* rangeStartLocation,
         SourceLocation* rangeEndLocation,
-        CSANode* parent)
+        QASTNode* parent)
 
-    : CSANode("destructor", cursorLocation, rangeStartLocation, rangeEndLocation, parent){
+    : QASTNode("destructor", cursorLocation, rangeStartLocation, rangeEndLocation, parent){
 
 
     if ( tokenSet->size() == 0 ){

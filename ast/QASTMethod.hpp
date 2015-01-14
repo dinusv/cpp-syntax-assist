@@ -15,33 +15,43 @@
 ****************************************************************************/
 
 
-#ifndef CSAACCESSSPECIFIER_HPP
-#define CSAACCESSSPECIFIER_HPP
+#ifndef CSAMETHOD_HPP
+#define CSAMETHOD_HPP
 
-#include "CSANode.hpp"
+#include "QASTNode.hpp"
 
-namespace csa{ namespace ast{
+namespace csa{
 
-class CSAAccessSpecifier : public CSANode{
+class TokenClassifier;
+
+namespace ast{
+
+class QASTMethod : public QASTNode{
 
 public:
-    CSAAccessSpecifier(AnnotatedTokenSet* tokenSet, SourceLocation* cursorLocation, SourceLocation* rangeStartLocation, SourceLocation* rangeEndLocation, CSANode* parent = 0);
+    QASTMethod(
+            AnnotatedTokenSet* tokenSet,
+            TokenClassifier* classifier,
+            SourceLocation* cursorLocation,
+            SourceLocation* rangeStartLocation,
+            SourceLocation* rangeEndLocation,
+            QASTNode* parent = 0);
 
-    virtual std::string content() const;
-    virtual std::string identifier() const;
+    std::string content() const;
+    std::string identifier() const;
 
 private:
-    std::string m_typeValueName;
+    std::string m_identifier;
 };
 
-inline std::string CSAAccessSpecifier::content() const{
-    return m_typeValueName + " :";
+inline std::string QASTMethod::identifier() const{
+    return m_identifier;
 }
 
-inline std::string CSAAccessSpecifier::identifier() const{
-    return m_typeValueName;
+inline std::string QASTMethod::content() const{
+    return m_identifier;
 }
 
 }}// namespace
 
-#endif // CSAACCESSSPECIFIER_HPP
+#endif // CSAMETHOD_HPP

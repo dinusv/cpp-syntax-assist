@@ -46,24 +46,28 @@ int main(int argc, char *argv[]){
     for ( ; it != arguments.end(); ++it ){
         if ( *it == "-c" ){
             if ( ++it == arguments.end() ){
-                qCritical( ("Error parsing command line arguments: no value after '-c'. Usage : " + argUsage).toStdString().c_str() );
+                qCritical( (   "Error parsing command line arguments: no value after '-c'. Usage : " +
+                               argUsage).toStdString().c_str() );
                 return 1;
             }
             argOffset = (*it).toInt();
         } else if ( *it == "-cl" ){
             if ( ++it == arguments.end() ){
-                qCritical( ("Error parsing command line arguments: no line value after '-cl'. Usage : " + argUsage).toStdString().c_str() );
+                qCritical( (   "Error parsing command line arguments: no line value after '-cl'. Usage : " +
+                               argUsage).toStdString().c_str() );
                 return 1;
             }
             argLine   = (*it).toInt();
             if ( ++it == arguments.end() ){
-                qCritical( ("Error parsing command line arguments: no column value after '-cl'. Usage : " + argUsage).toStdString().c_str() );
+                qCritical( (   "Error parsing command line arguments: no column value after '-cl'. Usage : " +
+                               argUsage).toStdString().c_str() );
                 return 1;
             }
             argColumn = (*it).toInt();
         } else if ( *it == "-e" ){
             if ( ++it == arguments.end() ){
-                qCritical( ("Error parsing command line arguments: no command value after '-e'. Usage : " + argUsage).toStdString().c_str() );
+                qCritical( (   "Error parsing command line arguments: no command value after '-e'. Usage : " +
+                               argUsage).toStdString().c_str() );
                 return 1;
             }
             argCommand = (*it);
@@ -75,7 +79,8 @@ int main(int argc, char *argv[]){
     }
 
     if ( argFile == "" ){
-        qCritical( ("Error parsing comamnd line arguments : no file specified. Usage : " + argUsage).toStdString().c_str() );
+        qCritical( (
+            "Error parsing comamnd line arguments : no file specified. Usage : " + argUsage).toStdString().c_str() );
         return 1;
     }
     if ( argOffset == -1 && argColumn == -1 )// user no cursor
@@ -108,7 +113,9 @@ int main(int argc, char *argv[]){
     QScriptValue result = configEngine.globalObject();
     if ( configEngine.hasUncaughtException() ){
         int line = configEngine.uncaughtExceptionLineNumber();
-        qFatal( ("Uncaught javascript exception at line " + QString::number(line) + ":" + result.toString()).toStdString().c_str());
+        qFatal( (
+                    "Uncaught javascript exception at line " + QString::number(line) + ":" +
+                    result.toString()).toStdString().c_str());
         return 3;
     }
 

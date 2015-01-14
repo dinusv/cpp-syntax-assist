@@ -23,6 +23,7 @@ include(qtquick2applicationviewer/qtquick2applicationviewer.pri)
 qtcAddDeployment()
 
 include(csatree/csatree.pri)
+include(ast/ast.pri)
 include(codebase/codebase.pri)
 include(3rdparty/libclang.pro)
 

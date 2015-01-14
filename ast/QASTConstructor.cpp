@@ -15,26 +15,23 @@
 ****************************************************************************/
 
 
-#include "CSAMethod.hpp"
+#include "CSAConstructor.hpp"
 #include "CSAClass.hpp"
 #include "AnnotatedTokenSet.hpp"
 #include "TokenClassifier.hpp"
-#include "SourceLocation.hpp"
 #include "clang-c/Index.h"
-
-#include <QDebug>
 
 namespace csa{ namespace ast{
 
-CSAMethod::CSAMethod(
+QASTConstructor::QASTConstructor(
         AnnotatedTokenSet *tokenSet,
         TokenClassifier* classifier,
         SourceLocation* cursorLocation,
         SourceLocation* rangeStartLocation,
         SourceLocation* rangeEndLocation,
-        CSANode* parent)
+        QASTNode* parent)
 
-    : CSANode("method", cursorLocation, rangeStartLocation, rangeEndLocation, parent){
+    : QASTNode("constructor", cursorLocation, rangeStartLocation, rangeEndLocation, parent){
 
     if ( tokenSet->size() == 0 ){
         CXType type          = clang_getCursorType(tokenSet->cursor());
@@ -43,8 +40,6 @@ CSAMethod::CSAMethod(
         m_identifier         = cTypeStr;
         clang_disposeString(typeStr);
     }
-
-    bool spaceFlag = false;
 
     for ( AnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
         CXToken t = *it;
@@ -60,27 +55,23 @@ CSAMethod::CSAMethod(
                 AnnotatedTokenSet* cursorTokenSet = classifier->findTokenSet(crs);
 
                 if ( cursorTokenSet ){
-                    bool argSpaceFlag = false;
+                    bool spaceFlag = false;
                     for ( AnnotatedTokenSet::Iterator it = cursorTokenSet->begin(); it != cursorTokenSet->end(); ++it ){
                         CXToken t = *it;
-                        CXString tArgSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
-                        CXTokenKind tArgKind  = clang_getTokenKind(t);
-                        if ( tArgKind == CXToken_Punctuation ){
-
-                            m_identifier += clang_getCString(tArgSpelling);
-
-                            if ( std::string(clang_getCString(tArgSpelling)) == "&" || std::string(clang_getCString(tArgSpelling)) == "*" )
-                                m_identifier += " ";
-                            argSpaceFlag    = false;
+                        CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
+                        CXTokenKind tKind  = clang_getTokenKind(t);
+                        if ( tKind == CXToken_Punctuation ){
+                            m_identifier += clang_getCString(tSpelling);
+                            spaceFlag    = false;
                         } else {
-                            if ( argSpaceFlag ){
+                            if ( spaceFlag ){
                                 m_identifier += std::string(" ");
-                                argSpaceFlag = false;
+                                spaceFlag = false;
                             }
-                            m_identifier += clang_getCString(tArgSpelling);
-                            argSpaceFlag     = true;
+                            m_identifier += clang_getCString(tSpelling);
+                            spaceFlag     = true;
                         }
-                        clang_disposeString(tArgSpelling);
+                        clang_disposeString(tSpelling);
                     }
                     if ( i != numargs - 1 )
                         m_identifier += ", ";
@@ -88,21 +79,7 @@ CSAMethod::CSAMethod(
             }
 
         } else if ( tKind != CXToken_Punctuation || std::string(clang_getCString(tSpelling)) != "," ){
-            if ( tKind == CXToken_Punctuation ){
-
-                m_identifier += clang_getCString(tSpelling);
-
-                if ( std::string(clang_getCString(tSpelling)) == "&" || std::string(clang_getCString(tSpelling)) == "*" )
-                    m_identifier += " ";
-                spaceFlag    = false;
-            } else {
-                if ( spaceFlag ){
-                    m_identifier += std::string(" ");
-                    spaceFlag = false;
-                }
-                m_identifier += clang_getCString(tSpelling);
-                spaceFlag     = true;
-            }
+            m_identifier += clang_getCString(tSpelling);
         }
         clang_disposeString(tSpelling);
     }

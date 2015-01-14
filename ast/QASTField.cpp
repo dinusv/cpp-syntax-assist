@@ -25,14 +25,14 @@
 
 namespace csa{ namespace ast{
 
-CSAField::CSAField(
+QASTField::QASTField(
         AnnotatedTokenSet *tokenSet,
         SourceLocation* cursorLocation,
         SourceLocation* rangeStartLocation,
         SourceLocation* rangeEndLocation,
-        CSANode* parent)
+        QASTNode* parent)
 
-    : CSANode("field", cursorLocation, rangeStartLocation, rangeEndLocation, parent){
+    : QASTNode("field", cursorLocation, rangeStartLocation, rangeEndLocation, parent){
 
 
     if ( tokenSet->size() == 0 ){

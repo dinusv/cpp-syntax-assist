@@ -15,20 +15,38 @@
 ****************************************************************************/
 
 
-#include "CSAFileRoot.hpp"
-#include "SourceLocation.hpp"
-#include "TokenClassifier.hpp"
+#ifndef CSAACCESSSPECIFIER_HPP
+#define CSAACCESSSPECIFIER_HPP
+
+#include "QASTNode.hpp"
 
 namespace csa{ namespace ast{
 
-CSAFileRoot::CSAFileRoot(const std::string& file, SourceLocation *endOfFile)
-    : CSANode("file",
-              new SourceLocation(file, 0, 0, 0),
-              new SourceLocation(file, 0, 0, 0),
-              endOfFile, 0)
-    , m_identifier(file){
+class QASTAccessSpecifier : public QASTNode{
 
+public:
+    QASTAccessSpecifier(
+            AnnotatedTokenSet* tokenSet,
+            SourceLocation* cursorLocation,
+            SourceLocation* rangeStartLocation,
+            SourceLocation* rangeEndLocation,
+            QASTNode* parent = 0);
 
+    virtual std::string content() const;
+    virtual std::string identifier() const;
+
+private:
+    std::string m_typeValueName;
+};
+
+inline std::string QASTAccessSpecifier::content() const{
+    return m_typeValueName + " :";
 }
 
-}}//namespace
+inline std::string QASTAccessSpecifier::identifier() const{
+    return m_typeValueName;
+}
+
+}}// namespace
+
+#endif // CSAACCESSSPECIFIER_HPP
