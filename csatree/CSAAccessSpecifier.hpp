@@ -25,7 +25,12 @@ namespace csa{ namespace ast{
 class CSAAccessSpecifier : public CSANode{
 
 public:
-    CSAAccessSpecifier(AnnotatedTokenSet* tokenSet, SourceLocation* cursorLocation, SourceLocation* rangeStartLocation, SourceLocation* rangeEndLocation, CSANode* parent = 0);
+    CSAAccessSpecifier(
+            AnnotatedTokenSet* tokenSet,
+            SourceLocation* cursorLocation,
+            SourceLocation* rangeStartLocation,
+            SourceLocation* rangeEndLocation,
+            CSANode* parent = 0);
 
     virtual std::string content() const;
     virtual std::string identifier() const;

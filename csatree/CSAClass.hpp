@@ -22,6 +22,52 @@
 
 namespace csa{ namespace ast{
 
+// jSON Structure
+
+/*
+
+  object of type class
+
+  function CreteCSAClass(){
+
+  }
+
+  function CSAClass(){
+
+  }
+
+  CSAClass.prototype : {
+    // configurable methods
+    addMethod(){
+
+    }
+    insertMethod(int index){
+
+    }
+    addProperty(){
+
+    }
+  }
+
+
+
+{
+    'class' : {
+        'name' : 'csa'
+        'children' : [
+            '
+
+
+
+*/
+
+// define class private / public section as non-tree based
+// define within methods to search for class public / private section
+// add attribute of parsing parents
+// create javascript tree using js calls
+// create js engine based on tree
+
+
 class CSAClass : public CSANode{
 
 public:

@@ -14,7 +14,6 @@
 **
 ****************************************************************************/
 
-
 #include <QtGui/QGuiApplication>
 #include <QtQuick/QQuickItem>
 #include <QtScript/QScriptEngine>
@@ -30,15 +29,19 @@
 using namespace csa;
 using namespace csa::ast;
 
+// js console interpreter
+// format class to json
+
 int main(int argc, char *argv[]){
 
     QString argUsage   = "<file> [-c <offset> -cl <line> <column> -e <command> -f].";
-    QString argFile    = "";
+    QString argFile    = "D:\\Work\\Qt - Plugins\\CppSnippetAssist\\csatree\\CSAClass.hpp";
     QString argCommand = "";
     int  argOffset = -1, argLine = -1, argColumn = -1;
     bool fullCommandFlag = false;
 
     // Parse Command line arguments
+    // ----------------------------
 
     QGuiApplication app(argc, argv);
     QStringList arguments    = app.arguments();
@@ -46,24 +49,32 @@ int main(int argc, char *argv[]){
     for ( ; it != arguments.end(); ++it ){
         if ( *it == "-c" ){
             if ( ++it == arguments.end() ){
-                qCritical( ("Error parsing command line arguments: no value after '-c'. Usage : " + argUsage).toStdString().c_str() );
+                qCritical( (
+                    "Error parsing command line arguments: no value after '-c'. Usage : " + argUsage).
+                           toStdString().c_str() );
                 return 1;
             }
             argOffset = (*it).toInt();
         } else if ( *it == "-cl" ){
             if ( ++it == arguments.end() ){
-                qCritical( ("Error parsing command line arguments: no line value after '-cl'. Usage : " + argUsage).toStdString().c_str() );
+                qCritical( (
+                    "Error parsing command line arguments: no line value after '-cl'. Usage : " + argUsage).
+                            toStdString().c_str() );
                 return 1;
             }
             argLine   = (*it).toInt();
             if ( ++it == arguments.end() ){
-                qCritical( ("Error parsing command line arguments: no column value after '-cl'. Usage : " + argUsage).toStdString().c_str() );
+                qCritical( (
+                    "Error parsing command line arguments: no column value after '-cl'. Usage : " + argUsage).
+                           toStdString().c_str() );
                 return 1;
             }
             argColumn = (*it).toInt();
         } else if ( *it == "-e" ){
             if ( ++it == arguments.end() ){
-                qCritical( ("Error parsing command line arguments: no command value after '-e'. Usage : " + argUsage).toStdString().c_str() );
+                qCritical( (
+                    "Error parsing command line arguments: no command value after '-e'. Usage : " + argUsage).
+                           toStdString().c_str() );
                 return 1;
             }
             argCommand = (*it);
@@ -75,13 +86,16 @@ int main(int argc, char *argv[]){
     }
 
     if ( argFile == "" ){
-        qCritical( ("Error parsing comamnd line arguments : no file specified. Usage : " + argUsage).toStdString().c_str() );
+        qCritical((
+            "Error parsing comamnd line arguments : no file specified. Usage : " + argUsage
+        ).toStdString().c_str());
         return 1;
     }
     if ( argOffset == -1 && argColumn == -1 )// user no cursor
         argOffset = 0;
 
     // Create codebase
+    // ---------------
 
     const char* args[] = {"-c", "-x", "c++"};
 
@@ -94,6 +108,7 @@ int main(int argc, char *argv[]){
         cBase.propagateUserCursor(argLine, argColumn, argFile);
 
     // QtScript
+    // --------
 
     QFile configScript(QDir::currentPath() + "/configuration.js");
     if ( !configScript.open(QIODevice::ReadOnly) ){
@@ -113,6 +128,7 @@ int main(int argc, char *argv[]){
     }
 
     // Interpret command
+    // -----------------
 
     CommandLineInterpreter cmdInterpreter(&result, &cBase);
     if( fullCommandFlag )
