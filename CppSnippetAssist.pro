@@ -11,6 +11,16 @@ Debug:DESTDIR   = debug/../debug
 #win32:CONFIGURATION_FILE_DEST ~= s,/,\\,g
 #QMAKE_POST_LINK = $$QMAKE_COPY \"$$CONFIGURATION_FILE\" \"$$CONFIGURATION_FILE_DEST\" $$escape_expand(\\n\\t)
 
+win32:CONFIG(debug, debug|release): PLUGIN_DEPLOY = $$OUT_PWD/debug/plugins
+else:win32:CONFIG(release, debug|release): PLUGIN_DEPLOY = $$OUT_PWD/release/plugins
+else:unix: DEPLOY_PATH = $$OUT_PWD
+
+plugincopy.commands = $(COPY_DIR) \"$$PWD/plugins\" \"$$PLUGIN_DEPLOY\"
+first.depends = $(first) plugincopy
+export(first.depends)
+export(plugincopy.commands)
+QMAKE_EXTRA_TARGETS += first plugincopy
+
 # Enable javascript and console output
 
 QT     += script
