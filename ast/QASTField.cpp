@@ -43,25 +43,39 @@ QASTField::QASTField(
         clang_disposeString(typeStr);
     }
 
+    QString fieldData;
     bool spaceFlag = false;
     for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
         CXToken t = *it;
         CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
         CXTokenKind tKind  = clang_getTokenKind(t);
         if ( tKind == CXToken_Punctuation ){
-            setIdentifier(identifier() + clang_getCString(tSpelling));
+            fieldData += clang_getCString(tSpelling);
             spaceFlag    = false;
         } else {
             if ( spaceFlag ){
-                setIdentifier(identifier() + " ");
+                fieldData += " ";
                 spaceFlag = false;
             }
-            setIdentifier(identifier() + clang_getCString(tSpelling));
+            fieldData += clang_getCString(tSpelling);
             spaceFlag     = true;
         }
         clang_disposeString(tSpelling);
     }
 
+    int splitPos = fieldData.indexOf(' ');
+    if ( splitPos == -1 )
+        setIdentifier(fieldData);
+    else {
+        m_fieldType = fieldData.mid(0, splitPos);
+        setIdentifier(fieldData.mid(splitPos + 1));
+    }
+}
+
+QString QASTField::prop(const QString &key) const{
+    if ( key == "type" )
+        return m_fieldType;
+    return QASTNode::prop(key);
 }
 
 }}// namespace

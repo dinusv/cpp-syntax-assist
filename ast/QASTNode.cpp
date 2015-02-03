@@ -48,6 +48,10 @@ QASTNode::~QASTNode(){
     delete m_cursorLocation;
 }
 
+QString QASTNode::prop(const QString &) const{
+    return "";
+}
+
 QASTNode*QASTNode::astParent(){
     QASTNode* p = qobject_cast<QASTNode*>(parent());
     return p;

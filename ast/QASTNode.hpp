@@ -65,6 +65,7 @@ public slots:
     QString identifier() const;
 
     virtual QString content() const = 0;
+    virtual QString prop(const QString& key) const;
 
     QList<csa::ast::QASTNode*> astChildren() const;
     QList<csa::ast::QASTNode*> astChildren(const QString& type) const;

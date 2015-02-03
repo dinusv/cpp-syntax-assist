@@ -31,7 +31,17 @@ public:
             QSourceLocation* rangeStartLocation,
             QSourceLocation* rangeEndLocation,
             QASTNode* parent = 0);
+
+    virtual QString content() const;
+    virtual QString prop(const QString &key) const;
+
+private:
+    QString m_fieldType;
 };
+
+inline QString QASTField::content() const{
+    return m_fieldType + " " + identifier();
+}
 
 }}// namespace
 
