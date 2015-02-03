@@ -31,13 +31,7 @@ public:
             QSourceLocation* rangeStartLocation,
             QSourceLocation* rangeEndLocation,
             QASTNode* parent = 0);
-
-    QString content() const;
 };
-
-inline QString QASTField::content() const{
-    return identifier();
-}
 
 }}// namespace
 

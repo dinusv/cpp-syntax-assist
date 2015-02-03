@@ -62,26 +62,6 @@ QASTField::QASTField(
         clang_disposeString(tSpelling);
     }
 
-    // set class offsets
-//    if ( parent != 0 ){
-//        if ( parent->typeString() == "class" ){
-//            CSAClass* node = static_cast<CSAClass*>(parent);
-
-//            switch( clang_getCXXAccessSpecifier(tokenSet->cursor()) ){
-//            case CX_CXXInvalidAccessSpecifier :
-//                break;
-//            case CX_CXXPrivate :
-//                node->setChildLocation(CSAClass::PRIVATE,   *rangeStartLocation);
-//                break;
-//            case CX_CXXPublic :
-//                node->setChildLocation(CSAClass::PUBLIC,    *rangeStartLocation);
-//                break;
-//            case CX_CXXProtected :
-//                node->setChildLocation(CSAClass::PROTECTED, *rangeStartLocation);
-//                break;
-//            } // switch
-//        }
-//    }
 }
 
 }}// namespace

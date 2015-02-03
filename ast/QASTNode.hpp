@@ -75,8 +75,8 @@ public slots:
     csa::ast::QASTNode* find(const QString& typeString, const QString& identifier);
     csa::ast::QASTNode* findFirst(const QString& typeString);
     csa::ast::QASTNode* parentFind(const QString& typeString);
-    csa::ast::QASTNode* childAfter(csa::ast::QASTNode* child);
     csa::ast::QASTNode* next();
+    csa::ast::QASTNode* prev();
 
     void append(const QString& value);
     void prepend(const QString& value);
@@ -120,6 +120,9 @@ public:
 
 protected:
     void setIdentifier(const QString& identifier);
+
+    csa::ast::QASTNode* childAfter(csa::ast::QASTNode* child);
+    csa::ast::QASTNode* childBefore(csa::ast::QASTNode* child);
 
     virtual void insert(const QString& value, const QSourceLocation& location);
 

@@ -33,7 +33,7 @@ using namespace csa::ast;
 
 int main(int argc, char *argv[]){
 
-    QString argUsage   = "<file> [-c <offset> -cl <line> <column> -e <command> -f].";
+    QString argUsage   = "<file> [-c <offset> -lc <line> <column> -e <command> -f].";
     QString argFile    = "";
     QString argCommand = "";
     int  argOffset = -1, argLine = -1, argColumn = -1;
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
                 return 1;
             }
             argOffset = (*it).toInt();
-        } else if ( *it == "-cl" ){
+        } else if ( *it == "-lc" ){
             if ( ++it == arguments.end() ){
                 qCritical( (   "Error parsing command line arguments: no line value after '-cl'. Usage : " +
                                argUsage).toStdString().c_str() );
@@ -85,6 +85,7 @@ int main(int argc, char *argv[]){
             "Error parsing comamnd line arguments : no file specified. Usage : " + argUsage).toStdString().c_str() );
         return 1;
     }
+
     if ( argOffset == -1 && argColumn == -1 )// user no cursor
         argOffset = 0;
 

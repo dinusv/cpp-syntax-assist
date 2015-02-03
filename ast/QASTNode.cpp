@@ -102,6 +102,7 @@ void QASTNode::insert(const QString& value, const QSourceLocation& location){
 QASTNode *QASTNode::propagateUserCursor(const QSourceLocation &location){
     QASTNode* base = 0;
     if ( m_rangeStartLocation->offset() <= location.offset() && m_rangeEndLocation->offset() >= location.offset() ){
+        base = this;
         for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
             QASTNode* result = (*it)->propagateUserCursor(location);
             if ( result != 0 )
@@ -174,10 +175,28 @@ QASTNode* QASTNode::childAfter(QASTNode* child){
     return 0;
 }
 
+QASTNode *QASTNode::childBefore(QASTNode *child){
+    QASTNode* prevChild = 0;
+    for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
+        QASTNode* currentChild = *it;
+        if ( currentChild == child )
+            return prevChild;
+        prevChild = currentChild;
+    }
+    return 0;
+}
+
 QASTNode* QASTNode::next(){
     QASTNode* p = qobject_cast<QASTNode*>(parent());
     if ( p )
         return p->childAfter(this);
+    return 0;
+}
+
+QASTNode *QASTNode::prev(){
+    QASTNode* p = qobject_cast<QASTNode*>(parent());
+    if ( p )
+        return p->childBefore(this);
     return 0;
 }
 

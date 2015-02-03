@@ -107,6 +107,9 @@ void QCodeBase::propagateUserCursor(int offset, const QString &file){
 }
 
 void QCodeBase::propagateUserCursor(int line, int column, const QString &file){
+
+    printf("%d %d", line, column);
+
     CXTranslationUnit transUnit = m_classifier->translatinoUnit();
     CXFile cfile = clang_getFile(transUnit, file.toStdString().c_str());
     CXSourceLocation sLocation = clang_getLocation(transUnit, cfile, line, column);
