@@ -21,11 +21,15 @@
 #include <QAbstractListModel>
 #include <QHash>
 
-namespace csa{ namespace ast{
-class CSANode;
-}}
+namespace csa{
 
-class CodeBase;
+namespace ast{
+class QASTNode;
+}
+
+class QCodeBase;
+}
+
 class SyntaxTreeItem;
 class SyntaxTreeModel : public QAbstractListModel{
 
@@ -42,15 +46,15 @@ class SyntaxTreeModel : public QAbstractListModel{
 public:
     explicit SyntaxTreeModel(QObject *parent = 0);
 
-    void safeClear();
-    void parse(csa::ast::CSANode* root);
+    void clearAndReset();
+    void parse(csa::ast::QASTNode* root);
     QVariant data(const QModelIndex &index, int role) const;
     int  rowCount(const QModelIndex &) const;
     virtual QHash<int, QByteArray> roleNames() const;
 
     int selected() const;
     void setSelected(int selected);
-    void setSelected(csa::ast::CSANode* node);
+    void setSelected(csa::ast::QASTNode* node);
 
 signals:
     void selectedChanged();
@@ -58,7 +62,7 @@ signals:
 protected:
 
 private:
-    void recursiveParse(csa::ast::CSANode* node, int indent = 0);
+    void recursiveParse(csa::ast::QASTNode* node, int indent = 0);
     void clear();
 
     QHash<int, QByteArray> m_roles;
