@@ -31,6 +31,9 @@ function property(type, name, options){
     var propertyDeclaration = 'm_' + name;
     var isNotifiable        = options.indexOf('n') !== -1;
     var isReference         = options.indexOf('r') !== -1;
+    var writeMember         = options.indexOf('m') !== -1;
+    var writeGetter         = options.indexOf('g') !== -1;
+    var writeSetter         = options.indexOf('s') !== -1;
     //var isQProperty         = options.indexOf('q');
 
     var member     = '\t' + type + ' m_' + name + ';\n';
@@ -70,22 +73,43 @@ function property(type, name, options){
 
     var privateAccess = classNode.astChild('access', 'private');
     if ( privateAccess !== null ){
-        var privateDeclarations = privateAccess.astChildren();
-        if ( privateDeclarations.length > 0 )
-            privateDeclarations[privateDeclarations.length - 1].after('\n' + member);
-        else
-            privateAccess.after('\n' + member);
+        var nextPrivateMember = privateAccess.next();
+
+        while ( nextPrivateMember !== null ){
+            var afterNextPrivateMember = nextPrivateMember.next();
+            if ( afterNextPrivateMember !== null ){
+                if ( afterNextPrivateMember.typeName() === 'access' ){
+                    nextPrivateMember.afterln(member);
+                    break;
+                }
+            } else {
+                nextPrivateMember.afterln(member);
+                break;
+            }
+            nextPrivateMember = nextPrivateMember.next();
+        }
     } else {
         classNode.append('private:\n' + member);
     }
 
     var publicAccess = classNode.astChild('access', 'public');
     if ( publicAccess !== null ){
-        var publicDeclarations = publicAccess.astChildren();
-        if ( publicDeclarations.length > 0 )
-            publicDeclarations[publicDeclarations.length - 1].afterln(methodDecl + '\n');
-        else
-            publicAccess.after('\n' + methodDecl);
+
+        var nextPublicMember = publicAccess.next();
+        while ( nextPublicMember !== null ){
+            var afterNextPublicMember = nextPublicMember.next();
+            if ( afterNextPublicMember !== null ){
+                if ( afterNextPublicMember.typeName() === 'access' ){
+                    nextPublicMember.afterln(methodDecl);
+                    break;
+                }
+            } else {
+                nextPublicMember.afterln(methodDecl);
+                break;
+            }
+            nextPublicMember = nextPublicMember.next();
+        }
+
     } else {
         classNode.append('\npublic:\n' + methodDecl);
     }

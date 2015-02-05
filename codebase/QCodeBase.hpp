@@ -24,7 +24,7 @@
 #include "QASTNode.hpp"
 #include "QASTFile.hpp"
 
-class SyntaxTreeModel;
+class QSyntaxTreeModel;
 
 namespace csa{
 
@@ -40,7 +40,7 @@ public:
             const char* const* translationUnitArgs,
             int                translationUnitNumArgs,
             const QString&     file,
-            SyntaxTreeModel*   treeModel,
+            QSyntaxTreeModel*   treeModel,
             QObject*           parent = 0);
 
     csa::ast::QASTNode* selected();
@@ -63,7 +63,7 @@ private:
     csa::ast::QASTFile* m_root;
     csa::ast::QASTNode* m_current;
 
-    SyntaxTreeModel*      m_treeModel;
+    QSyntaxTreeModel*      m_treeModel;
     csa::QTokenClassifier* m_classifier;
 };
 
