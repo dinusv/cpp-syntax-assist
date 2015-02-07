@@ -1,95 +1,45 @@
 # C++ Snippet Assist
 
-A configurable c/c++ code generator that can be used as an external plugin with all IDE's that support this feature: QT Creator, Visual Studio, etc.
-
-The generator parses a selected source file, creating *hooks* within the file according to its contents, then by a set of configured instructions, code can be automatically generated at the location specified by the *hooks*.
-
-Libclang is used to parse the c++ code and create the hooks, while a javascript file is used to configure the generator statements, which can then be accessed by a simple user interface written in qml.
+A configurable C and C++ code generator that can be used as an external plugin with most IDEs. The tool uses javascript code as a means of manipulating source files.
 
 ## How it works
 
-Given a file *csaexception.h* :
+The tool parses a selected source file, and, using clang library, creates an Abstract Syntax Tree (AST) Model which is then exposed to javascript functions. Think similarly to how the Document Object Model (DOM) is used in interacting with HTML and XML files, the AST Model can provide the same convention when dealing with C or C++ files. This can become very useful when one wishes to insert predefined chunks of code within a project.  
+
+Functionality is added through javascript files as a form of plugins. Each file or plugin can contain one or more sets of functions that manipulate the file. The functions can be called through command line arguments, or by using  C++ Snippet Assists GUI. 
+
+To further clarify, let's look at an actual example. Consider the following C++ header file:
 
 ```C++
-#include <exception>
-#include <string>
-
-namespace csa{
-
-class CSAException : public std::exception{
-
+class SimpleExample{
 public:
-    CSAException( const std::string& message );
-    virtual ~CSAException() throw() {}
-
-    virtual const std::string& message() const throw();
-
-private:
-    std::string m_message;
+	SimpleExample(){}
 };
 
-inline const std::string& CSAException::message() const throw(){
-    return m_message;
-}
-
-}// namespace
 ```
 
-Within c++ snippet assist, the following hooks will be created : 
+Now, let's assume we would like to wrap this class within the 'example' namespace, and that there will be more classes that will require that, so we need to provide a means to do it automatically. By using C++ Snippet Assist we can parse the file, and create an AST Model that can be accessed by javascript plugins. To create such a plugin, we simply create a javascript file in C++ Snippet Assist's plugin directory, and create a simple function we can call later. So we can setup the file in *plugins/namespace.js*, we can add the function *wrapNamespace()*:
 
-```C++
-// HOOK_FILE_BEGIN
-#include <exception>
-#include <string>
+```js
 
-namespace csa{
-// HOOK_NAMESPACE_BEGIN
+function wrapNamespace(){
 
-class CSAException : public std::exception{
-// HOOK_CLASS_BEGIN
+	// from the codebase, we select the main file received as a command line argument
+	var fileNode = codeBase.files()[0]; 
 
-public:
-    CSAException( const std::string& message );
-    virtual ~CSAException() throw() {}
+	// we find the first class within the file
+	var classNode = fileNode.find('class');
+	
+	// we insert the namespace before and after the node
+	first.before('namespace example{\n');
+	last.afterln('\n}');
 
-    virtual const std::string& message() const throw();
-
-	// HOOK_CLASS_PUBLIC_SECTION
-	// HOOK_CLASS_PROTECTED_SECTION
-private:
-    std::string m_message;
-
-	// HOOK_CLASS_PRIVATE_SECTION
-// HOOK_CLASS_END
-};
-// HOOK_CLASS_IMPLEMENTATION
-
-inline const std::string& CSAException::message() const throw(){
-    return m_message;
+	// we save the work
+	codeBase.save();
 }
 
-// HOOK_NAMESPACE_END
-}// namespace
-// HOOK_FILE_END
-```
-
-The javascript file can be configured to generate code for files, namespaces and classes. We can configure a function that will generate a getter method for a sent property to its argument list :
-
-```JavaScript
-var csaclass = {
-    
-	'add' : {
-        'getter' : function(options){
-            // options is an array of parameters
-            var varName = options[0];
-            var varType = options[1];
-            codeBase.insert({
-				// Generate code at the public section of the class
-                'PUBLIC' :  varType + ' ' + varName + '() const{ return m_' + varName + ';}\n'
-            });
-        }
-	}
-}
 
 ```
+
+
 
