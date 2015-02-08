@@ -14,15 +14,14 @@
 **
 ****************************************************************************/
 
-
-#include "SyntaxTreeModel.hpp"
+#include "QSyntaxTreeModel.hpp"
 #include "QSourceLocation.hpp"
 #include "QASTNode.hpp"
 
 using namespace csa;
 using namespace csa::ast;
 
-class SyntaxTreeItem{
+class QSyntaxTreeItem{
 
 public:
     int      indent;
@@ -33,38 +32,38 @@ public:
 
 };
 
-SyntaxTreeModel::SyntaxTreeModel(QObject *parent)
+QSyntaxTreeModel::QSyntaxTreeModel(QObject *parent)
     : QAbstractListModel(parent){
 
-    m_roles[SyntaxTreeModel::Identifier] = "identifier";
-    m_roles[SyntaxTreeModel::Indent]     = "indent";
-    m_roles[SyntaxTreeModel::Type]       = "type";
-    m_roles[SyntaxTreeModel::Line]       = "line";
+    m_roles[QSyntaxTreeModel::Identifier] = "identifier";
+    m_roles[QSyntaxTreeModel::Indent]     = "indent";
+    m_roles[QSyntaxTreeModel::Type]       = "type";
+    m_roles[QSyntaxTreeModel::Line]       = "line";
 }
 
-void SyntaxTreeModel::clearAndReset(){
+void QSyntaxTreeModel::clearAndReset(){
     beginResetModel();
     clear();
     endResetModel();
 }
 
-void SyntaxTreeModel::clear(){
-    for ( QList<SyntaxTreeItem*>::iterator it = m_items.begin(); it != m_items.end(); ++it ){
+void QSyntaxTreeModel::clear(){
+    for ( QList<QSyntaxTreeItem*>::iterator it = m_items.begin(); it != m_items.end(); ++it ){
         delete (*it);
     }
     m_items.clear();
 }
 
-void SyntaxTreeModel::parse(QASTNode *root){
+void QSyntaxTreeModel::parse(QASTNode *root){
     beginResetModel();
     clear();
     recursiveParse(root, 0);
     endResetModel();
 }
 
-void SyntaxTreeModel::recursiveParse(QASTNode *node, int indent){
+void QSyntaxTreeModel::recursiveParse(QASTNode *node, int indent){
 
-    SyntaxTreeItem* item = new SyntaxTreeItem;
+    QSyntaxTreeItem* item = new QSyntaxTreeItem;
     item->identifier   = node->identifier();
     item->indent = indent;
     item->node   = node;
@@ -76,21 +75,21 @@ void SyntaxTreeModel::recursiveParse(QASTNode *node, int indent){
     }
 }
 
-QVariant SyntaxTreeModel::data(const QModelIndex &index, int role) const{
-    if ( role == SyntaxTreeModel::Identifier)
+QVariant QSyntaxTreeModel::data(const QModelIndex &index, int role) const{
+    if ( role == QSyntaxTreeModel::Identifier)
         return m_items[index.row()]->identifier;
-    else if ( role == SyntaxTreeModel::Indent )
+    else if ( role == QSyntaxTreeModel::Indent )
         return m_items[index.row()]->indent;
-    else if ( role == SyntaxTreeModel::Type )
+    else if ( role == QSyntaxTreeModel::Type )
         return m_items[index.row()]->type;
-    else if ( role == SyntaxTreeModel::Line )
+    else if ( role == QSyntaxTreeModel::Line )
         return m_items[index.row()]->line;
     return QVariant();
 }
 
-void SyntaxTreeModel::setSelected(csa::ast::QASTNode *node){
+void QSyntaxTreeModel::setSelected(csa::ast::QASTNode *node){
     for ( int i = 0; i < m_items.size(); ++i ){
-        SyntaxTreeItem* item = m_items[i];
+        QSyntaxTreeItem* item = m_items[i];
         if ( item->node == node ){
             setSelected(i);
             return;

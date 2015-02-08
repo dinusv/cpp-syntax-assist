@@ -21,7 +21,7 @@
 #include "qtquick2applicationviewer.h"
 
 #include "QConfiguredEngine.hpp"
-#include "SyntaxTreeModel.hpp"
+#include "QSyntaxTreeModel.hpp"
 #include "QASTNode.hpp"
 #include "QCodeBase.hpp"
 #include "QTokenClassifier.hpp"
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]){
 
     const char* args[] = {"-c", "-x", "c++"};
 
-    SyntaxTreeModel* astTreeModel = new SyntaxTreeModel;
+    QSyntaxTreeModel* astTreeModel = new QSyntaxTreeModel;
     QCodeBase cBase(args, 3, argFile, astTreeModel);
 
     if ( argOffset != -1 )
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]){
             return 0;
 
     QtQuick2ApplicationViewer viewer;
-    qmlRegisterType<SyntaxTreeModel>("CSA", 1, 0, "SyntaxTree" );
+    qmlRegisterType<QSyntaxTreeModel>("CSA", 1, 0, "SyntaxTree" );
     qmlRegisterType<QConfiguredEngine>("CSA", 1, 0, "ConfiguredEngine");
     viewer.rootContext()->setContextProperty("syntaxTreeModel",   astTreeModel);
     viewer.rootContext()->setContextProperty("configuredEngine", &configuredEngine);

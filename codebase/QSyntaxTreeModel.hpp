@@ -23,15 +23,13 @@
 
 namespace csa{
 
-namespace ast{
-class QASTNode;
-}
-
+namespace ast{ class QASTNode; }
 class QCodeBase;
+
 }
 
-class SyntaxTreeItem;
-class SyntaxTreeModel : public QAbstractListModel{
+class QSyntaxTreeItem;
+class QSyntaxTreeModel : public QAbstractListModel{
 
     Q_OBJECT
     Q_PROPERTY(int selected READ selected WRITE setSelected NOTIFY selectedChanged)
@@ -44,7 +42,7 @@ class SyntaxTreeModel : public QAbstractListModel{
     };
 
 public:
-    explicit SyntaxTreeModel(QObject *parent = 0);
+    explicit QSyntaxTreeModel(QObject *parent = 0);
 
     void clearAndReset();
     void parse(csa::ast::QASTNode* root);
@@ -66,24 +64,24 @@ private:
     void clear();
 
     QHash<int, QByteArray> m_roles;
-    QList<SyntaxTreeItem*> m_items;
+    QList<QSyntaxTreeItem*> m_items;
 
     int       m_codebaseSelected;
 };
 
-inline int SyntaxTreeModel::rowCount(const QModelIndex &) const{
+inline int QSyntaxTreeModel::rowCount(const QModelIndex &) const{
     return m_items.count();
 }
 
-inline QHash<int, QByteArray> SyntaxTreeModel::roleNames() const{
+inline QHash<int, QByteArray> QSyntaxTreeModel::roleNames() const{
     return m_roles;
 }
 
-inline int SyntaxTreeModel::selected() const{
+inline int QSyntaxTreeModel::selected() const{
     return m_codebaseSelected;
 }
 
-inline void SyntaxTreeModel::setSelected(int selected){
+inline void QSyntaxTreeModel::setSelected(int selected){
     if ( m_codebaseSelected != selected ){
         m_codebaseSelected = selected;
         emit selectedChanged();
