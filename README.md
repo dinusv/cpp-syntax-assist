@@ -12,10 +12,10 @@ To further clarify, let's look at an actual example. Consider the following C++ 
 
 ```C++
 
-	class SimpleExample{
-	public:
-		SimpleExample(){}
-	};
+class SimpleExample{
+public:
+	SimpleExample(){}
+};
 
 ```
 
@@ -23,21 +23,21 @@ Now, let's assume we would like to wrap this class within the 'example' namespac
 
 ```js
 
-	function wrapNamespace(){
+function wrapNamespace(){
+
+	// from the codebase, we select the main file received as a command line argument
+	var fileNode = codeBase.files()[0]; 
+
+	// we find the first class within the file
+	var classNode = fileNode.find('class');
 	
-		// from the codebase, we select the main file received as a command line argument
-		var fileNode = codeBase.files()[0]; 
-	
-		// we find the first class within the file
-		var classNode = fileNode.find('class');
-		
-		// we insert the namespace before and after the node
-		classNode.before('namespace example{\n');
-		classNode.afterln('\n}');
-	
-		// we save the work and write the modified contents
-		codeBase.save();
-	}
+	// we insert the namespace before and after the node
+	classNode.before('namespace example{\n');
+	classNode.afterln('\n}');
+
+	// we save the work and write the modified contents
+	codeBase.save();
+}
 
 
 ```
@@ -46,7 +46,7 @@ I will describe the above function in detail later on, but for now I'd like to s
 
 ```
 
-	./cppsnippetassist "simpleexample.h"
+./cppsnippetassist "simpleexample.h"
 
 ```
 
@@ -59,7 +59,7 @@ It's also possible to call this function directly from the command line, we just
 
 ```
 
-	./cppsnippetassist "simpleexampe.h" -e "wrapNamespace()" -f
+./cppsnippetassist "simpleexampe.h" -e "wrapNamespace()" -f
 
 ```
 
@@ -75,7 +75,7 @@ The main executable is called **cppsnippetassist**. To launch it, you need to ca
 
 ```
 
-	cppsnippetassist <file> [-c <offset> -lc <line> <column> -e <command> -f]
+cppsnippetassist <file> [-c <offset> -lc <line> <column> -e <command> -f]
 
 ``` 
 
