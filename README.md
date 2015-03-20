@@ -1,5 +1,7 @@
 # C++ Snippet Assist
 
+Latest Release Version: **0.2.0**
+
 A configurable C and C++ code generator that can be used as an external plugin with most IDEs. The tool uses javascript code as a means of manipulating source files.
 
 ## How it works
