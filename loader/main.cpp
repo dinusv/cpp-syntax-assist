@@ -28,66 +28,21 @@
 #include "QASTScriptConvert.hpp"
 #include "QCsaPluginLoader.hpp"
 
+#include "QCsaCommandLineArguments.hpp"
+
 using namespace csa;
 using namespace csa::ast;
 
 int main(int argc, char *argv[]){
 
-    QString argUsage   = "<file> [-c <offset> -lc <line> <column> -e <command> -f].";
-    QString argFile    = "";
-    QString argCommand = "";
-    int  argOffset = -1, argLine = -1, argColumn = -1;
-    bool fullCommandFlag = false;
-
-    // Parse Command line arguments
-    // ----------------------------
-
     QGuiApplication app(argc, argv);
-    QStringList arguments    = app.arguments();
-    QStringList::Iterator it = arguments.begin(); ++it;
-    for ( ; it != arguments.end(); ++it ){
-        if ( *it == "-c" ){
-            if ( ++it == arguments.end() ){
-                qCritical( (   "Error parsing command line arguments: no value after '-c'. Usage : " +
-                               argUsage).toStdString().c_str() );
-                return 1;
-            }
-            argOffset = (*it).toInt();
-        } else if ( *it == "-lc" ){
-            if ( ++it == arguments.end() ){
-                qCritical( (   "Error parsing command line arguments: no line value after '-cl'. Usage : " +
-                               argUsage).toStdString().c_str() );
-                return 1;
-            }
-            argLine   = (*it).toInt();
-            if ( ++it == arguments.end() ){
-                qCritical( (   "Error parsing command line arguments: no column value after '-cl'. Usage : " +
-                               argUsage).toStdString().c_str() );
-                return 1;
-            }
-            argColumn = (*it).toInt();
-        } else if ( *it == "-e" ){
-            if ( ++it == arguments.end() ){
-                qCritical( (   "Error parsing command line arguments: no command value after '-e'. Usage : " +
-                               argUsage).toStdString().c_str() );
-                return 1;
-            }
-            argCommand = (*it);
-        } else if ( *it == "-f" ){
-            fullCommandFlag = true;
-        } else {
-            argFile    = (*it);
-        }
-    }
+    QGuiApplication::setApplicationName("cpp-snippet-assist");
+    QGuiApplication::setApplicationDisplayName("C++ Snippet Assist");
+    QGuiApplication::setApplicationVersion("0.3.0");
 
-    if ( argFile == "" ){
-        qCritical( (
-            "Error parsing comamnd line arguments : no file specified. Usage : " + argUsage).toStdString().c_str() );
-        return 1;
-    }
-
-    if ( argOffset == -1 && argColumn == -1 )// user no cursor
-        argOffset = 0;
+    QCsaCommandLineArguments commandLineArguments(
+                app,
+                "\nA configurable C and C++ code parser that exposes the ast model to javascript for manipulation.");
 
     // Create codebase
     // ---------------
@@ -95,12 +50,16 @@ int main(int argc, char *argv[]){
     const char* args[] = {"-c", "-x", "c++"};
 
     QSyntaxTreeModel* astTreeModel = new QSyntaxTreeModel;
-    QCodeBase cBase(args, 3, argFile, astTreeModel);
+    QCodeBase cBase(args, 3, commandLineArguments.file(), astTreeModel);
 
-    if ( argOffset != -1 )
-        cBase.propagateUserCursor(argOffset, argFile);
-    else
-        cBase.propagateUserCursor(argLine, argColumn, argFile);
+    if ( commandLineArguments.isCursorOffsetSet() ){
+        cBase.propagateUserCursor(commandLineArguments.cursorOffset(), commandLineArguments.file());
+    } else if ( commandLineArguments.isCursorLineColumnSet() ){
+        cBase.propagateUserCursor(
+                    commandLineArguments.cursorLine(), commandLineArguments.cursorColumn(), commandLineArguments.file());
+    } else {
+        cBase.propagateUserCursor(0, commandLineArguments.file());
+    }
 
     QCsaPluginLoader loader(QDir::currentPath() + "/plugins");
 
@@ -115,8 +74,8 @@ int main(int argc, char *argv[]){
     // -----------------
 
     QConfiguredEngine configuredEngine(loader.engine());
-    if( fullCommandFlag )
-        if( configuredEngine.execute(argCommand) )
+    if( commandLineArguments.isExecuteAndQuitSet() )
+        if( configuredEngine.execute(commandLineArguments.selectedFunction()) )
             return 0;
 
     QtQuick2ApplicationViewer viewer;
@@ -124,7 +83,7 @@ int main(int argc, char *argv[]){
     qmlRegisterType<QConfiguredEngine>("CSA", 1, 0, "ConfiguredEngine");
     viewer.rootContext()->setContextProperty("syntaxTreeModel",   astTreeModel);
     viewer.rootContext()->setContextProperty("configuredEngine", &configuredEngine);
-    viewer.rootContext()->setContextProperty("command",           argCommand);
+    viewer.rootContext()->setContextProperty("command",           commandLineArguments.selectedFunction());
     viewer.setTitle("C++ Snippet Assist");
     viewer.setMainQmlFile(QUrl::fromUserInput("qrc:/qml/main.qml"));
     viewer.show();
