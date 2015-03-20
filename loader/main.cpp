@@ -25,7 +25,8 @@
 #include "QASTNode.hpp"
 #include "QCodeBase.hpp"
 #include "QTokenClassifier.hpp"
-#include "QASTScriptConvert.hpp"
+#include "QASTNodeConvert.hpp"
+#include "QAnnotatedTokenConvert.hpp"
 #include "QCsaPluginLoader.hpp"
 
 #include "QCsaCommandLineArguments.hpp"

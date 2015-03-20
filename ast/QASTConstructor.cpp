@@ -41,7 +41,14 @@ QASTConstructor::QASTConstructor(
         clang_disposeString(typeStr);
     }
 
-    for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
+
+
+
+    CXString displayName = clang_getCursorDisplayName(tokenSet->cursor());
+    setIdentifier(clang_getCString(displayName));
+    clang_disposeString(displayName);
+
+    /*for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
         CXToken t = *it;
         CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
         CXTokenKind tKind  = clang_getTokenKind(t);
@@ -82,7 +89,7 @@ QASTConstructor::QASTConstructor(
             setIdentifier(identifier() + clang_getCString(tSpelling));
         }
         clang_disposeString(tSpelling);
-    }
+    }*/
 
 }
 

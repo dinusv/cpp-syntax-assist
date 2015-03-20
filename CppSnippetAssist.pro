@@ -38,9 +38,12 @@ include(ast/ast.pri)
 include(codebase/codebase.pri)
 
 OTHER_FILES += \
-    configuration/configuration.js \
     qml/main.qml \
-    img/logo.png
+    img/logo.png \
+    plugins/destructor.js \
+    plugins/namespace.js \
+    plugins/preventcopy.js \
+    plugins/property.js
 
 RESOURCES += \
     resources.qrc

@@ -36,7 +36,7 @@ public:
 };
 
 inline QString QASTAccessSpecifier::content() const{
-    return identifier() + " :";
+    return identifier() + ":";
 }
 
 }}// namespace

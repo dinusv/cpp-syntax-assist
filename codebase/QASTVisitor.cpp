@@ -75,12 +75,12 @@ CXChildVisitResult QASTVisitor::callback(CXCursor cursor, CXCursor, CXClientData
     // Skip cursors that are not in the same file
     CXFile cursorFile;
     clang_getSpellingLocation(loc, &cursorFile, 0, 0, 0);
-    if ( cursorFile != clang_getFile(classifier->translatinoUnit(), classifier->file().c_str()) )
+    if ( cursorFile != clang_getFile(classifier->translationUnit(), classifier->file().c_str()) )
         return CXChildVisit_Continue;
 
     QAnnotatedTokenSet* cursorTokenSet = classifier->findTokenSet(cursor);
     if ( cursorTokenSet == 0 ){
-        cursorTokenSet = new QAnnotatedTokenSet(cursor, classifier->translatinoUnit());
+        cursorTokenSet = new QAnnotatedTokenSet(cursor, classifier->translationUnit());
         classifier->appendTokenSet(cursorTokenSet);
     }
 

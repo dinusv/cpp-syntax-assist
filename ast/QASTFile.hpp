@@ -36,7 +36,6 @@ public:
     void saveInsertions();
     QString content() const;
 
-protected:
     void insert(const QString& value, const QSourceLocation& location);
 
 private:

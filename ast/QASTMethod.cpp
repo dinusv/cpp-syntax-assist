@@ -16,13 +16,11 @@
 
 
 #include "QASTMethod.hpp"
-#include "QASTClass.hpp"
+#include "QASTMethodArgument.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "QTokenClassifier.hpp"
 #include "QSourceLocation.hpp"
 #include "clang-c/Index.h"
-
-#include <QDebug>
 
 namespace csa{ namespace ast{
 
@@ -34,81 +32,103 @@ QASTMethod::QASTMethod(
         QSourceLocation* rangeEndLocation,
         QASTNode* parent)
 
-    : QASTNode("method", tokenSet, cursorLocation, rangeStartLocation, rangeEndLocation, parent){
+    : QASTNode("method", tokenSet, cursorLocation, rangeStartLocation, rangeEndLocation, parent)
+    , m_isStatic(false)
+    , m_isVirtual(false)
+{
 
-    if ( tokenSet->size() == 0 ){
-        CXType type          = clang_getCursorType(tokenSet->cursor());
-        CXString typeStr     = clang_getTypeSpelling(type);
-        const char* cTypeStr = clang_getCString(typeStr);
-        setIdentifier(cTypeStr);
-        clang_disposeString(typeStr);
-    }
+    // Get Identifier
 
-    bool spaceFlag = false;
+    CXString id = clang_getCursorSpelling(tokenSet->cursor());
+    setIdentifier(clang_getCString(id));
 
-    for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
-        CXToken t = *it;
+    // Get Return Type
+
+    QAnnotatedTokenSet::Iterator it = tokenSet->begin();
+    while ( it != tokenSet->end() ){
+        CXToken t = (*it)->token();
         CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
+        const char* tCSpelling = clang_getCString(tSpelling);
         CXTokenKind tKind  = clang_getTokenKind(t);
-        if ( tKind == CXToken_Punctuation && std::string(clang_getCString(tSpelling)) == "("){
 
-            setIdentifier(identifier() + clang_getCString(tSpelling));
-            int numargs = clang_Cursor_getNumArguments(tokenSet->cursor());
-            for ( int i = 0; i < numargs; ++i ){
+        if ( tKind == CXToken_Identifier && std::string(clang_getCString(id)) == tCSpelling )
+            break;
 
-                CXCursor crs                      = clang_Cursor_getArgument(tokenSet->cursor(), i);
-                QAnnotatedTokenSet* cursorTokenSet = classifier->findTokenSet(crs);
-
-                if ( cursorTokenSet ){
-                    bool argSpaceFlag = false;
-                    for ( QAnnotatedTokenSet::Iterator it = cursorTokenSet->begin(); it != cursorTokenSet->end(); ++it ){
-                        CXToken t = *it;
-                        CXString tArgSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
-                        CXTokenKind tArgKind  = clang_getTokenKind(t);
-                        if ( tArgKind == CXToken_Punctuation ){
-
-                            setIdentifier(identifier() + clang_getCString(tArgSpelling));
-
-                            if ( std::string(clang_getCString(tArgSpelling)) == "&" ||
-                                 std::string(clang_getCString(tArgSpelling)) == "*" )
-                                setIdentifier(identifier() + " ");
-                            argSpaceFlag    = false;
-                        } else {
-                            if ( argSpaceFlag ){
-                                setIdentifier(identifier() + " ");
-                                argSpaceFlag = false;
-                            }
-                            setIdentifier(identifier() + clang_getCString(tArgSpelling));
-                            argSpaceFlag     = true;
-                        }
-                        clang_disposeString(tArgSpelling);
-                    }
-                    if ( i != numargs - 1 )
-                        setIdentifier(identifier() + ", ");
-                }
-            }
-
-        } else if ( tKind != CXToken_Punctuation || std::string(clang_getCString(tSpelling)) != "," ){
-            if ( tKind == CXToken_Punctuation ){
-
-                setIdentifier(identifier() + clang_getCString(tSpelling));
-
-                if ( std::string(clang_getCString(tSpelling)) == "&" ||
-                     std::string(clang_getCString(tSpelling)) == "*" )
-                    setIdentifier(identifier() + " ");
-                spaceFlag    = false;
-            } else {
-                if ( spaceFlag ){
-                    setIdentifier(identifier() + " ");
-                    spaceFlag = false;
-                }
-                setIdentifier(identifier() + clang_getCString(tSpelling));
-                spaceFlag     = true;
-            }
+        if ( tKind == CXToken_Keyword && std::string("virtual") == tCSpelling ){
+            m_isVirtual = true;
+            ++it;
+            continue;
         }
+
+        if ( ( tKind == CXToken_Identifier || tKind == CXToken_Keyword ) && !m_returnType.isEmpty() )
+            m_returnType += " ";
+
+        m_returnType += tCSpelling;
+
         clang_disposeString(tSpelling);
+        ++it;
     }
 
+    // Check Static
+
+    m_isStatic = clang_CXXMethod_isStatic(tokenSet->cursor());
+
+    // Get Arguments
+
+    int numArguments = clang_Cursor_getNumArguments(tokenSet->cursor());
+    for( int i = 0; i < numArguments; ++i ){
+        CXCursor argCursor = clang_Cursor_getArgument(tokenSet->cursor(), i);
+
+        QAnnotatedTokenSet* argTokenSet = classifier->findTokenSet(argCursor);
+        if ( argTokenSet == 0 ){
+            argTokenSet = new QAnnotatedTokenSet(argCursor, classifier->translationUnit());
+            classifier->appendTokenSet(argTokenSet);
+        }
+
+        CXSourceLocation loc = clang_getCursorLocation(argCursor);
+        CXSourceRange range  = clang_getCursorExtent(argCursor);
+
+        CXSourceLocation locStart = clang_getRangeStart(range);
+        CXSourceLocation locEnd   = clang_getRangeEnd(range);
+
+        QASTMethodArgument* argument = new QASTMethodArgument(
+            argTokenSet,
+            new QSourceLocation(loc),
+            new QSourceLocation(locStart),
+            new QSourceLocation(locEnd),
+            0
+        );
+        argument->setParent(this);
+
+        m_arguments.append(argument);
+    }
+
+    clang_disposeString(id);
+
+    return;
+}
+
+QList<QASTNode*> QASTMethod::arguments() const{
+    return m_arguments;
+}
+
+QString QASTMethod::content() const{
+    QString base = "";
+    base += m_isStatic ? "static " : "";
+    base += m_isVirtual ? "virtual " : "";
+    base += m_returnType + " ";
+    base += identifier();
+    base += "(";
+    for ( QList<csa::ast::QASTNode*>::const_iterator it = m_arguments.begin(); it != m_arguments.end(); ++it ){
+        if ( base != "" )
+            base += " ";
+        base += (*it)->content();
+    }
+    base += ")";
+    base += m_isConst ? " const" : "";
+    base += m_isPureVirtual ? " = 0" : "";
+
+    return base;
 }
 
 }}// namespace

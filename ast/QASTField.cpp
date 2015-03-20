@@ -46,7 +46,7 @@ QASTField::QASTField(
     QString fieldData;
     bool spaceFlag = false;
     for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
-        CXToken t = *it;
+        CXToken t = (*it)->token();
         CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
         CXTokenKind tKind  = clang_getTokenKind(t);
         if ( tKind == CXToken_Punctuation ){

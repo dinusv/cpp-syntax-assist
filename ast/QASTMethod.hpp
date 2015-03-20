@@ -38,11 +38,20 @@ public:
             QASTNode* parent = 0);
 
     virtual QString content() const;
-};
 
-inline QString QASTMethod::content() const{
-    return identifier();
-}
+public slots:
+    virtual QList<csa::ast::QASTNode*> arguments() const;
+
+private:
+    QString m_returnType;
+
+    bool    m_isStatic;
+    bool    m_isVirtual;
+    bool    m_isPureVirtual;
+    bool    m_isConst;
+
+    QList<csa::ast::QASTNode*> m_arguments;
+};
 
 }}// namespace
 
