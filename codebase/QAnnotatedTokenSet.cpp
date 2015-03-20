@@ -16,18 +16,26 @@
 
 
 #include "QAnnotatedTokenSet.hpp"
+#include "QASTNode.hpp"
 #include <sstream>
 #include <iostream>
 
 namespace csa{
 
-QAnnotatedTokenSet::QAnnotatedTokenSet(const CXCursor &cursor, const CXTranslationUnit &tu)
-    : m_cursor(cursor)
-    , m_translationUnit(tu){
+QAnnotatedTokenSet::QAnnotatedTokenSet(const CXCursor &cursor, const CXTranslationUnit &tu, ast::QASTNode* parent)
+    : QObject(parent)
+    , m_cursor(cursor)
+    , m_translationUnit(tu)
+{
+}
+
+QAnnotatedTokenSet::~QAnnotatedTokenSet(){
+    for ( QAnnotatedTokenSet::Iterator it = begin(); it != end(); ++it )
+        delete *it;
 }
 
 void QAnnotatedTokenSet::append(const CXToken &token){
-    m_tokens.push_back(token);
+    m_tokens.append(new QAnnotatedToken(token, this));
 }
 
 bool QAnnotatedTokenSet::operator ==(const QAnnotatedTokenSet &other){
@@ -50,8 +58,8 @@ void QAnnotatedTokenSet::dump(std::string &str){
     clang_disposeString(displayName);
 
     for ( QAnnotatedTokenSet::Iterator it = begin(); it != end(); ++it ){
-        CXString tokenString           = clang_getTokenSpelling(m_translationUnit, *it);
-        CXSourceLocation tokenLocation = clang_getTokenLocation(m_translationUnit, *it);
+        CXString tokenString           = clang_getTokenSpelling(m_translationUnit, (*it)->token());
+        CXSourceLocation tokenLocation = clang_getTokenLocation(m_translationUnit, (*it)->token());
         unsigned int column, line;
         clang_getSpellingLocation(tokenLocation, 0, &line, &column, 0);
         std::stringstream stream;
@@ -60,6 +68,14 @@ void QAnnotatedTokenSet::dump(std::string &str){
         clang_disposeString(tokenString);
     }
     str.append("\n");
+}
+
+QList<QAnnotatedToken*> QAnnotatedTokenSet::tokenList(){
+    return m_tokens;
+}
+
+ast::QASTNode* QAnnotatedTokenSet::associatedNode(){
+    return qobject_cast<ast::QASTNode*>(parent());
 }
 
 }// namespace

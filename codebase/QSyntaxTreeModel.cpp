@@ -27,7 +27,7 @@ public:
     int      indent;
     int      line;
     QASTNode* node;
-    QString  identifier;
+    QString  display;
     QString  type;
 
 };
@@ -64,11 +64,11 @@ void QSyntaxTreeModel::parse(QASTNode *root){
 void QSyntaxTreeModel::recursiveParse(QASTNode *node, int indent){
 
     QSyntaxTreeItem* item = new QSyntaxTreeItem;
-    item->identifier   = node->identifier();
-    item->indent = indent;
-    item->node   = node;
-    item->type   = node->typeName();
-    item->line   = node->rangeStartLocation().line();
+    item->display = node->content();
+    item->indent  = indent;
+    item->node    = node;
+    item->type    = node->typeName();
+    item->line    = node->rangeStartLocation().line();
     m_items.append(item);
     for ( QASTNode::Iterator it = node->childrenBegin(); it != node->childrenEnd(); ++it ){
         recursiveParse(*it, indent + 1);
@@ -77,7 +77,7 @@ void QSyntaxTreeModel::recursiveParse(QASTNode *node, int indent){
 
 QVariant QSyntaxTreeModel::data(const QModelIndex &index, int role) const{
     if ( role == QSyntaxTreeModel::Identifier)
-        return m_items[index.row()]->identifier;
+        return m_items[index.row()]->display;
     else if ( role == QSyntaxTreeModel::Indent )
         return m_items[index.row()]->indent;
     else if ( role == QSyntaxTreeModel::Type )

@@ -47,8 +47,8 @@ QASTFile::QASTFile(QAnnotatedTokenSet* tokenSet, const QString& file, QSourceLoc
     : QASTNode(
           "file",
           tokenSet,
-          new QSourceLocation(file.toStdString(), 0, 0, 0),
-          new QSourceLocation(file.toStdString(), 0, 0, 0),
+          new QSourceLocation(file, 0, 0, 0),
+          new QSourceLocation(file, 0, 0, 0),
           endOfFile,
           0)
 {

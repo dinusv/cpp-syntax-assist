@@ -19,14 +19,14 @@
 #define QSOURCELOCATION_HPP
 
 #include "clang-c/Index.h"
-#include <string>
+#include <QString>
 
 namespace csa{
 
 class QSourceLocation{
 
 public:
-    QSourceLocation(const std::string& file, unsigned int line, unsigned int column, unsigned int offset );
+    QSourceLocation(const QString& file, unsigned int line, unsigned int column, unsigned int offset );
     QSourceLocation(const char* file, unsigned int line, unsigned int column, unsigned int offset );
     QSourceLocation(const CXFile& file, unsigned int line, unsigned int column, unsigned int offset );
     QSourceLocation(const CXSourceLocation& location);
@@ -39,10 +39,10 @@ public:
     unsigned int line() const;
     unsigned int column() const;
     unsigned int offset() const;
-    const std::string &filePath() const;
+    const QString &filePath() const;
 
 private:
-    std::string  m_file;
+    QString      m_file;
     unsigned int m_line;
     unsigned int m_column;
     unsigned int m_offset;

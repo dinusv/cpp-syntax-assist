@@ -9,7 +9,8 @@ HEADERS += \
     $$PWD/QASTField.hpp \
     $$PWD/QASTConstructor.hpp \
     $$PWD/QASTClass.hpp \
-    $$PWD/QASTFile.hpp
+    $$PWD/QASTFile.hpp \
+    $$PWD/QASTMethodArgument.hpp
 
 SOURCES += \
     $$PWD/QASTAccessSpecifier.cpp \
@@ -20,4 +21,5 @@ SOURCES += \
     $$PWD/QASTNode.cpp \
     $$PWD/QASTNamespace.cpp \
     $$PWD/QASTMethod.cpp \
-    $$PWD/QASTFile.cpp
+    $$PWD/QASTFile.cpp \
+    $$PWD/QASTMethodArgument.cpp

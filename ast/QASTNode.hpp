@@ -27,9 +27,10 @@
 
 
 namespace csa{
+
+class QAnnotatedToken;
 class QAnnotatedTokenSet;
 class QSourceLocation;
-
 class QCodeBase;
 
 namespace ast{
@@ -64,11 +65,15 @@ public slots:
     QString typeName() const;
     QString identifier() const;
 
-    virtual QString content() const = 0;
+    virtual QString content() const;
     virtual QString prop(const QString& key) const;
 
     QList<csa::ast::QASTNode*> astChildren() const;
     QList<csa::ast::QASTNode*> astChildren(const QString& type) const;
+
+    virtual QList<csa::ast::QASTNode*> arguments() const;
+
+    QList<csa::QAnnotatedToken*> associatedTokens();
 
     csa::ast::QASTNode* astParent();
     csa::ast::QASTNode* astChild(const QString& identifier);
@@ -114,6 +119,10 @@ public:
 
     void removeChildren();
 
+    virtual void insert(const QString& value, const QSourceLocation& location);
+
+    void setAstParent(csa::ast::QASTNode* parent);
+
     // Debugging
     // ---------
 
@@ -124,8 +133,6 @@ protected:
 
     csa::ast::QASTNode* childAfter(csa::ast::QASTNode* child);
     csa::ast::QASTNode* childBefore(csa::ast::QASTNode* child);
-
-    virtual void insert(const QString& value, const QSourceLocation& location);
 
 private:
     // Parameters
@@ -169,6 +176,10 @@ inline QList<QASTNode *> QASTNode::astChildren(const QString &type) const{
             astChildren.append(*it);
     }
     return astChildren;
+}
+
+inline QList<QASTNode*> QASTNode::arguments() const{
+    return QList<QASTNode*>();
 }
 
 inline QASTNode* QASTNode::astChild(const QString &identifier){

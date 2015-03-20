@@ -1,5 +1,6 @@
 #include "QCsaPluginLoader.hpp"
-#include "QASTScriptConvert.hpp"
+#include "QASTNodeConvert.hpp"
+#include "QAnnotatedTokenConvert.hpp"
 #include "QCodeBase.hpp"
 
 #include <QList>
@@ -12,8 +13,17 @@ QCsaPluginLoader::QCsaPluginLoader(const QString& path)
     : m_path(path)
 {
     m_engine = new QScriptEngine;
-    qScriptRegisterMetaType<ast::QASTNode*>(m_engine, nodeToScriptValue, nodeFromScriptValue);
+    qScriptRegisterMetaType<ast::QASTNode*>(m_engine, &nodeToScriptValue, &nodeFromScriptValue);
     qScriptRegisterSequenceMetaType<QList<ast::QASTNode*> >(m_engine);
+
+    qScriptRegisterMetaType<QAnnotatedToken*>(m_engine, &tokenToScriptValue, &tokenFromScriptValue);
+    qScriptRegisterSequenceMetaType<QList<QAnnotatedToken*> >(m_engine);
+
+    qScriptRegisterMetaType(m_engine, &tokenKindToScriptValue, &tokenKindFromScriptValue);
+
+    QScriptValue metaObject = m_engine->newQMetaObject(
+                &QAnnotatedToken::staticMetaObject, m_engine->newFunction(&tokenScriptConstructor) );
+    m_engine->globalObject().setProperty( "Token", metaObject );
 }
 
 QCsaPluginLoader::~QCsaPluginLoader(){

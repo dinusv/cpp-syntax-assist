@@ -19,20 +19,28 @@
 #define QANNOTATEDTOKENSET_HPP
 
 #include "clang-c/Index.h"
-#include <vector>
+#include "QAnnotatedToken.hpp"
+#include <QList>
 #include <string>
 
 namespace csa{
 
-class QAnnotatedTokenSet{
+namespace ast{
+class QASTNode;
+}
+
+class QAnnotatedTokenSet : public QObject{
+
+    Q_OBJECT
 
 public:
-    typedef std::vector<CXToken>        TokenVector;
-    typedef TokenVector::iterator       Iterator;
-    typedef TokenVector::const_iterator ConstIterator;
+    typedef QList<QAnnotatedToken*>   TokenList;
+    typedef TokenList::iterator       Iterator;
+    typedef TokenList::const_iterator ConstIterator;
 
 public:
-    QAnnotatedTokenSet(const CXCursor& cursor, const CXTranslationUnit& tu);
+    QAnnotatedTokenSet(const CXCursor& cursor, const CXTranslationUnit& tu, ast::QASTNode* parent = 0);
+    ~QAnnotatedTokenSet();
 
     void append(const CXToken& token);
 
@@ -46,14 +54,17 @@ public:
     Iterator      end();
     ConstIterator begin() const;
     ConstIterator end() const;
-    CXToken       last() const;
 
     void dump(std::string &str);
+
+    ast::QASTNode* associatedNode();
+
+    QList<QAnnotatedToken*> tokenList();
 
 private:
     CXCursor             m_cursor;
     CXTranslationUnit    m_translationUnit;
-    std::vector<CXToken> m_tokens;
+    TokenList            m_tokens;
 
 };
 
@@ -79,10 +90,6 @@ inline QAnnotatedTokenSet::ConstIterator QAnnotatedTokenSet::begin() const{
 
 inline QAnnotatedTokenSet::ConstIterator QAnnotatedTokenSet::end() const{
     return m_tokens.end();
-}
-
-inline CXToken QAnnotatedTokenSet::last() const{
-    return m_tokens.back();
 }
 
 }// namespace

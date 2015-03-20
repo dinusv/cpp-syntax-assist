@@ -82,7 +82,7 @@ void QCodeBase::save(){
         QString selectionTypeString = m_current->typeName();
         QString selectionIdentifier = m_current->identifier();
 
-        CXTranslationUnit transUnit = m_classifier->translatinoUnit();
+        CXTranslationUnit transUnit = m_classifier->translationUnit();
         clang_reparseTranslationUnit(transUnit, 0, 0, clang_defaultReparseOptions(transUnit));
         CXCursor startCursor        = clang_getTranslationUnitCursor(transUnit);
         m_classifier->reparse();
@@ -100,14 +100,14 @@ void QCodeBase::save(){
 }
 
 void QCodeBase::propagateUserCursor(int offset, const QString &file){
-    CXTranslationUnit transUnit = m_classifier->translatinoUnit();
+    CXTranslationUnit transUnit = m_classifier->translationUnit();
     CXFile cfile = clang_getFile(transUnit, file.toStdString().c_str());
     CXSourceLocation sLocation = clang_getLocationForOffset(transUnit, cfile, offset);
     propagateUserCursor(QSourceLocation(sLocation));
 }
 
 void QCodeBase::propagateUserCursor(int line, int column, const QString &file){
-    CXTranslationUnit transUnit = m_classifier->translatinoUnit();
+    CXTranslationUnit transUnit = m_classifier->translationUnit();
     CXFile cfile = clang_getFile(transUnit, file.toStdString().c_str());
     CXSourceLocation sLocation = clang_getLocation(transUnit, cfile, line, column);
     propagateUserCursor(QSourceLocation(sLocation));

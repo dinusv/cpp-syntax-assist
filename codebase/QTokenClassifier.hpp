@@ -46,7 +46,7 @@ public:
     void appendTokenSet(QAnnotatedTokenSet* tokenSet);
     void reparse();
 
-    const CXTranslationUnit& translatinoUnit() const;
+    const CXTranslationUnit& translationUnit() const;
     const std::string& file() const;
 
     void dump(std::string& str);
@@ -83,7 +83,7 @@ inline QTokenClassifier::ConstIterator QTokenClassifier::tokenSetEnd() const{
     return m_tokenSets.end();
 }
 
-inline const CXTranslationUnit &QTokenClassifier::translatinoUnit() const{
+inline const CXTranslationUnit &QTokenClassifier::translationUnit() const{
     return m_translationUnit;
 }
 

@@ -39,12 +39,12 @@ QASTNamespace::QASTNamespace(
 
     // Find '{' and '}' in token set
     for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
-        CXTokenKind tokenKind = clang_getTokenKind(*it);
+        CXTokenKind tokenKind = clang_getTokenKind((*it)->token());
 
         if ( tokenKind == CXToken_Punctuation ){
-            CXString tokenString           = clang_getTokenSpelling(tokenSet->translationUnit(), *it);
+            CXString tokenString           = clang_getTokenSpelling(tokenSet->translationUnit(), (*it)->token());
             std::string tokenStdString     = clang_getCString(tokenString);
-            CXSourceLocation tokenLocation = clang_getTokenLocation(tokenSet->translationUnit(), *it);
+            CXSourceLocation tokenLocation = clang_getTokenLocation(tokenSet->translationUnit(), (*it)->token());
             if ( tokenStdString == "{" ){
                 QSourceLocation* sl = m_bodyStart;
                 sl->assign(tokenLocation);

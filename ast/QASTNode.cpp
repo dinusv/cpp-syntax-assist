@@ -39,6 +39,9 @@ QASTNode::QASTNode(
 {
     if ( parent != 0 )
         parent->addChild(this);
+
+    if ( m_tokenSet )
+        m_tokenSet->setParent(this);
 }
 
 QASTNode::~QASTNode(){
@@ -48,8 +51,19 @@ QASTNode::~QASTNode(){
     delete m_cursorLocation;
 }
 
+QString QASTNode::content() const{
+    return identifier();
+}
+
 QString QASTNode::prop(const QString &) const{
     return "";
+}
+
+QList<QAnnotatedToken*> QASTNode::associatedTokens(){
+    if ( m_tokenSet )
+        return m_tokenSet->tokenList();
+
+    return QList<QAnnotatedToken*>();
 }
 
 QASTNode*QASTNode::astParent(){
@@ -79,7 +93,7 @@ void QASTNode::afterln(const QString& value){
 
     CXSourceLocation afterLocation = clang_getLocation(
                 m_tokenSet->translationUnit(),
-                clang_getFile(m_tokenSet->translationUnit(), rangeEndLocation().filePath().c_str()),
+                clang_getFile(m_tokenSet->translationUnit(), rangeEndLocation().filePath().toUtf8()),
                 rangeEndLocation().line() + 1,
                 1); // location will be automatically truncated to max lines
 
@@ -101,6 +115,12 @@ void QASTNode::insert(const QString& value, const QSourceLocation& location){
     QASTNode* p = qobject_cast<QASTNode*>(parent());
     if ( p )
         p->insert(value, location);
+}
+
+void QASTNode::setAstParent(QASTNode* parent){
+    if ( parent )
+        parent->addChild(this);
+    setParent(parent);
 }
 
 QASTNode *QASTNode::propagateUserCursor(const QSourceLocation &location){

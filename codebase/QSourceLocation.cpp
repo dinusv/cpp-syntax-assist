@@ -19,7 +19,7 @@
 
 namespace csa{
 
-QSourceLocation::QSourceLocation(const std::string &file, unsigned int line, unsigned int column, unsigned int offset)
+QSourceLocation::QSourceLocation(const QString& file, unsigned int line, unsigned int column, unsigned int offset)
     : m_file(file)
     , m_line(line)
     , m_column(column)
@@ -39,7 +39,7 @@ QSourceLocation::QSourceLocation(const CXFile &file, unsigned int line, unsigned
     , m_offset(offset){
 
     CXString fileName = clang_getFileName(file);
-    m_file.assign(clang_getCString(fileName));
+    m_file = clang_getCString(fileName);
     clang_disposeString(fileName);
 }
 
@@ -56,7 +56,7 @@ void QSourceLocation::assign(const CXSourceLocation &location){
 
     CXString fileName = clang_getFileName(file);
     if (fileName.data != 0)
-        m_file.assign(clang_getCString(fileName));
+        m_file = clang_getCString(fileName);
     clang_disposeString(fileName);
 }
 
@@ -68,13 +68,13 @@ void QSourceLocation::assign(const QSourceLocation &other){
 }
 
 void QSourceLocation::assign(unsigned int offset, const CXTranslationUnit &translationUnit){
-    CXFile file = clang_getFile(translationUnit, m_file.c_str());
+    CXFile file = clang_getFile(translationUnit, m_file.toUtf8());
     if ( file != 0 ){
         assign(clang_getLocationForOffset(translationUnit, file, offset));
     }
 }
 
-const std::string& QSourceLocation::filePath() const{
+const QString& QSourceLocation::filePath() const{
     return m_file;
 }
 
