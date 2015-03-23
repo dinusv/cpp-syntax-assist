@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>qml/main.qml</file>
-        <file alias="qml/logo.png">img/logo.png</file>
-    </qresource>
-</RCC>
