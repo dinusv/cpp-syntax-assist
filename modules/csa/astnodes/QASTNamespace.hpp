@@ -57,7 +57,7 @@ private:
 };
 
 inline QString QASTNamespace::content() const{
-    return typeName() + identifier();
+    return typeName() + " " + identifier();
 }
 
 }}// namespace

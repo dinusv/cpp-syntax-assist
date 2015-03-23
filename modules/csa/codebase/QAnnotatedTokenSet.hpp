@@ -57,6 +57,8 @@ public:
     ConstIterator begin() const;
     ConstIterator end() const;
 
+    void erase(Iterator it);
+
     void dump(std::string &str);
 
     ast::QASTNode* associatedNode();

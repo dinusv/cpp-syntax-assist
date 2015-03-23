@@ -50,6 +50,7 @@ private:
     bool    m_isVirtual;
     bool    m_isPureVirtual;
     bool    m_isConst;
+    bool    m_isInline;
 
     QList<csa::ast::QASTNode*> m_arguments;
 };

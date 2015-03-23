@@ -17,20 +17,25 @@ QASTMethodArgument::QASTMethodArgument(
     CXString id = clang_getCursorSpelling(tokenSet->cursor());
     setIdentifier(clang_getCString(id));
 
-    if ( tokenSet ){
-        for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
-            CXToken t = (*it)->token();
-            CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
-            const char* tCSpelling = clang_getCString(tSpelling);
-            CXTokenKind tKind  = clang_getTokenKind(t);
+    bool doubleColonFlag = false;
+    for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
 
-            if ( tKind == CXToken_Identifier && std::string(clang_getCString(id)) == tCSpelling )
-                break;
+        CXToken t              = (*it)->token();
+        CXString tSpelling     = clang_getTokenSpelling(tokenSet->translationUnit(), t);
+        const char* tCSpelling = clang_getCString(tSpelling);
+        CXTokenKind tKind      = clang_getTokenKind(t);
 
-            if ( ( tKind == CXToken_Identifier || tKind == CXToken_Keyword ) && !m_type.isEmpty() )
-                m_type += " ";
-
-            m_type += tCSpelling;
+        if ( tKind == CXToken_Identifier && std::string(clang_getCString(id)) == tCSpelling ){
+            break;
+        } else if ( tKind == CXToken_Punctuation && std::string("::") == tCSpelling ){
+            doubleColonFlag = true;
+            m_type         += tCSpelling;
+        } else if ( ( tKind == CXToken_Identifier || tKind == CXToken_Keyword ) &&
+                    !m_type.isEmpty() && !doubleColonFlag ){
+            m_type         += QString(" ") + tCSpelling;
+        } else {
+            doubleColonFlag = false;
+            m_type         += tCSpelling;
         }
     }
 

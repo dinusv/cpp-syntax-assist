@@ -131,4 +131,9 @@ QAnnotatedTokenSet::ConstIterator QAnnotatedTokenSet::end() const{
     return d->tokens.end();
 }
 
+void QAnnotatedTokenSet::erase(QAnnotatedTokenSet::Iterator it){
+    Q_D(QAnnotatedTokenSet);
+    d->tokens.erase(it);
+}
+
 }// namespace
