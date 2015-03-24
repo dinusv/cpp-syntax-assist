@@ -72,7 +72,7 @@ QASTClass::~QASTClass(){
 
 QASTNode *QASTClass::propagateUserCursor(const QSourceLocation &location){
     QASTNode* base = this;
-    if ( rangeStartLocation().offset() <= location.offset() && rangeEndLocation().offset() >= location.offset() ){
+    if ( rangeStartLocation()->offset() <= location.offset() && rangeEndLocation()->offset() >= location.offset() ){
         //m_offsets[QASTClass::CURSOR] = new SourceLocation(location);
         QASTNode* result = QASTNode::propagateUserCursor(location);
         if ( result != 0 )

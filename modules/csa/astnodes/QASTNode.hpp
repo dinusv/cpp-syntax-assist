@@ -87,17 +87,17 @@ public slots:
     void after(const QString& value);
     void afterln(const QString& value);
 
-public:
     // Location Getters
     // ----------------
 
-    const QSourceLocation& rangeStartLocation() const;
-    const QSourceLocation& rangeEndLocation() const;
-    const QSourceLocation& cursorLocation() const;
+    csa::QSourceLocation* rangeStartLocation();
+    csa::QSourceLocation* rangeEndLocation();
+    csa::QSourceLocation* cursorLocation();
 
-    virtual const QSourceLocation& bodyStartLocation() const;
-    virtual const QSourceLocation& bodyEndLocation() const;
+    csa::QSourceLocation* bodyStartLocation();
+    csa::QSourceLocation* bodyEndLocation();
 
+public:
     // Initializers
     // ------------
 
@@ -195,24 +195,24 @@ inline QASTNode* QASTNode::astChild(const QString &typeString, const QString &id
     return 0;
 }
 
-inline const QSourceLocation &QASTNode::rangeStartLocation() const{
-    return *m_rangeStartLocation;
+inline QSourceLocation* QASTNode::rangeStartLocation(){
+    return m_rangeStartLocation;
 }
 
-inline const QSourceLocation &QASTNode::rangeEndLocation() const{
-    return *m_rangeEndLocation;
+inline QSourceLocation* QASTNode::rangeEndLocation(){
+    return m_rangeEndLocation;
 }
 
-inline const QSourceLocation &QASTNode::cursorLocation() const{
-    return *m_cursorLocation;
+inline QSourceLocation* QASTNode::cursorLocation(){
+    return m_cursorLocation;
 }
 
-inline const QSourceLocation &QASTNode::bodyStartLocation() const{
-    return *m_rangeStartLocation;
+inline QSourceLocation* QASTNode::bodyStartLocation(){
+    return m_rangeStartLocation;
 }
 
-inline const QSourceLocation &QASTNode::bodyEndLocation() const{
-    return *m_rangeEndLocation;
+inline QSourceLocation* QASTNode::bodyEndLocation(){
+    return m_rangeEndLocation;
 }
 
 inline void QASTNode::addChild(QASTNode *node){

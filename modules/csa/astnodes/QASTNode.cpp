@@ -72,19 +72,19 @@ QASTNode*QASTNode::astParent(){
 }
 
 void QASTNode::append(const QString& value){
-    insert(value, bodyEndLocation());
+    insert(value, *bodyEndLocation());
 }
 
 void QASTNode::prepend(const QString& value){
-    insert(value, bodyStartLocation());
+    insert(value, *bodyStartLocation());
 }
 
 void QASTNode::before(const QString& value){
-    insert(value, rangeStartLocation());
+    insert(value, *rangeStartLocation());
 }
 
 void QASTNode::after(const QString& value){
-    insert(value, rangeEndLocation());
+    insert(value, *rangeEndLocation());
 }
 
 void QASTNode::afterln(const QString& value){
@@ -93,8 +93,8 @@ void QASTNode::afterln(const QString& value){
 
     CXSourceLocation afterLocation = clang_getLocation(
                 m_tokenSet->translationUnit(),
-                clang_getFile(m_tokenSet->translationUnit(), rangeEndLocation().filePath().toUtf8()),
-                rangeEndLocation().line() + 1,
+                clang_getFile(m_tokenSet->translationUnit(), rangeEndLocation()->filePath().toUtf8()),
+                rangeEndLocation()->line() + 1,
                 1); // location will be automatically truncated to max lines
 
     insert(value, QSourceLocation(afterLocation));
