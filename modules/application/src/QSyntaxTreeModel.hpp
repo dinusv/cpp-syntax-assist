@@ -27,7 +27,6 @@ namespace csa{
 
 namespace ast{ class QASTNode; }
 class QCodeBase;
-
 }
 
 class QSyntaxTreeItem;
