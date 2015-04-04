@@ -21,29 +21,51 @@
 #include "clang-c/Index.h"
 #include "QCSAGlobal.hpp"
 #include <QString>
+#include <QObject>
 
 namespace csa{
 
-class QSourceLocation{
+class QSourceLocation : public QObject{
+
+    Q_OBJECT
 
 public:
-    QSourceLocation(const QString& file, unsigned int line, unsigned int column, unsigned int offset );
-    QSourceLocation(const char* file, unsigned int line, unsigned int column, unsigned int offset );
-    QSourceLocation(const CXFile& file, unsigned int line, unsigned int column, unsigned int offset );
-    QSourceLocation(const CXSourceLocation& location);
+    QSourceLocation(
+            const QString& file,
+            unsigned int line,
+            unsigned int column,
+            unsigned int offset,
+            QObject* parent = 0 );
+    QSourceLocation(
+            const char* file,
+            unsigned int line,
+            unsigned int column,
+            unsigned int offset,
+            QObject* parent = 0);
+    QSourceLocation(
+            const CXFile& file,
+            unsigned int line,
+            unsigned int column,
+            unsigned int offset,
+            QObject* parent = 0);
+    QSourceLocation(const CXSourceLocation& location, QObject* parent = 0);
+    QSourceLocation(const QSourceLocation& other, QObject* parent = 0);
     ~QSourceLocation();
 
     void assign(const CXSourceLocation& location);
     void assign(const QSourceLocation& other);
     void assign(unsigned int offset, const CXTranslationUnit& translationUnit);
+    void assign(unsigned int line, unsigned int column, const CXTranslationUnit& translationUnit);
 
+public slots:
     unsigned int line() const;
     unsigned int column() const;
     unsigned int offset() const;
-    const QString &filePath() const;
+    QString filePath() const;
+    QString fileName() const;
 
 private:
-    QString      m_file;
+    QString      m_filePath;
     unsigned int m_line;
     unsigned int m_column;
     unsigned int m_offset;
@@ -62,6 +84,9 @@ inline unsigned int QSourceLocation::offset() const{
     return m_offset;
 }
 
+inline QString QSourceLocation::filePath() const{
+    return m_filePath;
+}
 
 }// namespace
 

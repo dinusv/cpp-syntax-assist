@@ -1,7 +1,8 @@
+TEMPLATE = subdirs
+CONFIG  += ordered
 
-### START
-
-include($$PWD/modules/modules.pro)
+SUBDIRS += $$PWD/modules/modules.pro
+SUBDIRS += $$PWD/tests/tests.pro
 
 OTHER_FILES += \
     $$PWD/plugins/destructor.js \

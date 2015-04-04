@@ -68,7 +68,7 @@ void QSyntaxTreeModel::recursiveParse(QASTNode *node, int indent){
     item->indent  = indent;
     item->node    = node;
     item->type    = node->typeName();
-    item->line    = node->rangeStartLocation().line();
+    item->line    = node->rangeStartLocation()->line();
     m_items.append(item);
     for ( QASTNode::Iterator it = node->childrenBegin(); it != node->childrenEnd(); ++it ){
         recursiveParse(*it, indent + 1);

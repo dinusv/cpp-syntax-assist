@@ -34,42 +34,50 @@ QASTField::QASTField(
 
     : QASTNode("field", tokenSet, cursorLocation, rangeStartLocation, rangeEndLocation, parent){
 
+    // Get Identifier
+    // --------------
 
-    if ( tokenSet->size() == 0 ){
-        CXType type          = clang_getCursorType(tokenSet->cursor());
-        CXString typeStr     = clang_getTypeSpelling(type);
-        const char* cTypeStr = clang_getCString(typeStr);
-        setIdentifier(cTypeStr);
-        clang_disposeString(typeStr);
-    }
+    CXString id = clang_getCursorSpelling(tokenSet->cursor());
+    setIdentifier(clang_getCString(id));
 
-    QString fieldData;
-    bool spaceFlag = false;
-    for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
-        CXToken t = (*it)->token();
-        CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
-        CXTokenKind tKind  = clang_getTokenKind(t);
-        if ( tKind == CXToken_Punctuation ){
-            fieldData += clang_getCString(tSpelling);
-            spaceFlag    = false;
-        } else {
-            if ( spaceFlag ){
-                fieldData += " ";
-                spaceFlag = false;
+    // Get Field Type
+    // ---------------
+
+    CXType type           = clang_getCursorType(tokenSet->cursor());
+    CXString typeSpelling = clang_getTypeSpelling(type);
+    m_fieldType           = clang_getCString(typeSpelling);
+    clang_disposeString(typeSpelling);
+
+    // Determine field type
+    // --------------------
+
+    if ( type.kind == CXType_Unexposed || type.kind == CXType_Invalid || m_fieldType.contains("int") ){
+        m_fieldType = "";
+
+        bool doubleColonFlag = false;
+        for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
+
+            CXToken t              = (*it)->token();
+            CXString tSpelling     = clang_getTokenSpelling(tokenSet->translationUnit(), t);
+            const char* tCSpelling = clang_getCString(tSpelling);
+            CXTokenKind tKind      = clang_getTokenKind(t);
+
+            if ( tKind == CXToken_Identifier && std::string(clang_getCString(id)) == tCSpelling ){
+                break;
+            } else if ( tKind == CXToken_Punctuation && std::string("::") == tCSpelling ){
+                doubleColonFlag = true;
+                m_fieldType    += tCSpelling;
+            } else if ( ( tKind == CXToken_Identifier || tKind == CXToken_Keyword ) &&
+                        !m_fieldType.isEmpty() && !doubleColonFlag ){
+                m_fieldType    += QString(" ") + tCSpelling;
+            } else {
+                doubleColonFlag = false;
+                m_fieldType    += tCSpelling;
             }
-            fieldData += clang_getCString(tSpelling);
-            spaceFlag     = true;
         }
-        clang_disposeString(tSpelling);
     }
 
-    int splitPos = fieldData.indexOf(' ');
-    if ( splitPos == -1 )
-        setIdentifier(fieldData);
-    else {
-        m_fieldType = fieldData.mid(0, splitPos);
-        setIdentifier(fieldData.mid(splitPos + 1));
-    }
+    clang_disposeString(id);
 }
 
 QString QASTField::prop(const QString &key) const{

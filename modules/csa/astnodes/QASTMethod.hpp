@@ -42,6 +42,7 @@ public:
 
 public slots:
     virtual QList<csa::ast::QASTNode*> arguments() const;
+    virtual QString prop(const QString& key) const;
 
 private:
     QString m_returnType;
@@ -54,6 +55,12 @@ private:
 
     QList<csa::ast::QASTNode*> m_arguments;
 };
+
+inline QString QASTMethod::prop(const QString& key) const{
+    if ( key == "returnType" )
+        return m_returnType;
+    return QASTNode::prop(key);
+}
 
 }}// namespace
 

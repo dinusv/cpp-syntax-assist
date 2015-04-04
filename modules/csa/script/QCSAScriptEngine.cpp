@@ -1,5 +1,6 @@
 #include "QCsaScriptEngine.hpp"
 #include "QASTNodeConvert.hpp"
+#include "QSourceLocationConvert.hpp"
 #include "QAnnotatedTokenConvert.hpp"
 #include "QCodeBase.hpp"
 
@@ -15,6 +16,8 @@ QCSAScriptEngine::QCSAScriptEngine(QObject* parent)
     m_engine = new QScriptEngine;
     qScriptRegisterMetaType<ast::QASTNode*>(m_engine, &nodeToScriptValue, &nodeFromScriptValue);
     qScriptRegisterSequenceMetaType<QList<ast::QASTNode*> >(m_engine);
+
+    qScriptRegisterMetaType<QSourceLocation*>(m_engine, &sourceLocationToScriptValue, &sourceLocationFromScriptValue);
 
     qScriptRegisterMetaType<QAnnotatedToken*>(m_engine, &tokenToScriptValue, &tokenFromScriptValue);
     qScriptRegisterSequenceMetaType<QList<QAnnotatedToken*> >(m_engine);
@@ -75,17 +78,22 @@ int QCSAScriptEngine::loadPlugins(const QString& path){
     return 0;
 }
 
-bool QCSAScriptEngine::execute(const QString& jsCode){
+bool QCSAScriptEngine::execute(const QString& jsCode, QScriptValue& result){
     if ( !m_engine )
         return false;
 
-    QScriptValue result = m_engine->evaluate(jsCode);
+    result = m_engine->evaluate(jsCode);
     if ( m_engine->hasUncaughtException() ){
         qCritical( ("Uncaught javascript exception:" + result.toString()).toStdString().c_str() );
         return false;
     }
 
     return true;
+}
+
+bool QCSAScriptEngine::execute(const QString& jsCode){
+    QScriptValue result;
+    return execute(jsCode, result);
 }
 
 }// namespace

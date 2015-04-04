@@ -6,6 +6,7 @@
 #include <QObject>
 
 class QScriptEngine;
+class QScriptValue;
 
 namespace csa{
 
@@ -22,6 +23,8 @@ public:
 
     QScriptEngine* engine();
     int loadPlugins(const QString& path);
+
+    bool execute(const QString &jsCode, QScriptValue& result);
 
 public slots:
     bool execute(const QString& jsCode);

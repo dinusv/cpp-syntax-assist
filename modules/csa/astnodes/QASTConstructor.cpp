@@ -16,7 +16,8 @@
 
 
 #include "QASTConstructor.hpp"
-#include "QASTClass.hpp"
+#include "QSourceLocation.hpp"
+#include "QASTMethodArgument.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "QTokenClassifier.hpp"
 #include "clang-c/Index.h"
@@ -33,64 +34,115 @@ QASTConstructor::QASTConstructor(
 
     : QASTNode("constructor", tokenSet, cursorLocation, rangeStartLocation, rangeEndLocation, parent){
 
-    if ( tokenSet->size() == 0 ){
-        CXType type          = clang_getCursorType(tokenSet->cursor());
-        CXString typeStr     = clang_getTypeSpelling(type);
-        const char* cTypeStr = clang_getCString(typeStr);
-        setIdentifier(cTypeStr);
-        clang_disposeString(typeStr);
-    }
+    // Get Identifier
+    // --------------
 
+    CXString id = clang_getCursorSpelling(tokenSet->cursor());
+    setIdentifier(clang_getCString(id));
 
+    // Get Arguments
+    // -------------
 
+    QAnnotatedTokenSet::Iterator it = tokenSet->begin();
 
-    CXString displayName = clang_getCursorDisplayName(tokenSet->cursor());
-    setIdentifier(clang_getCString(displayName));
-    clang_disposeString(displayName);
+    int numArguments = clang_Cursor_getNumArguments(tokenSet->cursor());
+    QList< QList<QAnnotatedToken*> > argTokenSetList;
 
-    /*for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
-        CXToken t = *it;
-        CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
-        CXTokenKind tKind  = clang_getTokenKind(t);
-        if ( tKind == CXToken_Punctuation && std::string(clang_getCString(tSpelling)) == "("){
+    for( int i = 0; i < numArguments; ++i ){
+        CXCursor argCursor = clang_Cursor_getArgument(tokenSet->cursor(), i);
 
-            setIdentifier(identifier() + clang_getCString(tSpelling));
-            int numargs = clang_Cursor_getNumArguments(tokenSet->cursor());
-            for ( int i = 0; i < numargs; ++i ){
+        QAnnotatedTokenSet* argTokenSet = classifier->findTokenSet(argCursor);
+        if ( argTokenSet == 0 ){
 
-                CXCursor crs                      = clang_Cursor_getArgument(tokenSet->cursor(), i);
-                QAnnotatedTokenSet* cursorTokenSet = classifier->findTokenSet(crs);
+            // See if argTokenSet has been attributed to this method
+            // -----------------------------------------------------
 
-                if ( cursorTokenSet ){
-                    bool spaceFlag = false;
-                    for ( QAnnotatedTokenSet::Iterator it = cursorTokenSet->begin(); it != cursorTokenSet->end(); ++it ){
-                        CXToken t = *it;
-                        CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
-                        CXTokenKind tKind  = clang_getTokenKind(t);
-                        if ( tKind == CXToken_Punctuation ){
-                            setIdentifier(identifier() + clang_getCString(tSpelling));
-                            spaceFlag    = false;
+            if ( argTokenSetList.empty() && it != tokenSet->end() ){
+                bool locationInArg = false;
+
+                QList<QAnnotatedToken*> currentTokenSetList;
+
+                while ( it != tokenSet->end() ){
+                    CXToken t              = (*it)->token();
+                    CXString tSpelling     = clang_getTokenSpelling(tokenSet->translationUnit(), t);
+                    const char* tCSpelling = clang_getCString(tSpelling);
+                    CXTokenKind tKind      = clang_getTokenKind(t);
+
+                    if ( tKind == CXToken_Punctuation && std::string("(") == tCSpelling ){
+                        locationInArg = true;
+                        ++it;
+                    } else if ( locationInArg ){
+
+                        if ( tKind == CXToken_Punctuation && std::string(",") == tCSpelling ){
+                            argTokenSetList.append(currentTokenSetList);
+                            currentTokenSetList = QList<QAnnotatedToken*>();
+                        } else if ( tKind == CXToken_Punctuation && std::string(")") == tCSpelling ){
+                            argTokenSetList.append(currentTokenSetList);
+                            locationInArg = false;
                         } else {
-                            if ( spaceFlag ){
-                                setIdentifier(identifier() + " ");
-                                spaceFlag = false;
-                            }
-                            setIdentifier(identifier() + clang_getCString(tSpelling));
-                            spaceFlag     = true;
+                            currentTokenSetList.append(*it);
                         }
-                        clang_disposeString(tSpelling);
+
+                        tokenSet->erase(it);
+                    } else {
+                        ++it;
                     }
-                    if ( i != numargs - 1 )
-                        setIdentifier(identifier() + ", ");
+
+                    clang_disposeString(tSpelling);
                 }
             }
 
-        } else if ( tKind != CXToken_Punctuation || std::string(clang_getCString(tSpelling)) != "," ){
-            setIdentifier(identifier() + clang_getCString(tSpelling));
-        }
-        clang_disposeString(tSpelling);
-    }*/
+            // Add parsed tokens from this method to the args
+            // ----------------------------------------------
 
+            argTokenSet = new QAnnotatedTokenSet(argCursor, classifier->translationUnit());
+            if ( i < argTokenSetList.size() ){
+                for ( int j = 0; j < argTokenSetList[i].size(); ++j ){
+                    argTokenSet->append(argTokenSetList[i][j]->token());
+                }
+            }
+
+            classifier->appendTokenSet(argTokenSet);
+        }
+
+        CXSourceLocation loc = clang_getCursorLocation(argCursor);
+        CXSourceRange range  = clang_getCursorExtent(argCursor);
+
+        CXSourceLocation locStart = clang_getRangeStart(range);
+        CXSourceLocation locEnd   = clang_getRangeEnd(range);
+
+        QASTMethodArgument* argument = new QASTMethodArgument(
+            argTokenSet,
+            new QSourceLocation(loc),
+            new QSourceLocation(locStart),
+            new QSourceLocation(locEnd),
+            0
+        );
+        argument->setParent(this);
+
+        m_arguments.append(argument);
+    }
+
+    clang_disposeString(id);
+}
+
+QString QASTConstructor::content() const{
+    QString base = "";
+    base += identifier();
+    base += "(";
+
+    bool firstArg = true;
+    for ( QList<csa::ast::QASTNode*>::const_iterator it = m_arguments.begin(); it != m_arguments.end(); ++it ){
+        if ( firstArg ){
+            base    += (*it)->content();
+            firstArg = false;
+        } else {
+            base    += ", " + (*it)->content();
+        }
+    }
+    base += ")";
+
+    return base;
 }
 
 }}// namespace

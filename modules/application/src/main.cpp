@@ -55,8 +55,9 @@ int main(int argc, char *argv[]){
     // Create Codebase
     // ---------------
 
-    const char* args[] = {"-c", "-x", "c++"};
     QSyntaxTreeModel* astTreeModel = new QSyntaxTreeModel;
+
+    const char* args[] = {"-c", "-x", "c++"};
     QCodeBase codeBase(args, 3, commandLineArguments.file(), astTreeModel);
 
     if ( commandLineArguments.isCursorOffsetSet() ){

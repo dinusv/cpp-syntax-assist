@@ -21,6 +21,7 @@ public:
     virtual ~QASTMethodArgument();
 
     virtual QString content() const;
+    virtual QString prop(const QString &key) const;
 
 signals:
 

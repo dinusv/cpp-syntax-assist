@@ -40,7 +40,7 @@ public:
             const char* const* translationUnitArgs,
             int                translationUnitNumArgs,
             const QString&     file,
-            QCodeBaseObserver* treeModel,
+            QCodeBaseObserver* observer = 0,
             QObject*           parent = 0);
 
     csa::ast::QASTNode* selected();
@@ -54,6 +54,9 @@ public:
 public slots:
     QList<csa::ast::QASTNode*> files();
     csa::ast::QASTNode* cursorNode();
+
+    csa::QSourceLocation* createLocation(const QString &file, unsigned int offset);
+    csa::QSourceLocation* createLocation(const QString &file, unsigned int line, unsigned int column);
 
     void save();
     bool select(const QString &typeString, const QString &name);

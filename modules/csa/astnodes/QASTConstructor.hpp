@@ -39,10 +39,16 @@ public:
             QASTNode* parent = 0);
 
     QString content() const;
+
+public slots:
+    virtual QList<csa::ast::QASTNode*> arguments() const;
+
+private:
+    QList<csa::ast::QASTNode*> m_arguments;
 };
 
-inline QString QASTConstructor::content() const{
-    return identifier();
+inline QList<QASTNode*> QASTConstructor::arguments() const{
+    return m_arguments;
 }
 
 }}// namespace

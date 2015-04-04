@@ -1,11 +1,16 @@
 # Copy js plugins to release path
 # -------------------------------
 
-win32:CONFIG(debug, debug|release): PLUGIN_DEPLOY = $$OUT_PWD/debug/plugins
-else:win32:CONFIG(release, debug|release): PLUGIN_DEPLOY = $$OUT_PWD/release/plugins
+PLUGIN_DEPLOY_FROM = $$PWD/../../plugins
+
+win32:CONFIG(debug, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/debug/plugins
+else:win32:CONFIG(release, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/release/plugins
 else:unix: DEPLOY_PATH = $$OUT_PWD
 
-plugincopy.commands = $(COPY_DIR) \"$$PWD/../../plugins\" \"$$PLUGIN_DEPLOY\"
+win32:PLUGIN_DEPLOY_TO ~= s,/,\\,g
+win32:PLUGIN_DEPLOY_FROM ~= s,/,\\,g
+
+plugincopy.commands = $(COPY_DIR) \"$$PLUGIN_DEPLOY_FROM\" \"$$PLUGIN_DEPLOY_TO\"
 first.depends = $(first) plugincopy
 export(first.depends)
 export(plugincopy.commands)
@@ -59,3 +64,4 @@ QML_IMPORT_PATH =
 
 # Default rules for deployment.
 include(deployment.pri)
+

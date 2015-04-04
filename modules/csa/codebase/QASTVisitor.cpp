@@ -66,8 +66,8 @@ CXChildVisitResult QASTVisitor::callback(CXCursor cursor, CXCursor, CXClientData
     QASTNode* csanode            = static_cast<VisitorClientData*>(data)->node();
     QTokenClassifier* classifier = static_cast<VisitorClientData*>(data)->classifier();
 
-    CXSourceLocation loc = clang_getCursorLocation(cursor);
-    CXSourceRange range  = clang_getCursorExtent(cursor);
+    CXSourceLocation loc      = clang_getCursorLocation(cursor);
+    CXSourceRange range       = clang_getCursorExtent(cursor);
 
     CXSourceLocation locStart = clang_getRangeStart(range);
     CXSourceLocation locEnd   = clang_getRangeEnd(range);

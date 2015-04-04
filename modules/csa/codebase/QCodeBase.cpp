@@ -44,10 +44,12 @@ QCodeBase::QCodeBase(const char* const* translationUnitArgs,
 
     CXIndex index = clang_createIndex(0, 0);
     CXTranslationUnit transUnit  = clang_parseTranslationUnit(
-                index, file.toStdString().c_str(),
+                index,
+                file.toStdString().c_str(),
                 translationUnitArgs,
                 translationUnitNumArgs,
-                0, 0,
+                0,
+                0,
                 CXTranslationUnit_Incomplete | CXTranslationUnit_CXXChainedPCH);
 
     CXCursor startCursor  = clang_getTranslationUnitCursor(transUnit);
@@ -141,6 +143,29 @@ QList<QASTNode*> QCodeBase::files(){
 
 QASTNode* QCodeBase::cursorNode(){
     return m_current;
+}
+
+QSourceLocation* QCodeBase::createLocation(const QString& file, unsigned int offset){
+    CXTranslationUnit transUnit     = m_classifier->translationUnit();
+    CXSourceLocation sourceLocation = clang_getLocationForOffset(
+                transUnit,
+                clang_getFile(transUnit, file.toStdString().c_str()),
+                offset);
+    if ( !clang_equalLocations(sourceLocation, clang_getNullLocation()) )
+        return new QSourceLocation(sourceLocation);
+    return 0;
+}
+
+QSourceLocation* QCodeBase::createLocation(const QString& file, unsigned int line, unsigned int column){
+    CXTranslationUnit transUnit     = m_classifier->translationUnit();
+    CXSourceLocation sourceLocation = clang_getLocation(
+                transUnit,
+                clang_getFile(transUnit, file.toStdString().c_str()),
+                line,
+                column);
+    if ( !clang_equalLocations(sourceLocation, clang_getNullLocation()) )
+        return new QSourceLocation(sourceLocation);
+    return 0;
 }
 
 }// namespace
