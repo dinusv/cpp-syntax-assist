@@ -17,6 +17,7 @@
 
 #include "QCsaScriptEngine.hpp"
 #include "QASTNodeConvert.hpp"
+#include "QASTFileConvert.hpp"
 #include "QSourceLocationConvert.hpp"
 #include "QAnnotatedTokenConvert.hpp"
 #include "QCodeBase.hpp"
@@ -33,6 +34,9 @@ QCSAScriptEngine::QCSAScriptEngine(QObject* parent)
     m_engine = new QScriptEngine;
     qScriptRegisterMetaType<ast::QASTNode*>(m_engine, &nodeToScriptValue, &nodeFromScriptValue);
     qScriptRegisterSequenceMetaType<QList<ast::QASTNode*> >(m_engine);
+
+    qScriptRegisterMetaType<ast::QASTFile*>(m_engine, &fileToScriptValue, &fileFromScriptValue);
+    qScriptRegisterSequenceMetaType<QList<ast::QASTFile*> >(m_engine);
 
     qScriptRegisterMetaType<QSourceLocation*>(m_engine, &sourceLocationToScriptValue, &sourceLocationFromScriptValue);
 

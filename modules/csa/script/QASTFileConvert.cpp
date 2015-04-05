@@ -15,40 +15,18 @@
 ****************************************************************************/
 
 
-#ifndef QASTFILEROOT_HPP
-#define QASTFILEROOT_HPP
+#include "QASTFileConvert.hpp"
 
-#include "QCSAGlobal.hpp"
-#include "QASTNode.hpp"
-#include <QDebug>
+namespace csa{
 
-namespace csa{ namespace ast{
-
-class QInsertionElementPrivate;
-
-class Q_CSA_EXPORT QASTFile : public QASTNode{
-
-    Q_OBJECT
-
-public:
-    QASTFile(QAnnotatedTokenSet* tokenSet, const QString& file, QSourceLocation* endOfFile);
-
-    bool hasInsertions();
-    void saveInsertions();
-    QString content() const;
-
-    void insert(const QString& value, const QSourceLocation& location);
-
-public slots:
-
-private:
-    QList<QInsertionElementPrivate*> m_insertions;
-};
-
-inline QString QASTFile::content() const{
-    return QString("file \"") + identifier() + "\"";
+QScriptValue fileToScriptValue(QScriptEngine* engine, ast::QASTFile* const & file){
+    QScriptValue obj = engine->newQObject(file, QScriptEngine::QtOwnership);
+    return obj;
 }
 
-}}//namespace
+void fileFromScriptValue(const QScriptValue& obj, ast::QASTFile*& file){
+    file = qobject_cast<ast::QASTFile*>(obj.toQObject());
+}
 
-#endif // QASTFILEROOT_HPP
+}// namespace
+

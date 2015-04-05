@@ -137,7 +137,7 @@ bool QCodeBase::select(const QString &typeString, const QString &name){
     return false;
 }
 
-QList<QASTNode*> QCodeBase::files(){
+QList<QASTFile*> QCodeBase::files(){
     return m_files;
 }
 

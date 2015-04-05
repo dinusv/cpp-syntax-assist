@@ -52,7 +52,7 @@ public:
     void updateTreeModel();
 
 public slots:
-    QList<csa::ast::QASTNode*> files();
+    QList<csa::ast::QASTFile*> files();
     csa::ast::QASTNode* cursorNode();
 
     csa::QSourceLocation* createLocation(const QString &file, unsigned int offset);
@@ -63,7 +63,7 @@ public slots:
 
 private:
 
-    QList<ast::QASTNode*>  m_files;
+    QList<ast::QASTFile*>  m_files;
 
     csa::ast::QASTFile*    m_root;
     csa::ast::QASTNode*    m_current;

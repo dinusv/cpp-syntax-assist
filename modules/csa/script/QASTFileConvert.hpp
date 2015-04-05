@@ -15,40 +15,21 @@
 ****************************************************************************/
 
 
-#ifndef QASTFILEROOT_HPP
-#define QASTFILEROOT_HPP
+#ifndef QASTFILECONVERT_HPP
+#define QASTFILECONVERT_HPP
 
-#include "QCSAGlobal.hpp"
-#include "QASTNode.hpp"
-#include <QDebug>
+#include <QScriptEngine>
+#include <QScriptValue>
+#include "QASTFile.hpp"
 
-namespace csa{ namespace ast{
+namespace csa{
 
-class QInsertionElementPrivate;
+// JS Conversion
+// -------------
 
-class Q_CSA_EXPORT QASTFile : public QASTNode{
+QScriptValue Q_CSA_EXPORT fileToScriptValue(QScriptEngine *engine, ast::QASTFile* const & file);
+void Q_CSA_EXPORT fileFromScriptValue(const QScriptValue &obj, ast::QASTFile* &file);
 
-    Q_OBJECT
+}// namespace
 
-public:
-    QASTFile(QAnnotatedTokenSet* tokenSet, const QString& file, QSourceLocation* endOfFile);
-
-    bool hasInsertions();
-    void saveInsertions();
-    QString content() const;
-
-    void insert(const QString& value, const QSourceLocation& location);
-
-public slots:
-
-private:
-    QList<QInsertionElementPrivate*> m_insertions;
-};
-
-inline QString QASTFile::content() const{
-    return QString("file \"") + identifier() + "\"";
-}
-
-}}//namespace
-
-#endif // QASTFILEROOT_HPP
+#endif // QASTFILECONVERT_HPP
