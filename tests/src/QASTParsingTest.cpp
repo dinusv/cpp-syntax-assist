@@ -35,19 +35,16 @@ void QASTParsingTest::unknownTypeDeduction(){
 
     QScriptValue result;
     m_engine->execute("parserplugin();", result);
-
     QJsonValue jsonResult = helpers::jsonFromScriptValue(result);
 
-    QFile file(m_parserTestPath + "unknowntype.expect");
-    if ( file.open(QIODevice::ReadOnly) ){
-        QByteArray bstr = file.readAll();
-        QJsonDocument expectedResult = QJsonDocument::fromJson(bstr);
-
-        QJsonObject er = expectedResult.object();
-        QJsonObject gr = jsonResult.toObject();
-
-        QVERIFY(helpers::compareJsonValues(er, gr));
+    bool parseOk;
+    QJsonObject expectedResult = helpers::parseJsonFile(m_parserTestPath + "unknowntype.expect", &parseOk);
+    if ( !parseOk ){
+        QFAIL(qPrintable("Unable to parse result file: " + m_parserTestPath + "unknowntype.exepect"));
+        return;
     }
+
+    QVERIFY(helpers::compareJsonValues(jsonResult.toObject(), expectedResult));
 }
 
 void QASTParsingTest::init(){

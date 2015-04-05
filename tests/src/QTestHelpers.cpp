@@ -4,6 +4,8 @@
 #include <QScriptValueIterator>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QJsonDocument>
+#include <QFile>
 
 namespace helpers{
 
@@ -81,5 +83,23 @@ bool compareJsonValues(const QJsonValue& val1, const QJsonValue& val2){
 
     return true;
 }
+
+QJsonObject parseJsonFile(const QString& filePath, bool* parseOk){
+    QFile file(filePath);
+    if ( !file.open(QIODevice::ReadOnly ) ){
+        if ( parseOk )
+            *parseOk = false;
+        return QJsonObject();
+    }
+
+    QByteArray fileData = file.readAll();
+    QJsonDocument fileJsonData = QJsonDocument::fromJson(fileData);
+
+    if( parseOk )
+        *parseOk = true;
+    return fileJsonData.object();
+}
+
+
 
 }
