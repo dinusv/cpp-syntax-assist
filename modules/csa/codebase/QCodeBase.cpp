@@ -19,6 +19,7 @@
 #include "QCodeBaseObserver.hpp"
 #include "QSourceLocation.hpp"
 #include "QTokenClassifier.hpp"
+#include "QAnnotatedTokenSet.hpp"
 #include "QASTFile.hpp"
 #include "QASTNode.hpp"
 #include "QASTVisitor.hpp"
@@ -58,7 +59,7 @@ QCodeBase::QCodeBase(const char* const* translationUnitArgs,
     m_classifier = new QTokenClassifier(transUnit, file.toStdString().c_str());
 
     m_root       = new QASTFile(
-                        0,
+                        new QAnnotatedTokenSet(startCursor, transUnit),
                         file,
                         new QSourceLocation(
                             clang_getLocationForOffset(
