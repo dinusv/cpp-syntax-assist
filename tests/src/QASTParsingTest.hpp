@@ -35,15 +35,12 @@ public:
     virtual ~QASTParsingTest();
 
 private slots:
-    void unknownTypeDeduction();
+    void initTestCase();
+    void unknownTypeDeductionTest();
 
 private:
-    void init();
-
     csa::QCSAScriptEngine* m_engine;
-
-    int     m_parserEngineCode;
-    QString m_parserTestPath;
+    QString                m_parserTestPath;
 
 };
 

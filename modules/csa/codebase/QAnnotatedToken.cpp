@@ -59,8 +59,8 @@ void QAnnotatedToken::before(const QString& value){
     if ( !node )
         return;
 
-    CXSourceLocation locStart = clang_getRangeStart(m_tokenRange);
-    node->insert(value, QSourceLocation(locStart));
+    QSourceLocation locStart(clang_getRangeStart(m_tokenRange));
+    node->insert(value, &locStart);
 }
 
 void QAnnotatedToken::after(const QString& value){
@@ -68,8 +68,8 @@ void QAnnotatedToken::after(const QString& value){
     if ( !node )
         return;
 
-    CXSourceLocation locEnd = clang_getRangeEnd(m_tokenRange);
-    node->insert(value, QSourceLocation(locEnd));
+    QSourceLocation locEnd(clang_getRangeEnd(m_tokenRange));
+    node->insert(value, &locEnd);
 }
 
 void QAnnotatedToken::afterln(const QString& value){
@@ -87,13 +87,14 @@ void QAnnotatedToken::afterln(const QString& value){
     unsigned line, column, offset;
     clang_getSpellingLocation(location, &file, &line, &column, &offset);
 
-    CXSourceLocation afterLocation = clang_getLocation(
+    QSourceLocation afterLocation(clang_getLocation(
                 tokenSet->translationUnit(),
                 file,
                 line + 1,
-                1); // location will be automatically truncated to max lines
+                1
+    )); // location will be automatically truncated to max lines
 
-    node->insert(value, QSourceLocation(afterLocation));
+    node->insert(value, &afterLocation);
 }
 
 }// namespace

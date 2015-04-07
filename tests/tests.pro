@@ -46,4 +46,7 @@ TEMPLATE = app
 OTHER_FILES += \
     data/parsing/unknowntype.test \
     data/parsing/unknowntype.expect \
-    data/parsing/parserplugin.js
+    data/parsing/parserplugin.js \
+    data/insertion/insertion.js \
+    data/insertion/insertion.test \
+    data/insertion/insertion.expect

@@ -37,12 +37,16 @@ public:
     void saveInsertions();
     QString content() const;
 
-    void insert(const QString& value, const QSourceLocation& location);
-
 public slots:
+    bool insert(const QString& value, csa::QSourceLocation* location);
+    QString readAll();
+    unsigned int size();
+    csa::QSourceLocation* createLocation(unsigned int offset);
+    csa::QSourceLocation* createLocation(unsigned int line, unsigned int column);
 
 private:
     QList<QInsertionElementPrivate*> m_insertions;
+
 };
 
 inline QString QASTFile::content() const{

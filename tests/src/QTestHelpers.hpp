@@ -19,6 +19,8 @@
 #define QTESTHELPERS_HPP
 
 #include <QJsonValue>
+#include <QSharedPointer>
+#include "QCodeBase.hpp"
 
 class QScriptValue;
 
@@ -27,6 +29,11 @@ namespace helpers{
     QJsonValue jsonFromScriptValue(const QScriptValue& val);
     bool compareJsonValues(const QJsonValue& val1, const QJsonValue& val2);
     QJsonObject parseJsonFile(const QString& filePath, bool* parseOk = 0);
+
+    QSharedPointer<csa::QCodeBase> createCodeBaseFromFile(
+            const QString& filePath,
+            csa::QCodeBaseObserver* observer = 0
+    );
 
 }// namespace
 

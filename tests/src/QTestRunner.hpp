@@ -29,13 +29,14 @@ public:
     static int runTests(int argc, char *argv[]);
     static int runTest(int index, int argc, char* argv[]);
     static int totalRegisteredTests();
+    static void cleanupTests();
 
 private:
-    static QList<QSharedPointer<QObject> > m_tests;
+    static QList<QSharedPointer<QObject> >* m_tests;
 };
 
 inline int QTestRunner::totalRegisteredTests(){
-    return m_tests.size();
+    return m_tests->size();
 }
 
 #define Q_TEST_RUNNER_SUITE \

@@ -37,18 +37,20 @@ QASTParsingTest::~QASTParsingTest(){
     delete m_engine;
 }
 
-void QASTParsingTest::unknownTypeDeduction(){
-    init();
+void QASTParsingTest::initTestCase(){
+    m_engine             = new csa::QCSAScriptEngine;
+    m_parserTestPath     = QCoreApplication::applicationDirPath() + "/data/parsing/";
+    int parserEngineCode = m_engine->loadPlugins(m_parserTestPath + "parserplugin.js");
 
-    if ( m_parserEngineCode != 0 ){
-        QFAIL("Unable to load parser plugin: " + m_parserEngineCode);
+    if ( parserEngineCode != 0 ){
+        QFAIL("Unable to load parser plugin: " + parserEngineCode);
         return;
     }
+}
 
-    const char* args[] = {"-c", "-x", "c++"};
-    QCodeBase cbase(args, 3, m_parserTestPath + "unknowntype.test");
-
-    m_engine->setCodeBase(&cbase);
+void QASTParsingTest::unknownTypeDeductionTest(){
+    QSharedPointer<QCodeBase> cbase = helpers::createCodeBaseFromFile(m_parserTestPath + "unknowntype.test");
+    m_engine->setCodeBase(cbase.data());
 
     QScriptValue result;
     m_engine->execute("parserplugin();", result);
@@ -62,12 +64,4 @@ void QASTParsingTest::unknownTypeDeduction(){
     }
 
     QVERIFY(helpers::compareJsonValues(jsonResult.toObject(), expectedResult));
-}
-
-void QASTParsingTest::init(){
-    if ( m_engine == 0 ){
-        m_engine = new csa::QCSAScriptEngine;
-        m_parserTestPath = QCoreApplication::applicationDirPath() + "/data/parsing/";
-        m_parserEngineCode = m_engine->loadPlugins(m_parserTestPath + "parserplugin.js");
-    }
 }

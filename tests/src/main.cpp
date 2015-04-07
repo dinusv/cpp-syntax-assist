@@ -20,6 +20,7 @@
 
 #include "QTestRunner.hpp"
 #include "QASTParsingTest.hpp"
+#include "QASTInsertionTest.hpp"
 
 int main(int argc, char *argv[])
 {
