@@ -1,4 +1,4 @@
-#include "QCsaScriptEngine.hpp"
+#include "QCSAScriptEngine.hpp"
 #include "QASTNodeConvert.hpp"
 #include "QSourceLocationConvert.hpp"
 #include "QAnnotatedTokenConvert.hpp"
@@ -41,7 +41,7 @@ void QCSAScriptEngine::setCodeBase(QCodeBase* cBase){
 int QCSAScriptEngine::loadPlugins(const QString& path){
     QFileInfo fInfo(path);
     if ( !fInfo.exists() ){
-        qCritical(qPrintable("Path does not exist: " + path + "."));
+        qCritical("%s", qPrintable("Path does not exist: " + path + "."));
         return -1;
     }
 
@@ -59,7 +59,7 @@ int QCSAScriptEngine::loadPlugins(const QString& path){
         QFile configScript(path);
         if ( !configScript.open(QIODevice::ReadOnly) ){
             qCritical(
-                qPrintable(("Error opening js configuration file. Make sure the file is present in " + path + ".")));
+                "%s", qPrintable(("Error opening js configuration file. Make sure the file is present in " + path + ".")));
             return 2;
         }
 
@@ -68,9 +68,11 @@ int QCSAScriptEngine::loadPlugins(const QString& path){
 
         if ( m_engine->hasUncaughtException() ){
             int line = m_engine->uncaughtExceptionLineNumber();
-            qCritical( (
-                "Uncaught javascript exception at line " + QString::number(line) + ":" +
-                m_engine->uncaughtException().toString()).toStdString().c_str());
+            qCritical(
+                "%s",(
+                    "Uncaught javascript exception at line " + QString::number(line) + ":" +
+                    m_engine->uncaughtException().toString()).toStdString().c_str()
+            );
             return 3;
         }
     }
@@ -84,7 +86,7 @@ bool QCSAScriptEngine::execute(const QString& jsCode){
 
     QScriptValue result = m_engine->evaluate(jsCode);
     if ( m_engine->hasUncaughtException() ){
-        qCritical( ("Uncaught javascript exception:" + result.toString()).toStdString().c_str() );
+        qCritical("%s", ("Uncaught javascript exception:" + result.toString()).toStdString().c_str() );
         return false;
     }
 

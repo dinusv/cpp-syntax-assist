@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
     // ----------------
 
     if ( !QFileInfo::exists(commandLineArguments.file()) ){
-        qCritical(qPrintable("Error: Input file does not exist: " + commandLineArguments.file()));
+        qCritical("%s", qPrintable("Error: Input file does not exist: " + commandLineArguments.file()));
         return -1;
     }
 

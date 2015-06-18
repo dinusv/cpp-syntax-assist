@@ -17,7 +17,7 @@ DEPENDPATH  += $$PWD/../modules/csa/script
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../modules/csa/release/ -lcsa
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../modules/csa/debug/ -lcsa
-else:unix: LIBS += -L$$OUT_PWD/../application/ -llcvlib
+else:unix: LIBS += -L$$OUT_PWD/../modules/application/ -lcsa
 
 include($$PWD/src/tests.pri)
 
