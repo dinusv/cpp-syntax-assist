@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Dinu SV.
+** Copyright (C) 2014-2015 Dinu SV.
 ** (contact: mail@dinusv.com)
 ** This file is part of C++ Snippet Assist application.
 **
@@ -116,7 +116,7 @@ public:
 
     void removeChildren();
 
-    virtual void insert(const QString& value, const QSourceLocation& location);
+    virtual bool insert(const QString& value, QSourceLocation* location);
 
     void setAstParent(csa::ast::QASTNode* parent);
 
@@ -130,6 +130,8 @@ protected:
 
     csa::ast::QASTNode* childAfter(csa::ast::QASTNode* child);
     csa::ast::QASTNode* childBefore(csa::ast::QASTNode* child);
+
+    QAnnotatedTokenSet* tokenSet();
 
 private:
     // Parameters
@@ -152,6 +154,10 @@ private:
 
 inline void QASTNode::setIdentifier(const QString &identifier){
     m_identifier = identifier;
+}
+
+inline QAnnotatedTokenSet*QASTNode::tokenSet(){
+    return m_tokenSet;
 }
 
 inline QString QASTNode::typeName() const{

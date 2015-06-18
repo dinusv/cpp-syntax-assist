@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Dinu SV.
+** Copyright (C) 2014-2015 Dinu SV.
 ** (contact: mail@dinusv.com)
 ** This file is part of C++ Snippet Assist application.
 **
@@ -18,10 +18,14 @@
 #include "QASTFile.hpp"
 #include "QSourceLocation.hpp"
 #include "QTokenClassifier.hpp"
+#include "QAnnotatedTokenSet.hpp"
 
 #include <QFile>
 
 namespace csa{ namespace ast{
+
+// QInsertionElementPrivate
+// ------------------------
 
 class QInsertionElementPrivate{
 
@@ -43,6 +47,9 @@ bool offsetCompare(QInsertionElementPrivate* e1, QInsertionElementPrivate* e2){
     return (e1->location.filePath() < e2->location.filePath());
 }
 
+// QASTFile Definitions
+// --------------------
+
 QASTFile::QASTFile(QAnnotatedTokenSet* tokenSet, const QString& file, QSourceLocation *endOfFile)
     : QASTNode(
           "file",
@@ -60,7 +67,6 @@ bool QASTFile::hasInsertions(){
 }
 
 void QASTFile::saveInsertions(){
-
     if ( hasInsertions() ){
         std::sort(m_insertions.begin(), m_insertions.end(), offsetCompare);
 
@@ -92,8 +98,38 @@ void QASTFile::saveInsertions(){
     }
 }
 
-void QASTFile::insert(const QString& value, const QSourceLocation& location){
-    m_insertions.append(new QInsertionElementPrivate(value, location));
+bool QASTFile::insert(const QString& value, QSourceLocation* location){
+    if ( location->offset() < size() && location->filePath() == identifier() ){
+         m_insertions.append(new QInsertionElementPrivate(value, *location));
+        return true;
+    } else {
+        qCritical() << "Cannot insert :'" <<  value << "'. Incompatible file location.";
+        return false;
+    }
+}
+
+QString QASTFile::readAll(){
+    QFile file(identifier());
+    if ( !file.open(QIODevice::ReadOnly) ){
+        qCritical() << "Cannot open file '" << identifier() << "' for reading.";
+        return "";
+    }
+
+    return QTextStream(&file).readAll();
+}
+
+unsigned int QASTFile::size(){
+    return rangeEndLocation()->offset();
+}
+
+QSourceLocation* QASTFile::createLocation(unsigned int offset){
+    CXFile clangFile = clang_getFile(tokenSet()->translationUnit(), identifier().toLocal8Bit().constData());
+    return new QSourceLocation(clang_getLocationForOffset(tokenSet()->translationUnit(), clangFile, offset));
+}
+
+QSourceLocation* QASTFile::createLocation(unsigned int line, unsigned int column){
+    CXFile clangFile = clang_getFile(tokenSet()->translationUnit(), identifier().toLocal8Bit().constData());
+    return new QSourceLocation(clang_getLocation(tokenSet()->translationUnit(), clangFile, line, column));
 }
 
 }}//namespace

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Dinu SV.
+** Copyright (C) 2014-2015 Dinu SV.
 ** (contact: mail@dinusv.com)
 ** This file is part of C++ Snippet Assist application.
 **
@@ -55,8 +55,9 @@ int main(int argc, char *argv[]){
     // Create Codebase
     // ---------------
 
-    const char* args[] = {"-c", "-x", "c++"};
     QSyntaxTreeModel* astTreeModel = new QSyntaxTreeModel;
+
+    const char* args[] = {"-c", "-x", "c++"};
     QCodeBase codeBase(args, 3, commandLineArguments.file(), astTreeModel);
 
     if ( commandLineArguments.isCursorOffsetSet() ){

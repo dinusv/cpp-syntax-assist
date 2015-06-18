@@ -1,5 +1,22 @@
+/****************************************************************************
+**
+** Copyright (C) 2014-2015 Dinu SV.
+** (contact: mail@dinusv.com)
+** This file is part of C++ Snippet Assist application.
+**
+** GNU General Public License Usage
+** 
+** This file may be used under the terms of the GNU General Public License 
+** version 3.0 as published by the Free Software Foundation and appearing 
+** in the file LICENSE.GPL included in the packaging of this file.  Please 
+** review the following information to ensure the GNU General Public License 
+** version 3.0 requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+**
+****************************************************************************/
+
 #include "QCSAScriptEngine.hpp"
 #include "QASTNodeConvert.hpp"
+#include "QASTFileConvert.hpp"
 #include "QSourceLocationConvert.hpp"
 #include "QAnnotatedTokenConvert.hpp"
 #include "QCodeBase.hpp"
@@ -17,6 +34,9 @@ QCSAScriptEngine::QCSAScriptEngine(QObject* parent)
     qScriptRegisterMetaType<ast::QASTNode*>(m_engine, &nodeToScriptValue, &nodeFromScriptValue);
     qScriptRegisterSequenceMetaType<QList<ast::QASTNode*> >(m_engine);
 
+    qScriptRegisterMetaType<ast::QASTFile*>(m_engine, &fileToScriptValue, &fileFromScriptValue);
+    qScriptRegisterSequenceMetaType<QList<ast::QASTFile*> >(m_engine);
+
     qScriptRegisterMetaType<QSourceLocation*>(m_engine, &sourceLocationToScriptValue, &sourceLocationFromScriptValue);
 
     qScriptRegisterMetaType<QAnnotatedToken*>(m_engine, &tokenToScriptValue, &tokenFromScriptValue);
@@ -26,7 +46,7 @@ QCSAScriptEngine::QCSAScriptEngine(QObject* parent)
 
     QScriptValue metaObject = m_engine->newQMetaObject(
                 &QAnnotatedToken::staticMetaObject, m_engine->newFunction(&tokenScriptConstructor) );
-    m_engine->globalObject().setProperty( "Token", metaObject );
+    m_engine->globalObject().setProperty("Token", metaObject);
 }
 
 QCSAScriptEngine::~QCSAScriptEngine(){
@@ -80,17 +100,22 @@ int QCSAScriptEngine::loadPlugins(const QString& path){
     return 0;
 }
 
-bool QCSAScriptEngine::execute(const QString& jsCode){
+bool QCSAScriptEngine::execute(const QString& jsCode, QScriptValue& result){
     if ( !m_engine )
         return false;
 
-    QScriptValue result = m_engine->evaluate(jsCode);
+    result = m_engine->evaluate(jsCode);
     if ( m_engine->hasUncaughtException() ){
         qCritical("%s", ("Uncaught javascript exception:" + result.toString()).toStdString().c_str() );
         return false;
     }
 
     return true;
+}
+
+bool QCSAScriptEngine::execute(const QString& jsCode){
+    QScriptValue result;
+    return execute(jsCode, result);
 }
 
 }// namespace

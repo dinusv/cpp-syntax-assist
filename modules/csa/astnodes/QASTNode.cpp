@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Dinu SV.
+** Copyright (C) 2014-2015 Dinu SV.
 ** (contact: mail@dinusv.com)
 ** This file is part of C++ Snippet Assist application.
 **
@@ -72,32 +72,34 @@ QASTNode*QASTNode::astParent(){
 }
 
 void QASTNode::append(const QString& value){
-    insert(value, *bodyEndLocation());
+    insert(value, bodyEndLocation());
 }
 
 void QASTNode::prepend(const QString& value){
-    insert(value, *bodyStartLocation());
+    insert(value, bodyStartLocation());
 }
 
 void QASTNode::before(const QString& value){
-    insert(value, *rangeStartLocation());
+    insert(value, rangeStartLocation());
 }
 
 void QASTNode::after(const QString& value){
-    insert(value, *rangeEndLocation());
+    insert(value, rangeEndLocation());
 }
 
 void QASTNode::afterln(const QString& value){
     if ( !m_tokenSet )
         after(value);
 
-    CXSourceLocation afterLocation = clang_getLocation(
+    CXSourceLocation cxAfterLocation = clang_getLocation(
                 m_tokenSet->translationUnit(),
                 clang_getFile(m_tokenSet->translationUnit(), rangeEndLocation()->filePath().toUtf8()),
                 rangeEndLocation()->line() + 1,
                 1); // location will be automatically truncated to max lines
 
-    insert(value, QSourceLocation(afterLocation));
+    QSourceLocation* afterLocation = new QSourceLocation(cxAfterLocation);
+    insert(value, afterLocation);
+    delete afterLocation;
 }
 
 void QASTNode::dump(QString& out, int depth) const{
@@ -111,10 +113,11 @@ void QASTNode::dump(QString& out, int depth) const{
     }
 }
 
-void QASTNode::insert(const QString& value, const QSourceLocation& location){
+bool QASTNode::insert(const QString& value, QSourceLocation* location){
     QASTNode* p = qobject_cast<QASTNode*>(parent());
     if ( p )
-        p->insert(value, location);
+        return p->insert(value, location);
+    return false;
 }
 
 void QASTNode::setAstParent(QASTNode* parent){

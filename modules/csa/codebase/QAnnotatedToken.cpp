@@ -1,3 +1,20 @@
+/****************************************************************************
+**
+** Copyright (C) 2014-2015 Dinu SV.
+** (contact: mail@dinusv.com)
+** This file is part of C++ Snippet Assist application.
+**
+** GNU General Public License Usage
+** 
+** This file may be used under the terms of the GNU General Public License 
+** version 3.0 as published by the Free Software Foundation and appearing 
+** in the file LICENSE.GPL included in the packaging of this file.  Please 
+** review the following information to ensure the GNU General Public License 
+** version 3.0 requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+**
+****************************************************************************/
+
+
 #include "QAnnotatedToken.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "QSourceLocation.hpp"
@@ -42,8 +59,8 @@ void QAnnotatedToken::before(const QString& value){
     if ( !node )
         return;
 
-    CXSourceLocation locStart = clang_getRangeStart(m_tokenRange);
-    node->insert(value, QSourceLocation(locStart));
+    QSourceLocation locStart(clang_getRangeStart(m_tokenRange));
+    node->insert(value, &locStart);
 }
 
 void QAnnotatedToken::after(const QString& value){
@@ -51,8 +68,8 @@ void QAnnotatedToken::after(const QString& value){
     if ( !node )
         return;
 
-    CXSourceLocation locEnd = clang_getRangeEnd(m_tokenRange);
-    node->insert(value, QSourceLocation(locEnd));
+    QSourceLocation locEnd(clang_getRangeEnd(m_tokenRange));
+    node->insert(value, &locEnd);
 }
 
 void QAnnotatedToken::afterln(const QString& value){
@@ -70,13 +87,14 @@ void QAnnotatedToken::afterln(const QString& value){
     unsigned line, column, offset;
     clang_getSpellingLocation(location, &file, &line, &column, &offset);
 
-    CXSourceLocation afterLocation = clang_getLocation(
+    QSourceLocation afterLocation(clang_getLocation(
                 tokenSet->translationUnit(),
                 file,
                 line + 1,
-                1); // location will be automatically truncated to max lines
+                1
+    )); // location will be automatically truncated to max lines
 
-    node->insert(value, QSourceLocation(afterLocation));
+    node->insert(value, &afterLocation);
 }
 
 }// namespace

@@ -1,0 +1,124 @@
+{
+    "id": "unknowntype.test",
+    "nodeType": "file",
+    "rangeEndOffset": 445,
+    "rangeStartOffset": 0,
+    "children": [
+        {
+            "id": "UnknownTypeTest",
+            "nodeType": "class",
+            "rangeEndOffset": 442,
+            "rangeStartOffset": 30,
+            "children": [
+                {
+                    "id": "public",
+                    "nodeType": "access",
+                    "rangeEndOffset": 63,
+                    "rangeStartOffset": 56
+                },
+                {
+                    "arguments": [
+                    ],
+                    "id": "getField",
+                    "nodeType": "method",
+                    "rangeEndOffset": 101,
+                    "rangeStartOffset": 69,
+                    "returnType": "ns::UnknownType"
+                },
+                {
+                    "arguments": [
+                        {
+                            "id": "field",
+                            "nodeType": "methodArgument",
+                            "rangeEndOffset": 143,
+                            "rangeStartOffset": 122,
+                            "type": "na::UnknownType"
+                        }
+                    ],
+                    "id": "setField",
+                    "nodeType": "method",
+                    "rangeEndOffset": 144,
+                    "rangeStartOffset": 108,
+                    "returnType": "void"
+                },
+                {
+                    "arguments": [
+                    ],
+                    "id": "getPField",
+                    "nodeType": "method",
+                    "rangeEndOffset": 187,
+                    "rangeStartOffset": 153,
+                    "returnType": "ns::UnknownType*"
+                },
+                {
+                    "arguments": [
+                        {
+                            "id": "pfield",
+                            "nodeType": "methodArgument",
+                            "rangeEndOffset": 232,
+                            "rangeStartOffset": 209,
+                            "type": "na::UnknownType*"
+                        }
+                    ],
+                    "id": "setPField",
+                    "nodeType": "method",
+                    "rangeEndOffset": 233,
+                    "rangeStartOffset": 194,
+                    "returnType": "void"
+                },
+                {
+                    "arguments": [
+                    ],
+                    "id": "getPPField",
+                    "nodeType": "method",
+                    "rangeEndOffset": 278,
+                    "rangeStartOffset": 242,
+                    "returnType": "ns::UnknownType**"
+                },
+                {
+                    "arguments": [
+                        {
+                            "id": "ppfield",
+                            "nodeType": "methodArgument",
+                            "rangeEndOffset": 326,
+                            "rangeStartOffset": 301,
+                            "type": "na::UnknownType**"
+                        }
+                    ],
+                    "id": "setPPField",
+                    "nodeType": "method",
+                    "rangeEndOffset": 327,
+                    "rangeStartOffset": 285,
+                    "returnType": "void"
+                },
+                {
+                    "id": "private",
+                    "nodeType": "access",
+                    "rangeEndOffset": 340,
+                    "rangeStartOffset": 332
+                },
+                {
+                    "id": "m_field",
+                    "nodeType": "field",
+                    "rangeEndOffset": 371,
+                    "rangeStartOffset": 346,
+                    "type": "ns::UnknownType"
+                },
+                {
+                    "id": "m_pfield",
+                    "nodeType": "field",
+                    "rangeEndOffset": 404,
+                    "rangeStartOffset": 378,
+                    "type": "ns::UnknownType*"
+                },
+                {
+                    "id": "m_ppfield",
+                    "nodeType": "field",
+                    "rangeEndOffset": 438,
+                    "rangeStartOffset": 411,
+                    "type": "ns::UnknownType**"
+                }
+            ]
+        }
+    ]
+}

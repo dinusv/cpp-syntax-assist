@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Dinu SV.
+** Copyright (C) 2014-2015 Dinu SV.
 ** (contact: mail@dinusv.com)
 ** This file is part of C++ Snippet Assist application.
 **
@@ -40,7 +40,7 @@ public:
             const char* const* translationUnitArgs,
             int                translationUnitNumArgs,
             const QString&     file,
-            QCodeBaseObserver* treeModel,
+            QCodeBaseObserver* observer = 0,
             QObject*           parent = 0);
 
     csa::ast::QASTNode* selected();
@@ -52,7 +52,7 @@ public:
     void updateTreeModel();
 
 public slots:
-    QList<csa::ast::QASTNode*> files();
+    QList<csa::ast::QASTFile*> files();
     csa::ast::QASTNode* cursorNode();
 
     csa::QSourceLocation* createLocation(const QString &file, unsigned int offset);
@@ -63,7 +63,7 @@ public slots:
 
 private:
 
-    QList<ast::QASTNode*>  m_files;
+    QList<ast::QASTFile*>  m_files;
 
     csa::ast::QASTFile*    m_root;
     csa::ast::QASTNode*    m_current;

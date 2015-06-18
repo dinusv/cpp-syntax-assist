@@ -1,8 +1,5 @@
-
 TEMPLATE = subdirs
 CONFIG  += ordered
-
-#include($$PWD/modules/modules.pro)
 
 SUBDIRS += $$PWD/modules/modules.pro
 SUBDIRS += $$PWD/tests/tests.pro

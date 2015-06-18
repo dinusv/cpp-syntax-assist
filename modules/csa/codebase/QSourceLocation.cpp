@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Dinu SV.
+** Copyright (C) 2014-2015 Dinu SV.
 ** (contact: mail@dinusv.com)
 ** This file is part of C++ Snippet Assist application.
 **
@@ -14,8 +14,8 @@
 **
 ****************************************************************************/
 
-
 #include "QSourceLocation.hpp"
+#include <QFileInfo>
 
 namespace csa{
 
@@ -102,6 +102,10 @@ void QSourceLocation::assign(unsigned int line, unsigned int column, const CXTra
     CXFile file = clang_getFile(translationUnit, m_filePath.toUtf8());
     if ( file != 0 )
         assign(clang_getLocation(translationUnit, file, line, column));
+}
+
+QString QSourceLocation::fileName() const{
+    return QFileInfo(m_filePath).fileName();
 }
 
 }// namespace

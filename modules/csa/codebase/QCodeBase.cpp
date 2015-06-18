@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Dinu SV.
+** Copyright (C) 2014-2015 Dinu SV.
 ** (contact: mail@dinusv.com)
 ** This file is part of C++ Snippet Assist application.
 **
@@ -19,6 +19,7 @@
 #include "QCodeBaseObserver.hpp"
 #include "QSourceLocation.hpp"
 #include "QTokenClassifier.hpp"
+#include "QAnnotatedTokenSet.hpp"
 #include "QASTFile.hpp"
 #include "QASTNode.hpp"
 #include "QASTVisitor.hpp"
@@ -58,7 +59,7 @@ QCodeBase::QCodeBase(const char* const* translationUnitArgs,
     m_classifier = new QTokenClassifier(transUnit, file.toStdString().c_str());
 
     m_root       = new QASTFile(
-                        0,
+                        new QAnnotatedTokenSet(startCursor, transUnit),
                         file,
                         new QSourceLocation(
                             clang_getLocationForOffset(
@@ -137,7 +138,7 @@ bool QCodeBase::select(const QString &typeString, const QString &name){
     return false;
 }
 
-QList<QASTNode*> QCodeBase::files(){
+QList<QASTFile*> QCodeBase::files(){
     return m_files;
 }
 

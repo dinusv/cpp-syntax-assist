@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Dinu SV.
+** Copyright (C) 2014-2015 Dinu SV.
 ** (contact: mail@dinusv.com)
 ** This file is part of C++ Snippet Assist application.
 **
@@ -62,6 +62,7 @@ public slots:
     unsigned int column() const;
     unsigned int offset() const;
     QString filePath() const;
+    QString fileName() const;
 
 private:
     QString      m_filePath;
