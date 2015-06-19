@@ -17,7 +17,6 @@
 
 #include <QCoreApplication>
 #include <QTest>
-
 #include "QTestRunner.hpp"
 #include "QASTParsingTest.hpp"
 #include "QASTInsertionTest.hpp"

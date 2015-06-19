@@ -25,7 +25,7 @@
 
 namespace csa{
 
-namespace ast{ class QASTNode; }
+namespace ast{ class QASTNode; class QASTFile; }
 class QCodeBase;
 }
 
@@ -46,7 +46,7 @@ public:
     explicit QSyntaxTreeModel(QObject *parent = 0);
 
     void clearAndReset();
-    void parse(csa::ast::QASTNode* root);
+    void parse(const QList<csa::ast::QASTFile*>& files);
     QVariant data(const QModelIndex &index, int role) const;
     int  rowCount(const QModelIndex &) const;
     virtual QHash<int, QByteArray> roleNames() const;

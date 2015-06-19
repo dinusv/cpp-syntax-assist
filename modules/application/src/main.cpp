@@ -47,8 +47,13 @@ int main(int argc, char *argv[]){
     // Assert Arguments
     // ----------------
 
-    if ( !QFileInfo::exists(commandLineArguments.file()) ){
-        qCritical("%s", qPrintable("Error: Input file does not exist: " + commandLineArguments.file()));
+    if ( commandLineArguments.hasFileErrors() ){
+        for ( QStringList::const_iterator it = commandLineArguments.fileErrors().begin();
+              it != commandLineArguments.fileErrors().end();
+              ++it )
+        {
+            qCritical("%s\n", qPrintable(*it));
+        }
         return -1;
     }
 
@@ -58,15 +63,21 @@ int main(int argc, char *argv[]){
     QSyntaxTreeModel* astTreeModel = new QSyntaxTreeModel;
 
     const char* args[] = {"-c", "-x", "c++"};
-    QCodeBase codeBase(args, 3, commandLineArguments.file(), astTreeModel);
+    QCodeBase codeBase(args, 3, commandLineArguments.files(), "", astTreeModel);
 
     if ( commandLineArguments.isCursorOffsetSet() ){
-        codeBase.propagateUserCursor(commandLineArguments.cursorOffset(), commandLineArguments.file());
+        codeBase.propagateUserCursor(
+            commandLineArguments.cursorOffset(),
+            commandLineArguments.files().first()
+        );
     } else if ( commandLineArguments.isCursorLineColumnSet() ){
         codeBase.propagateUserCursor(
-            commandLineArguments.cursorLine(), commandLineArguments.cursorColumn(), commandLineArguments.file());
+            commandLineArguments.cursorLine(),
+            commandLineArguments.cursorColumn(),
+            commandLineArguments.files().first()
+        );
     } else {
-        codeBase.propagateUserCursor(0, commandLineArguments.file());
+        codeBase.propagateUserCursor(0, commandLineArguments.files().first());
     }
 
     // Load plugins

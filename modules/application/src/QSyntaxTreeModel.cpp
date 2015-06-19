@@ -17,6 +17,7 @@
 #include "QSyntaxTreeModel.hpp"
 #include "QSourceLocation.hpp"
 #include "QASTNode.hpp"
+#include "QASTFile.hpp"
 
 using namespace csa;
 using namespace csa::ast;
@@ -24,11 +25,11 @@ using namespace csa::ast;
 class QSyntaxTreeItem{
 
 public:
-    int      indent;
-    int      line;
+    int       indent;
+    int       line;
     QASTNode* node;
-    QString  display;
-    QString  type;
+    QString   display;
+    QString   type;
 
 };
 
@@ -54,10 +55,13 @@ void QSyntaxTreeModel::clear(){
     m_items.clear();
 }
 
-void QSyntaxTreeModel::parse(QASTNode *root){
+void QSyntaxTreeModel::parse(const QList<ast::QASTFile *> &files){
     beginResetModel();
     clear();
-    recursiveParse(root, 0);
+    for ( QList<ast::QASTFile*>::const_iterator it = files.begin(); it != files.end(); ++it ){
+        QASTFile* file = *it;
+        recursiveParse(file, 0);
+    }
     endResetModel();
 }
 

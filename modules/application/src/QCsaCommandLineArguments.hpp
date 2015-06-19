@@ -18,7 +18,7 @@
 #ifndef QCSACOMMANDLINEARGUMENTS_HPP
 #define QCSACOMMANDLINEARGUMENTS_HPP
 
-#include <QString>
+#include <QStringList>
 
 class QGuiApplication;
 class QCommandLineParser;
@@ -28,7 +28,9 @@ public:
     QCsaCommandLineArguments(const QGuiApplication& app, const QString& applicationDescription);
     ~QCsaCommandLineArguments();
 
-    const QString file() const;
+    const QStringList& files() const;
+    const QStringList& fileErrors() const;
+    bool  hasFileErrors() const;
 
     bool  isSelectedFunctionSet() const;
     const QString& selectedFunction() const;
@@ -48,7 +50,13 @@ private:
 private:
     QCommandLineParser* m_commandLineParser;
 
-    QString m_file;
+    QStringList m_files;
+    QStringList m_fileErrors;
+
+    QStringList m_headerSearchPatterns;
+    QStringList m_sourceSearchPatterns;
+
+    QString m_searchDir;
 
     bool    m_functionSet;
     QString m_function;
@@ -60,8 +68,16 @@ private:
     bool    m_executeAndQuitFlag;
 };
 
-inline const QString QCsaCommandLineArguments::file() const{
-    return m_file;
+inline const QStringList& QCsaCommandLineArguments::files() const{
+    return m_files;
+}
+
+inline const QStringList &QCsaCommandLineArguments::fileErrors() const{
+    return m_fileErrors;
+}
+
+inline bool QCsaCommandLineArguments::hasFileErrors() const{
+    return m_fileErrors.size() > 0;
 }
 
 inline bool QCsaCommandLineArguments::isSelectedFunctionSet() const{

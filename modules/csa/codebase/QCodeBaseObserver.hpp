@@ -24,6 +24,7 @@ namespace csa{
 
 namespace ast{
 class QASTNode;
+class QASTFile;
 }
 
 class Q_CSA_EXPORT QCodeBaseObserver{
@@ -34,7 +35,7 @@ public:
 
     virtual void clearAndReset() = 0;
     virtual void setSelected(ast::QASTNode* node) = 0;
-    virtual void parse(ast::QASTNode* root) = 0;
+    virtual void parse(const QList<ast::QASTFile*>& root) = 0;
 };
 
 }// namespace
