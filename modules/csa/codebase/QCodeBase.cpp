@@ -23,6 +23,7 @@
 #include "QASTFile.hpp"
 #include "QASTNode.hpp"
 #include "QASTVisitor.hpp"
+#include "QASTSearch.hpp"
 #include <QMap>
 #include <QHash>
 #include <QDebug>
@@ -127,10 +128,22 @@ void QCodeBase::updateTreeModel(){
     }
 }
 
-bool QCodeBase::select(const QString &typeString, const QString &name){
-    QASTNode* result = qobject_cast<QASTNode*>(m_root->find(typeString, name));
-    if ( result ){
-        m_current = result;
+bool QCodeBase::select(const QString &searchData, const QString &type){
+    for ( QList<ast::QASTFile*>::iterator it = m_files.begin(); it != m_files.end(); ++it ){
+        QASTFile* file = *it;
+        QASTNode* foundChild = file->findFirst(searchData, type);
+        if ( foundChild ){
+            select(foundChild);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool QCodeBase::select(QASTNode* node){
+    if ( node != 0 ){
+        m_current = node;
         if ( m_observer )
             m_observer->setSelected(m_current);
         return true;

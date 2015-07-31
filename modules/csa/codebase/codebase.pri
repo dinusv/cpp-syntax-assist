@@ -8,7 +8,8 @@ HEADERS += \
     $$PWD/QSourceLocation.hpp \
     $$PWD/QTokenClassifier.hpp \
     $$PWD/QAnnotatedToken.hpp \
-    $$PWD/QCodeBaseObserver.hpp
+    $$PWD/QCodeBaseObserver.hpp \
+    $$PWD/QASTSearch.hpp
 
 SOURCES += \
     $$PWD/QCodeBase.cpp \
@@ -17,4 +18,5 @@ SOURCES += \
     $$PWD/QSourceLocation.cpp \
     $$PWD/QTokenClassifier.cpp \
     $$PWD/QCodeBaseObserver.cpp \
-    $$PWD/QAnnotatedToken.cpp
+    $$PWD/QAnnotatedToken.cpp \
+    $$PWD/QASTSearch.cpp

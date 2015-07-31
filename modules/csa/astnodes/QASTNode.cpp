@@ -19,6 +19,8 @@
 #include "QSourceLocation.hpp"
 #include "QAnnotatedTokenSet.hpp"
 
+#include "QASTSearch.hpp"
+
 namespace csa{ namespace ast{
 
 int QASTNode::dumpIndentation = 1;
@@ -113,6 +115,55 @@ void QASTNode::dump(QString& out, int depth) const{
     }
 }
 
+QASTNode* QASTNode::findFirst(const QASTSearch& searchPattern, const QString& type){
+    QASTSearch::MatchResult result = searchPattern.matchCurrentSegment(identifier());
+    if ( result == QASTSearch::FullMatch && ( type == "" || type == typeName() ) )
+        return this;
+    else if ( result == QASTSearch::SegmentMatch ){
+        QASTSearch nextPattern = QASTSearch(searchPattern).nextPosition();
+        for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
+            QASTNode* child = *it;
+            QASTNode* foundChild = child->findFirst(nextPattern, type);
+            if ( foundChild )
+                return foundChild;
+        }
+    }
+
+    for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
+        QASTNode* child = *it;
+        QASTNode* foundChild = child->findFirst(searchPattern, type);
+        if ( foundChild )
+            return foundChild;
+    }
+    return 0;
+}
+
+QList<QASTNode*> QASTNode::find(const QASTSearch& searchPattern, const QString& type){
+    QList<QASTNode*> foundChildren;
+
+    QASTSearch::MatchResult result = searchPattern.matchCurrentSegment(identifier());
+    if ( result == QASTSearch::FullMatch && ( type == "" || type == typeName() ) ){
+        foundChildren.append(this);
+    } else if ( result == QASTSearch::SegmentMatch ){
+        QASTSearch nextPattern = QASTSearch(searchPattern).nextPosition();
+        for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
+            QASTNode* child = *it;
+            QList<QASTNode*> foundNodes = child->find(nextPattern, type);
+            if ( foundNodes.size() > 0 )
+                foundChildren << foundNodes;
+        }
+    }
+
+    for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
+        QASTNode* child = *it;
+        QList<QASTNode*> foundNodes = child->find(searchPattern, type);
+        if ( foundNodes.size() > 0 )
+            foundChildren << foundNodes;
+    }
+
+    return foundChildren;
+}
+
 bool QASTNode::insert(const QString& value, QSourceLocation* location){
     QASTNode* p = qobject_cast<QASTNode*>(parent());
     if ( p )
@@ -151,27 +202,39 @@ QASTNode *QASTNode::find(QASTNode* node){
     return 0;
 }
 
-QASTNode *QASTNode::find(const QString &typeString, const QString& identifier){
+QList<QASTNode*> QASTNode::find(const QString &searchData, const QString& type){
+    if ( QASTSearch::isPattern(searchData) )
+        return find(QASTSearch(searchData), type);
+
+    QList<QASTNode*> foundData;
+    if ( identifier() == searchData && (type == "" || type == typeName()) )
+        foundData << this;
+
     for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
         QASTNode* child = *it;
-        if ( child->typeName() == typeString && child->identifier() == identifier )
-            return child;
-        QASTNode* childFind = child->find(typeString, identifier);
-        if ( childFind != 0 )
-            return childFind;
+
+        QList<QASTNode*> foundChildren = child->find(searchData, type);
+        if ( foundChildren.size() > 0 )
+            foundData << foundChildren;
     }
-    return 0;
+
+    return foundData;
 }
 
-QASTNode* QASTNode::findFirst(const QString& typeString){
+QASTNode* QASTNode::findFirst(const QString& searchData, const QString& type){
+    if ( QASTSearch::isPattern(searchData) )
+        return findFirst(QASTSearch(searchData), type);
+
+    if ( identifier() == searchData && (type == "" || type == typeName()) )
+        return this;
+
     for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
         QASTNode* child = *it;
-        if ( child->typeName() == typeString )
-            return child;
-        QASTNode* childFind = child->findFirst(typeString);
-        if ( childFind != 0 )
-            return childFind;
+        QASTNode* foundChild = child->findFirst(searchData, type);
+        if ( foundChild )
+            return foundChild;
     }
+
     return 0;
 }
 

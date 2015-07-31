@@ -28,6 +28,7 @@ namespace csa{
 class QAnnotatedToken;
 class QAnnotatedTokenSet;
 class QSourceLocation;
+class QASTSearch;
 class QCodeBase;
 
 namespace ast{
@@ -75,11 +76,14 @@ public slots:
     csa::ast::QASTNode* astParent();
     csa::ast::QASTNode* astChild(const QString& identifier);
     csa::ast::QASTNode* astChild(const QString& typeString, const QString& identif);
-    csa::ast::QASTNode* find(const QString& typeString, const QString& identifier);
-    csa::ast::QASTNode* findFirst(const QString& typeString);
-    csa::ast::QASTNode* parentFind(const QString& typeString);
+
     csa::ast::QASTNode* next();
     csa::ast::QASTNode* prev();
+
+    csa::ast::QASTNode* find(csa::ast::QASTNode *node);
+    QList<csa::ast::QASTNode*> find(const QString& searchData, const QString& type = "");
+    csa::ast::QASTNode* findFirst(const QString& searchData, const QString& type = "");
+    csa::ast::QASTNode* parentFind(const QString& typeString);
 
     void append(const QString& value);
     void prepend(const QString& value);
@@ -107,7 +111,6 @@ public:
     // -----------------
 
     void addChild(QASTNode* node);
-    QASTNode* find(QASTNode *node);
 
     Iterator childrenBegin();
     Iterator childrenEnd();
@@ -127,6 +130,8 @@ public:
 
 protected:
     void setIdentifier(const QString& identifier);
+    csa::ast::QASTNode* findFirst(const QASTSearch& searchPattern, const QString& type = "");
+    QList<csa::ast::QASTNode*> find(const QASTSearch& searchPattern, const QString& type = "");
 
     csa::ast::QASTNode* childAfter(csa::ast::QASTNode* child);
     csa::ast::QASTNode* childBefore(csa::ast::QASTNode* child);

@@ -59,10 +59,12 @@ public slots:
     csa::QSourceLocation* createLocation(const QString &file, unsigned int line, unsigned int column);
 
     void save();
-    bool select(const QString &typeString, const QString &name);
+    bool select(const QString &searchData, const QString &type = "");
+    bool select(csa::ast::QASTNode* node);
+
+    // TODO: Add select
 
 private:
-
     QList<ast::QASTFile*>  m_files;
 
     csa::ast::QASTFile*    m_root;

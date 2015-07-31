@@ -21,6 +21,7 @@
 #include "QTestRunner.hpp"
 #include "QASTParsingTest.hpp"
 #include "QASTInsertionTest.hpp"
+#include "QASTSearchTest.hpp"
 
 int main(int argc, char *argv[])
 {
