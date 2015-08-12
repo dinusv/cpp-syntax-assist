@@ -29,16 +29,17 @@ function destructor(){
 
     classNode.afterln('\n' + destructorDefinition);
 
-    var constructorArray = classNode.astChildren('constructor');
+    var constructorArray = classNode.children('constructor');
     if ( constructorArray.length > 0 ){
         constructorArray[constructorArray.length - 1].afterln(destructorDeclaration + '\n');
     } else {
-        var publicAccess = classNode.astChild('access', 'public');
+        var publicAccess = classNode.firstChild('access', 'public');
         if ( publicAccess !== 0 ){
             publicAccess.afterln(destructorDeclaration + '\n');
         } else {
             classNode.append('\npublic:\n' + destructorDeclaration);
         }
     }
+
     codeBase.save();
 }

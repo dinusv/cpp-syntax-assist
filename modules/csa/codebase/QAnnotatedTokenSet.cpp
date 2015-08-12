@@ -92,8 +92,8 @@ void QAnnotatedTokenSet::dump(std::string &str){
     str.append("\n");
 }
 
-QList<QAnnotatedToken*> QAnnotatedTokenSet::tokenList(){
-    Q_D(QAnnotatedTokenSet);
+const QList<QAnnotatedToken*>& QAnnotatedTokenSet::tokenList() const{
+    const Q_D(QAnnotatedTokenSet);
     return d->tokens;
 }
 

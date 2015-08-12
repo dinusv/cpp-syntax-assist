@@ -17,6 +17,7 @@
 
 #include "QASTConstructor.hpp"
 #include "QSourceLocation.hpp"
+#include "QSourceLocation_p.hpp"
 #include "QASTMethodArgument.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "QTokenClassifier.hpp"
@@ -113,9 +114,9 @@ QASTConstructor::QASTConstructor(
 
         QASTMethodArgument* argument = new QASTMethodArgument(
             argTokenSet,
-            new QSourceLocation(loc),
-            new QSourceLocation(locStart),
-            new QSourceLocation(locEnd),
+            new QSourceLocation(createSourceLocation(loc)),
+            new QSourceLocation(createSourceLocation(locStart)),
+            new QSourceLocation(createSourceLocation(locEnd)),
             0
         );
         argument->setParent(this);

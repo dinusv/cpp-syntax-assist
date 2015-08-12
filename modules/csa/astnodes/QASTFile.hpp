@@ -55,4 +55,6 @@ inline QString QASTFile::content() const{
 
 }}//namespace
 
+Q_DECLARE_METATYPE(csa::ast::QASTFile*)
+
 #endif // QASTFILEROOT_HPP

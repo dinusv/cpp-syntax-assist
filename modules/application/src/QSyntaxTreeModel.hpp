@@ -25,7 +25,7 @@
 
 namespace csa{
 
-namespace ast{ class QASTNode; }
+namespace ast{ class QASTNode; class QASTFile; }
 class QCodeBase;
 }
 
@@ -33,41 +33,53 @@ class QSyntaxTreeItem;
 class QSyntaxTreeModel : public QAbstractListModel, public csa::QCodeBaseObserver{
 
     Q_OBJECT
-    Q_PROPERTY(int selected READ selected WRITE setSelected NOTIFY selectedChanged)
+    Q_PROPERTY(int selected    READ selected    WRITE setSelected    NOTIFY selectedChanged)
+    Q_PROPERTY(int expandLevel READ expandLevel WRITE setExpandLevel NOTIFY expandLevelChanged)
 
     enum Roles{
         Identifier = Qt::UserRole + 1,
         Type,
         Indent,
-        Line
+        Line,
+        IsCollapsible,
+        IsCollapsed,
+        Breadcrumbs
     };
 
 public:
     explicit QSyntaxTreeModel(QObject *parent = 0);
 
     void clearAndReset();
-    void parse(csa::ast::QASTNode* root);
+    void parse(const QList<csa::ast::QASTFile*>& files);
     QVariant data(const QModelIndex &index, int role) const;
     int  rowCount(const QModelIndex &) const;
     virtual QHash<int, QByteArray> roleNames() const;
 
-    int selected() const;
+    int  selected() const;
     void setSelected(int selected);
     void setSelected(csa::ast::QASTNode* node);
 
+    int  expandLevel() const;
+    void setExpandLevel(int arg);
+
+public slots:
+    void collapse(int index);
+    void expand(int index);
+
 signals:
     void selectedChanged();
-
-protected:
+    void expandLevelChanged();
 
 private:
     void recursiveParse(csa::ast::QASTNode* node, int indent = 0);
+    void recursiveCollapse(int index);
     void clear();
 
-    QHash<int, QByteArray> m_roles;
+    QHash<int, QByteArray>  m_roles;
     QList<QSyntaxTreeItem*> m_items;
 
-    int       m_codebaseSelected;
+    int m_codebaseSelected;
+    int m_expandLevel;
 };
 
 inline int QSyntaxTreeModel::rowCount(const QModelIndex &) const{
@@ -87,6 +99,18 @@ inline void QSyntaxTreeModel::setSelected(int selected){
         m_codebaseSelected = selected;
         emit selectedChanged();
     }
+}
+
+inline int QSyntaxTreeModel::expandLevel() const{
+    return m_expandLevel;
+}
+
+inline void QSyntaxTreeModel::setExpandLevel(int arg){
+    if (m_expandLevel == arg)
+        return;
+
+    m_expandLevel = arg;
+    emit expandLevelChanged();
 }
 
 #endif // SYNTAXTREEMODEL_HPP

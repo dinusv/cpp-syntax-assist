@@ -16,12 +16,16 @@
 
 
 #include "QASTParsingTest.hpp"
+#include <QtGui/QGuiApplication>
 #include "QTestHelpers.hpp"
 
 #include <QtTest/QtTest>
+#include <QJSEngine>
+#include <QJSValue>
 
+#include <qqml.h>
 #include "QCodeBase.hpp"
-#include "QCSAScriptEngine.hpp"
+#include "QCSAPluginLoader.hpp"
 
 using namespace csa;
 
@@ -29,18 +33,20 @@ Q_TEST_RUNNER_REGISTER(QASTParsingTest);
 
 QASTParsingTest::QASTParsingTest(QObject *parent)
     : QObject(parent)
-    , m_engine(0)
+    , m_loader(0)
 {
 }
 
 QASTParsingTest::~QASTParsingTest(){
+    delete m_loader;
     delete m_engine;
 }
 
 void QASTParsingTest::initTestCase(){
-    m_engine             = new csa::QCSAScriptEngine;
+    m_engine             = new QJSEngine;
+    m_loader             = new csa::QCSAPluginLoader(m_engine);
     m_parserTestPath     = QCoreApplication::applicationDirPath() + "/data/parsing/";
-    int parserEngineCode = m_engine->loadPlugins(m_parserTestPath + "parserplugin.js");
+    int parserEngineCode = m_loader->loadPlugins(m_parserTestPath + "parserplugin.js");
 
     if ( parserEngineCode != 0 ){
         QFAIL("Unable to load parser plugin: " + parserEngineCode);
@@ -50,10 +56,12 @@ void QASTParsingTest::initTestCase(){
 
 void QASTParsingTest::unknownTypeDeductionTest(){
     QSharedPointer<QCodeBase> cbase = helpers::createCodeBaseFromFile(m_parserTestPath + "unknowntype.test");
-    m_engine->setCodeBase(cbase.data());
 
-    QScriptValue result;
-    m_engine->execute("parserplugin();", result);
+//    m_engine->globalObject().setProperty("codeBase", m_engine->newQObject(cbase.data()));
+    m_engine->globalObject().setProperty("codeBase", m_engine->newQObject(cbase.data()));//m_engine->newQObject(cbase.data()));
+
+    QJSValue result;
+    m_loader->execute("parserplugin();", result);
     QJsonValue jsonResult = helpers::jsonFromScriptValue(result);
 
     bool parseOk;

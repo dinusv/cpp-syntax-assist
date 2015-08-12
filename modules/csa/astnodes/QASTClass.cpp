@@ -18,6 +18,7 @@
 #include "QASTClass.hpp"
 #include "QSourceLocation.hpp"
 #include "QAnnotatedTokenSet.hpp"
+#include "QSourceLocation_p.hpp"
 
 namespace csa{ namespace ast{
 
@@ -46,13 +47,13 @@ QASTClass::QASTClass(
             CXSourceLocation tokenLocation = clang_getTokenLocation(tokenSet->translationUnit(), aToken->token());
             if ( tokenStdString == "{" && !m_bodyStartSet ){
                 QSourceLocation* sl = m_bodyStart;
-                sl->assign(tokenLocation);
-                sl->assign(sl->offset() + 1, tokenSet->translationUnit());
+                sl->assign(createSourceLocation(tokenLocation));
+                sl->assign(createSourceLocation(sl->filePath(), sl->offset() + 1, tokenSet->translationUnit()));
                 m_bodyStartSet = true;
 
             } else if ( tokenStdString == "}" ){
                 QSourceLocation* sl = m_bodyEnd;
-                sl->assign(tokenLocation);
+                sl->assign(createSourceLocation(tokenLocation));
 
             }
             clang_disposeString(tokenString);

@@ -41,7 +41,7 @@ public:
     virtual QString content() const;
 
 public slots:
-    virtual QList<csa::ast::QASTNode*> arguments() const;
+    virtual QList<QObject*> arguments() const;
     virtual QString prop(const QString& key) const;
 
 private:

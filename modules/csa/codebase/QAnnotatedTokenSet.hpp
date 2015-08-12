@@ -63,7 +63,7 @@ public:
 
     ast::QASTNode* associatedNode();
 
-    QList<QAnnotatedToken*> tokenList();
+    const QList<QAnnotatedToken*>& tokenList() const;
 
 private:
     QAnnotatedTokenSet(const QAnnotatedTokenSet& other);

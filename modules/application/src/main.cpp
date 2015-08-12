@@ -16,12 +16,14 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtQuick/QQuickItem>
-#include <QtScript/QScriptEngine>
 #include <QQmlContext>
 #include <QQmlApplicationEngine>
 
 #include "QCodeBase.hpp"
-#include "QCSAScriptEngine.hpp"
+#include "QCSAPluginLoader.hpp"
+
+#include "QASTNode.hpp"
+#include "QASTFile.hpp"
 
 #include "QSyntaxTreeModel.hpp"
 #include "QCsaCommandLineArguments.hpp"
@@ -47,8 +49,13 @@ int main(int argc, char *argv[]){
     // Assert Arguments
     // ----------------
 
-    if ( !QFileInfo::exists(commandLineArguments.file()) ){
-        qCritical("%s", qPrintable("Error: Input file does not exist: " + commandLineArguments.file()));
+    if ( commandLineArguments.hasFileErrors() ){
+        for ( QStringList::const_iterator it = commandLineArguments.fileErrors().begin();
+              it != commandLineArguments.fileErrors().end();
+              ++it )
+        {
+            qCritical("%s\n", qPrintable(*it));
+        }
         return -1;
     }
 
@@ -58,41 +65,66 @@ int main(int argc, char *argv[]){
     QSyntaxTreeModel* astTreeModel = new QSyntaxTreeModel;
 
     const char* args[] = {"-c", "-x", "c++"};
-    QCodeBase codeBase(args, 3, commandLineArguments.file(), astTreeModel);
+    QCodeBase codeBase(args, 3, commandLineArguments.files(), "", astTreeModel);
 
     if ( commandLineArguments.isCursorOffsetSet() ){
-        codeBase.propagateUserCursor(commandLineArguments.cursorOffset(), commandLineArguments.file());
+        codeBase.propagateUserCursor(
+            commandLineArguments.cursorOffset(),
+            commandLineArguments.files().first()
+        );
     } else if ( commandLineArguments.isCursorLineColumnSet() ){
         codeBase.propagateUserCursor(
-            commandLineArguments.cursorLine(), commandLineArguments.cursorColumn(), commandLineArguments.file());
+            commandLineArguments.cursorLine(),
+            commandLineArguments.cursorColumn(),
+            commandLineArguments.files().first()
+        );
     } else {
-        codeBase.propagateUserCursor(0, commandLineArguments.file());
+        codeBase.propagateUserCursor(0, commandLineArguments.files().first());
     }
 
-    // Load plugins
-    // ------------
+    // Configure Engine
+    // ----------------
 
-    QCSAScriptEngine engine;
-    engine.setCodeBase(&codeBase);
 
-    int loaderError = engine.loadPlugins(QGuiApplication::applicationDirPath() + "/plugins");
+    qmlRegisterType<QSyntaxTreeModel>("CSA", 1, 0, "SyntaxTree");
+
+    qmlRegisterUncreatableType<QCSAPluginDebugger>(
+        "CSA", 1, 0, "ConfiguredDebugger", "Only access to the debug property is allowed.");
+
+    qmlRegisterUncreatableType<QCSAPluginLoader>(
+        "CSA", 1, 0, "ConfiguredEngine", "Only access to the engine property is allowed.");
+
+    qmlRegisterUncreatableType<csa::QCodeBase>(
+        "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
+
+    qmlRegisterUncreatableType<csa::ast::QASTFile>(
+        "CSA", 1, 0, "ASTFile", "ASTFile is available only as a property.");
+
+    qmlRegisterUncreatableType<csa::ast::QASTNode>(
+        "CSA", 1, 0, "ASTNode", "ASTNode is available only as a property.");
+
+    QCSAPluginLoader scriptEngine(new QJSEngine);
+    scriptEngine.setContextObject("codeBase", &codeBase);
+
+    QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("syntaxTreeModel",  astTreeModel);
+    engine.rootContext()->setContextProperty("configuredEngine", &scriptEngine);
+    engine.rootContext()->setContextProperty("codeBase",         &codeBase);
+    engine.rootContext()->setContextProperty("command",          commandLineArguments.selectedFunction());
+
+    int loaderError = scriptEngine.loadPlugins(QGuiApplication::applicationDirPath() + "/plugins");
     if ( loaderError != 0 )
         return loaderError;
 
     // Interpret command
     // -----------------
 
-    if( commandLineArguments.isExecuteAndQuitSet() )
-        if( engine.execute(commandLineArguments.selectedFunction()) )
-            return 0;
+    if( commandLineArguments.isExecuteAndQuitSet() ){
+        engine.evaluate(commandLineArguments.selectedFunction());
+        return 0;
+    }
 
-    QQmlApplicationEngine viewer;
-    qmlRegisterType<QSyntaxTreeModel>("CSA", 1, 0, "SyntaxTree" );
-    qmlRegisterType<QCSAScriptEngine>("CSA", 1, 0, "ConfiguredEngine");
-    viewer.rootContext()->setContextProperty("syntaxTreeModel",   astTreeModel);
-    viewer.rootContext()->setContextProperty("configuredEngine",  &engine);
-    viewer.rootContext()->setContextProperty("command",           commandLineArguments.selectedFunction());
-    viewer.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();
 }

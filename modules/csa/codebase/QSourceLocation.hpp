@@ -18,14 +18,13 @@
 #ifndef QSOURCELOCATION_HPP
 #define QSOURCELOCATION_HPP
 
-#include "clang-c/Index.h"
 #include "QCSAGlobal.hpp"
 #include <QString>
 #include <QObject>
 
 namespace csa{
 
-class QSourceLocation : public QObject{
+class Q_CSA_EXPORT QSourceLocation : public QObject{
 
     Q_OBJECT
 
@@ -43,19 +42,13 @@ public:
             unsigned int offset,
             QObject* parent = 0);
     QSourceLocation(
-            const CXFile& file,
-            unsigned int line,
-            unsigned int column,
-            unsigned int offset,
+            const QSourceLocation& other,
             QObject* parent = 0);
-    QSourceLocation(const CXSourceLocation& location, QObject* parent = 0);
-    QSourceLocation(const QSourceLocation& other, QObject* parent = 0);
     ~QSourceLocation();
 
-    void assign(const CXSourceLocation& location);
     void assign(const QSourceLocation& other);
-    void assign(unsigned int offset, const CXTranslationUnit& translationUnit);
-    void assign(unsigned int line, unsigned int column, const CXTranslationUnit& translationUnit);
+
+    QSourceLocation& operator =(const QSourceLocation& other);
 
 public slots:
     unsigned int line() const;
@@ -89,5 +82,7 @@ inline QString QSourceLocation::filePath() const{
 }
 
 }// namespace
+
+Q_DECLARE_METATYPE(csa::QSourceLocation*)
 
 #endif // QSOURCELOCATION_HPP

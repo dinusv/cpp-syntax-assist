@@ -17,8 +17,8 @@
 
 #include "QTestHelpers.hpp"
 
-#include <QScriptValue>
-#include <QScriptValueIterator>
+#include <QJSValue>
+#include <QJSValueIterator>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -26,23 +26,22 @@
 
 namespace helpers{
 
-QJsonValue jsonFromScriptValue(const QScriptValue& val){
+QJsonValue jsonFromScriptValue(const QJSValue& val){
     if ( val.isArray() ){
-            QScriptValueIterator it(val);
+            QJSValueIterator it(val);
 
             QJsonArray arr;
             while( it.hasNext() ){
                 it.next();
-                if ( !(it.flags() & QScriptValue::SkipInEnumeration) ){
-                    QJsonValue itJsonValue = jsonFromScriptValue(it.value());
-                    if( !itJsonValue.isNull() )
-                        arr.append(itJsonValue);
-                }
+
+                QJsonValue itJsonValue = jsonFromScriptValue(it.value());
+                if( !itJsonValue.isNull() )
+                    arr.append(itJsonValue);
             }
 
             return QJsonValue(arr);
     } else if ( val.isObject() ){
-        QScriptValueIterator it(val);
+        QJSValueIterator it(val);
 
         QJsonObject obj;
         while( it.hasNext() ){
@@ -55,7 +54,7 @@ QJsonValue jsonFromScriptValue(const QScriptValue& val){
         return QJsonValue(obj);
     } else  if ( val.isString() ){
         return QJsonValue(val.toString());
-    } else if ( val.isBool() || val.isBoolean() ){
+    } else if ( val.isBool() ){
         return QJsonValue(val.toString());
     } else if ( val.isNumber() ){
         return QJsonValue(val.toNumber() );
@@ -119,7 +118,7 @@ QJsonObject parseJsonFile(const QString& filePath, bool* parseOk){
 
 QSharedPointer<csa::QCodeBase> createCodeBaseFromFile(const QString& filePath, csa::QCodeBaseObserver* observer){
     const char* args[] = {"-c", "-x", "c++"};
-    return QSharedPointer<csa::QCodeBase>(new csa::QCodeBase(args, 3, filePath, observer));
+    return QSharedPointer<csa::QCodeBase>(new csa::QCodeBase(args, 3, QStringList() << filePath, "", observer));
 }
 
 }

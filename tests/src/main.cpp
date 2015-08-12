@@ -17,16 +17,35 @@
 
 #include <QCoreApplication>
 #include <QTest>
-
 #include "QTestRunner.hpp"
 #include "QASTParsingTest.hpp"
 #include "QASTInsertionTest.hpp"
 #include "QASTSearchTest.hpp"
 
+#include <qqml.h>
+#include "QCodeBase.hpp"
+#include "QASTFile.hpp"
+#include "QASTNode.hpp"
+#include "QSourceLocation.hpp"
+
 int main(int argc, char *argv[])
 {
+    qmlRegisterUncreatableType<csa::QSourceLocation>(
+        "CSA", 1, 0, "SourceLocation", "SourceLocation is available only as a property.");
+
+    qmlRegisterUncreatableType<csa::QCodeBase>(
+        "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
+
+    qmlRegisterUncreatableType<csa::ast::QASTFile>(
+        "CSA", 1, 0, "ASTFile", "ASTFile is available only as a property.");
+
+    qmlRegisterUncreatableType<csa::ast::QASTNode>(
+        "CSA", 1, 0, "ASTNode", "ASTNode is available only as a property.");
+
     QCoreApplication app(argc, argv);
     app.setAttribute(Qt::AA_Use96Dpi, true);
 
+//    QASTInsertionTest test;
+//    return QTest::qExec(&test, argc, argv);
     return QTestRunner::runTests(argc, argv);
 }

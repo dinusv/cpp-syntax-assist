@@ -17,6 +17,7 @@
 
 #include "QASTNode.hpp"
 #include "QSourceLocation.hpp"
+#include "QSourceLocation_p.hpp"
 #include "QAnnotatedTokenSet.hpp"
 
 #include "QASTSearch.hpp"
@@ -53,6 +54,17 @@ QASTNode::~QASTNode(){
     delete m_cursorLocation;
 }
 
+const QASTNode*QASTNode::astParent() const{
+    const QASTNode* p = qobject_cast<QASTNode*>(parent());
+    return p;
+}
+
+QString QASTNode::breadcrumbs() const{
+    if ( astParent() )
+        return astParent()->breadcrumbs() + "/" + identifier();
+    return identifier();
+}
+
 QString QASTNode::content() const{
     return identifier();
 }
@@ -61,14 +73,39 @@ QString QASTNode::prop(const QString &) const{
     return "";
 }
 
-QList<QAnnotatedToken*> QASTNode::associatedTokens(){
-    if ( m_tokenSet )
-        return m_tokenSet->tokenList();
-
-    return QList<QAnnotatedToken*>();
+QList<QObject*> QASTNode::children() const{
+    return castNodeListToObjectList(m_children);
 }
 
-QASTNode*QASTNode::astParent(){
+QList<QObject*> QASTNode::children(const QString& type){
+    QList<QObject*> foundChildren;
+    for ( ConstIterator it = m_children.begin(); it != m_children.end(); ++it ){
+        if ( (*it)->typeName() == type )
+            foundChildren.append(*it);
+    }
+    return foundChildren;
+}
+
+QList<QObject*> QASTNode::arguments() const{
+    return QList<QObject*>();
+}
+
+QList<QObject*> QASTNode::associatedTokens(){
+    if ( m_tokenSet ){
+        QList<QObject*> tokens;
+        for ( QList<QAnnotatedToken*>::const_iterator it = m_tokenSet->tokenList().begin();
+              it != m_tokenSet->tokenList().end();
+              ++it
+        ){
+            tokens.append(*it);
+        }
+        return tokens;
+    }
+
+    return QList<QObject*>();
+}
+
+QASTNode* QASTNode::astParent(){
     QASTNode* p = qobject_cast<QASTNode*>(parent());
     return p;
 }
@@ -99,7 +136,7 @@ void QASTNode::afterln(const QString& value){
                 rangeEndLocation()->line() + 1,
                 1); // location will be automatically truncated to max lines
 
-    QSourceLocation* afterLocation = new QSourceLocation(cxAfterLocation);
+    QSourceLocation* afterLocation = new QSourceLocation(createSourceLocation(cxAfterLocation));
     insert(value, afterLocation);
     delete afterLocation;
 }
@@ -138,8 +175,8 @@ QASTNode* QASTNode::findFirst(const QASTSearch& searchPattern, const QString& ty
     return 0;
 }
 
-QList<QASTNode*> QASTNode::find(const QASTSearch& searchPattern, const QString& type){
-    QList<QASTNode*> foundChildren;
+QList<QObject*> QASTNode::find(const QASTSearch& searchPattern, const QString& type){
+    QList<QObject*> foundChildren;
 
     QASTSearch::MatchResult result = searchPattern.matchCurrentSegment(identifier());
     if ( result == QASTSearch::FullMatch && ( type == "" || type == typeName() ) ){
@@ -148,7 +185,7 @@ QList<QASTNode*> QASTNode::find(const QASTSearch& searchPattern, const QString& 
         QASTSearch nextPattern = QASTSearch(searchPattern).nextPosition();
         for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
             QASTNode* child = *it;
-            QList<QASTNode*> foundNodes = child->find(nextPattern, type);
+            QList<QObject*> foundNodes = child->find(nextPattern, type);
             if ( foundNodes.size() > 0 )
                 foundChildren << foundNodes;
         }
@@ -156,7 +193,7 @@ QList<QASTNode*> QASTNode::find(const QASTSearch& searchPattern, const QString& 
 
     for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
         QASTNode* child = *it;
-        QList<QASTNode*> foundNodes = child->find(searchPattern, type);
+        QList<QObject*> foundNodes = child->find(searchPattern, type);
         if ( foundNodes.size() > 0 )
             foundChildren << foundNodes;
     }
@@ -202,18 +239,18 @@ QASTNode *QASTNode::find(QASTNode* node){
     return 0;
 }
 
-QList<QASTNode*> QASTNode::find(const QString &searchData, const QString& type){
+QList<QObject*> QASTNode::find(const QString &searchData, const QString& type){
     if ( QASTSearch::isPattern(searchData) )
         return find(QASTSearch(searchData), type);
 
-    QList<QASTNode*> foundData;
+    QList<QObject*> foundData;
     if ( identifier() == searchData && (type == "" || type == typeName()) )
         foundData << this;
 
     for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
         QASTNode* child = *it;
 
-        QList<QASTNode*> foundChildren = child->find(searchData, type);
+        QList<QObject*> foundChildren = child->find(searchData, type);
         if ( foundChildren.size() > 0 )
             foundData << foundChildren;
     }
@@ -274,6 +311,13 @@ QASTNode *QASTNode::childBefore(QASTNode *child){
         prevChild = currentChild;
     }
     return 0;
+}
+
+QList<QObject*> QASTNode::castNodeListToObjectList(const QList<QASTNode*>& list){
+    QList<QObject*> objectList;
+    for ( ConstIterator it = list.begin(); it != list.end(); ++it)
+        objectList.append(*it);
+    return objectList;
 }
 
 QASTNode* QASTNode::next(){

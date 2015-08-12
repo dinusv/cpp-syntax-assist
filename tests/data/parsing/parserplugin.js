@@ -12,7 +12,7 @@ function parserplugin(){
         parsedNode['rangeStartOffset'] = nodeRangeStart.offset()
         parsedNode['rangeEndOffset']   = nodeRangeEnd.offset()
 
-        var nodeChildren = node.astChildren()
+        var nodeChildren = node.children()
         if ( nodeChildren.length !== 0 ){
             parsedNode['children'] = [];
             for( var i = 0; i < nodeChildren.length; ++i )

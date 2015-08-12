@@ -19,6 +19,7 @@
 #include "QAnnotatedTokenSet.hpp"
 #include "QTokenClassifier.hpp"
 #include "QSourceLocation.hpp"
+#include "QSourceLocation_p.hpp"
 #include "clang-c/Index.h"
 
 namespace csa{ namespace ast{
@@ -170,9 +171,9 @@ QASTMethod::QASTMethod(
 
         QASTMethodArgument* argument = new QASTMethodArgument(
             argTokenSet,
-            new QSourceLocation(loc),
-            new QSourceLocation(locStart),
-            new QSourceLocation(locEnd),
+            new QSourceLocation(createSourceLocation(loc)),
+            new QSourceLocation(createSourceLocation(locStart)),
+            new QSourceLocation(createSourceLocation(locEnd)),
             0
         );
         argument->setParent(this);
@@ -185,8 +186,8 @@ QASTMethod::QASTMethod(
     return;
 }
 
-QList<QASTNode*> QASTMethod::arguments() const{
-    return m_arguments;
+QList<QObject*> QASTMethod::arguments() const{
+    return QASTNode::castNodeListToObjectList(m_arguments);
 }
 
 QString QASTMethod::content() const{
@@ -198,7 +199,7 @@ QString QASTMethod::content() const{
     base += "(";
 
     bool firstArg = true;
-    for ( QList<csa::ast::QASTNode*>::const_iterator it = m_arguments.begin(); it != m_arguments.end(); ++it ){
+    for( QList<csa::ast::QASTNode*>::const_iterator it = m_arguments.begin(); it != m_arguments.end(); ++it ){
         if ( firstArg ){
             base    += (*it)->content();
             firstArg = false;

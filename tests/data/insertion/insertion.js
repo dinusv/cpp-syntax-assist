@@ -7,3 +7,5 @@ function insertAtLocation(line, column){
 
     return result;
 }
+
+debug.print("Loaded insertion.js")

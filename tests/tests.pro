@@ -21,7 +21,6 @@ QMAKE_EXTRA_TARGETS += first testdatacopy
 # ------------------------------------
 
 QT     += qml quick script testlib
-QT     -= gui
 CONFIG += console testcase
 
 ## Configure Dependencies

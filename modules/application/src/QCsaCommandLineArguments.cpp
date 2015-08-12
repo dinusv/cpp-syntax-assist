@@ -18,6 +18,9 @@
 #include "QCsaCommandLineArguments.hpp"
 #include <QGuiApplication>
 #include <QCommandLineParser>
+#include <QFileInfo>
+#include <QDirIterator>
+#include <QDir>
 
 QCsaCommandLineArguments::QCsaCommandLineArguments(
         const QGuiApplication& app,
@@ -28,6 +31,9 @@ QCsaCommandLineArguments::QCsaCommandLineArguments(
     , m_cursorColumn(-1)
     , m_executeAndQuitFlag(false)
 {
+    m_headerSearchPatterns << "*.c" << "*.C" << "*.cxx" << "*.cpp" << "*.c++" << "*.cc" << "*.cp";
+    m_sourceSearchPatterns << "*.h" << "*.H" << "*.hxx" << "*.hpp" << "*.h++" << "*.hh" << "*.hp";
+
     initialize(app, applicationDescription);
 }
 
@@ -43,7 +49,7 @@ void QCsaCommandLineArguments::initialize(const QGuiApplication& app, const QStr
     m_commandLineParser->setApplicationDescription(applicationDescription);
     m_commandLineParser->addHelpOption();
     m_commandLineParser->addVersionOption();
-    m_commandLineParser->addPositionalArgument("file", QGuiApplication::translate("main", "File to parse."));
+    m_commandLineParser->addPositionalArgument("files and directiories", QGuiApplication::translate("main", "Files and directories to parse."));
 
     QCommandLineOption cursorOffset("c",
         QCoreApplication::translate("main", "User cursor offset within the file."),
@@ -68,19 +74,43 @@ void QCsaCommandLineArguments::initialize(const QGuiApplication& app, const QStr
     );
     m_commandLineParser->addOption(executeAndQuit);
 
+    QCommandLineOption searchDir("dir",
+        QCoreApplication::translate("main", "File search directory.")
+    );
+    m_commandLineParser->addOption(searchDir);
+
     // Process arguments
     // -----------------
 
     m_commandLineParser->process(app);
 
-    // Get Values
-    // ----------
+    // Get Positional Arguments
+    // ------------------------
 
     QStringList positionalArgs = m_commandLineParser->positionalArguments();
     if ( positionalArgs.size() == 0 )
         m_commandLineParser->showHelp(1);
 
-    m_file = positionalArgs.at(0);
+    for ( QStringList::iterator it = positionalArgs.begin(); it != positionalArgs.end(); ++it ){
+        QString& val = *it;
+
+        if ( QFileInfo::exists(val) ){
+            if ( QFileInfo(val).isDir() ){
+
+                QStringList searchVals = QStringList() << m_headerSearchPatterns << m_sourceSearchPatterns;
+                QDirIterator it(val, searchVals, QDir::Files, QDirIterator::Subdirectories);
+                while (it.hasNext())
+                    m_files.append(it.next());
+            } else {
+                m_files.append(val);
+            }
+        } else {
+            m_fileErrors.append("Error: Path does not exist: " + val);
+        }
+    }
+
+    // Get Option Values
+    // -----------------
 
     m_functionSet = m_commandLineParser->isSet(selectedFunction);
     if ( m_functionSet )
@@ -104,9 +134,9 @@ void QCsaCommandLineArguments::initialize(const QGuiApplication& app, const QStr
             m_cursorColumn = -1;
             m_cursorLine   = -1;
         }
-
     }
 
+    m_searchDir          = m_commandLineParser->isSet(searchDir) ? m_commandLineParser->value(searchDir) : "";
     m_executeAndQuitFlag = m_commandLineParser->isSet(executeAndQuit);
 }
 

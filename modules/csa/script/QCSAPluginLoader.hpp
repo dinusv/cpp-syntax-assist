@@ -22,35 +22,50 @@
 #include <QString>
 #include <QObject>
 
-class QScriptEngine;
-class QScriptValue;
+class QJSValue;
+class QJSEngine;
 
 namespace csa{
 
 class QCodeBase;
-class Q_CSA_EXPORT QCSAScriptEngine : public QObject{
+
+class Q_CSA_EXPORT QCSAPluginDebugger : public QObject{
 
     Q_OBJECT
 
 public:
-    QCSAScriptEngine(QObject* parent = 0);
-    ~QCSAScriptEngine();
+    QCSAPluginDebugger(QObject* parent = 0);
+    ~QCSAPluginDebugger();
 
-    void setCodeBase(QCodeBase* base);
+public slots:
+    void print(const QString& message);
+};
 
-    QScriptEngine* engine();
-    int loadPlugins(const QString& path);
+class Q_CSA_EXPORT QCSAPluginLoader : public QObject{
 
-    bool execute(const QString &jsCode, QScriptValue& result);
+    Q_OBJECT
+
+public:
+    QCSAPluginLoader(QJSEngine* engine, QObject* parent = 0);
+    ~QCSAPluginLoader();
+
+    QJSEngine* engine();
+
+    int loadPlugins(const QString &path);
+
+    bool execute(const QString &jsCode, QJSValue& result);
+
+    void setContextObject(const QString& name, QObject* object);
 
 public slots:
     bool execute(const QString& jsCode);
 
 private:
-    QScriptEngine* m_engine;
+    QJSEngine*          m_engine;
+    QCSAPluginDebugger* m_pluginDebugger;
 };
 
-inline QScriptEngine* QCSAScriptEngine::engine(){
+inline QJSEngine* QCSAPluginLoader::engine(){
     return m_engine;
 }
 

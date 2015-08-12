@@ -19,6 +19,7 @@
 #include "QTokenClassifier.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "QSourceLocation.hpp"
+#include "QSourceLocation_p.hpp"
 #include "QASTNode.hpp"
 #include "QASTNamespace.hpp"
 #include "QASTClass.hpp"
@@ -92,59 +93,59 @@ CXChildVisitResult QASTVisitor::callback(CXCursor cursor, CXCursor, CXClientData
     case CXCursor_Namespace :
         csanode = new QASTNamespace(
                     cursorTokenSet,
-                    new QSourceLocation(loc),
-                    new QSourceLocation(locStart),
-                    new QSourceLocation(locEnd),
+                    new QSourceLocation(createSourceLocation(loc)),
+                    new QSourceLocation(createSourceLocation(locStart)),
+                    new QSourceLocation(createSourceLocation(locEnd)),
                     csanode);
         break;
     case CXCursor_ClassDecl :
         csanode = new QASTClass(
                     cursorTokenSet,
-                    new QSourceLocation(loc),
-                    new QSourceLocation(locStart),
-                    new QSourceLocation(locEnd),
+                    new QSourceLocation(createSourceLocation(loc)),
+                    new QSourceLocation(createSourceLocation(locStart)),
+                    new QSourceLocation(createSourceLocation(locEnd)),
                     csanode);
         break;
     case CXCursor_CXXAccessSpecifier :
         csanode = new QASTAccessSpecifier(
                     cursorTokenSet,
-                    new QSourceLocation(loc),
-                    new QSourceLocation(locStart),
-                    new QSourceLocation(locEnd),
+                    new QSourceLocation(createSourceLocation(loc)),
+                    new QSourceLocation(createSourceLocation(locStart)),
+                    new QSourceLocation(createSourceLocation(locEnd)),
                     csanode);
         break;
     case CXCursor_FieldDecl :
         csanode = new QASTField(
                     cursorTokenSet,
-                    new QSourceLocation(loc),
-                    new QSourceLocation(locStart),
-                    new QSourceLocation(locEnd),
+                    new QSourceLocation(createSourceLocation(loc)),
+                    new QSourceLocation(createSourceLocation(locStart)),
+                    new QSourceLocation(createSourceLocation(locEnd)),
                     csanode);
         break;
     case CXCursor_Constructor :
         csanode = new QASTConstructor(
                     cursorTokenSet,
                     classifier,
-                    new QSourceLocation(loc),
-                    new QSourceLocation(locStart),
-                    new QSourceLocation(locEnd),
+                    new QSourceLocation(createSourceLocation(loc)),
+                    new QSourceLocation(createSourceLocation(locStart)),
+                    new QSourceLocation(createSourceLocation(locEnd)),
                     csanode);
         break;
     case CXCursor_Destructor :
         csanode = new QASTDestructor(
                     cursorTokenSet,
-                    new QSourceLocation(loc),
-                    new QSourceLocation(locStart),
-                    new QSourceLocation(locEnd),
+                    new QSourceLocation(createSourceLocation(loc)),
+                    new QSourceLocation(createSourceLocation(locStart)),
+                    new QSourceLocation(createSourceLocation(locEnd)),
                     csanode);
         break;
     case CXCursor_CXXMethod :
         csanode = new QASTMethod(
                     cursorTokenSet,
                     classifier,
-                    new QSourceLocation(loc),
-                    new QSourceLocation(locStart),
-                    new QSourceLocation(locEnd),
+                    new QSourceLocation(createSourceLocation(loc)),
+                    new QSourceLocation(createSourceLocation(locStart)),
+                    new QSourceLocation(createSourceLocation(locEnd)),
                     csanode);
         break;
     default:

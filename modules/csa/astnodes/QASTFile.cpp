@@ -17,6 +17,7 @@
 
 #include "QASTFile.hpp"
 #include "QSourceLocation.hpp"
+#include "QSourceLocation_p.hpp"
 #include "QTokenClassifier.hpp"
 #include "QAnnotatedTokenSet.hpp"
 
@@ -124,12 +125,16 @@ unsigned int QASTFile::size(){
 
 QSourceLocation* QASTFile::createLocation(unsigned int offset){
     CXFile clangFile = clang_getFile(tokenSet()->translationUnit(), identifier().toLocal8Bit().constData());
-    return new QSourceLocation(clang_getLocationForOffset(tokenSet()->translationUnit(), clangFile, offset));
+    return new QSourceLocation(
+        createSourceLocation(clang_getLocationForOffset(tokenSet()->translationUnit(), clangFile, offset))
+    );
 }
 
 QSourceLocation* QASTFile::createLocation(unsigned int line, unsigned int column){
     CXFile clangFile = clang_getFile(tokenSet()->translationUnit(), identifier().toLocal8Bit().constData());
-    return new QSourceLocation(clang_getLocation(tokenSet()->translationUnit(), clangFile, line, column));
+    return new QSourceLocation(
+        createSourceLocation(clang_getLocation(tokenSet()->translationUnit(), clangFile, line, column))
+    );
 }
 
 }}//namespace

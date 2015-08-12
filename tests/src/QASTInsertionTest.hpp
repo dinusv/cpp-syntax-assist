@@ -4,8 +4,10 @@
 #include <QObject>
 #include "QTestRunner.hpp"
 
+class QJSEngine;
+
 namespace csa{
-class QCSAScriptEngine;
+class QCSAPluginLoader;
 }
 
 class QASTInsertionTest : public QObject{
@@ -22,7 +24,8 @@ private slots:
     void definedLocationInsertionTest();
 
 private:
-    csa::QCSAScriptEngine* m_engine;
+    QJSEngine*             m_engine;
+    csa::QCSAPluginLoader* m_pluginLoader;
     QString                m_parserTestPath;
 
 };

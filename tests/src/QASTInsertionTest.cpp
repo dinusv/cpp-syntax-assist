@@ -1,35 +1,34 @@
 #include "QASTInsertionTest.hpp"
 #include "QTestHelpers.hpp"
 
+#include <QJSEngine>
 #include <QtTest/QtTest>
 #include <QTemporaryFile>
 
 #include "QCodeBase.hpp"
-#include "QCSAScriptEngine.hpp"
+#include "QCSAPluginLoader.hpp"
 
 using namespace csa;
 
 Q_TEST_RUNNER_REGISTER(QASTInsertionTest);
 
-QASTInsertionTest::QASTInsertionTest(QObject *parent) :
-    QObject(parent)
+QASTInsertionTest::QASTInsertionTest(QObject *parent)
+    : QObject(parent)
 {
 }
 
 QASTInsertionTest::~QASTInsertionTest(){
+    delete m_pluginLoader;
+    delete m_engine;
 }
 
 void QASTInsertionTest::initTestCase(){
-    m_parserTestPath     = QCoreApplication::applicationDirPath() + "/data/insertion/";
-    m_engine             = new csa::QCSAScriptEngine;
+    m_parserTestPath = QCoreApplication::applicationDirPath() + "/data/insertion/";
+    m_engine         = new QJSEngine;
+    m_pluginLoader   = new csa::QCSAPluginLoader(m_engine);
 }
 
 void QASTInsertionTest::definedLocationInsertionTest(){
-    int parserEngineCode = m_engine->loadPlugins(m_parserTestPath + "insertion.js");
-    if ( parserEngineCode != 0 ){
-        QFAIL("Unable to load parser plugin: " + parserEngineCode);
-        return;
-    }
 
     QTemporaryFile tfile("csa-test");
     if ( !tfile.open() ){
@@ -47,12 +46,18 @@ void QASTInsertionTest::definedLocationInsertionTest(){
     tfile.close();
 
     QSharedPointer<QCodeBase> cbase = helpers::createCodeBaseFromFile(tfile.fileName());
-    m_engine->setCodeBase(cbase.data());
+    m_pluginLoader->setContextObject("codeBase", cbase.data());
 
-    QScriptValue result;
-    m_engine->execute("insertAtLocation(3, 1);", result);
+    int parserEngineCode = m_pluginLoader->loadPlugins(m_parserTestPath + "insertion.js");
+    if ( parserEngineCode != 0 ){
+        QFAIL("Unable to load parser plugin: " + parserEngineCode);
+        return;
+    }
 
-    if ( !result.isBool() || !result.isBoolean() ){
+    QJSValue result;
+    m_pluginLoader->execute("insertAtLocation(3, 1);", result);
+
+    if ( !result.isBool() ){
         QFAIL(qPrintable("Unexpected function 'insertAtLocation' result type."));
         return;
     } else if ( result.toBool() == false ){

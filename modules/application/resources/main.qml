@@ -18,6 +18,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.0
+import CSA 1.0
 
 ApplicationWindow {
     width: 600
@@ -78,7 +79,7 @@ ApplicationWindow {
                                 selectionBegin = i + 1;
                             break;
                         }
-                        if ( i > cursorPosition && !quoteFlag && !doubleQuoteFlag && selectionBegin !== -1){
+                        if(i > cursorPosition && !quoteFlag && !doubleQuoteFlag && selectionBegin !== -1){
                             select(selectionBegin, i);
                             return;
                         }
@@ -132,7 +133,7 @@ ApplicationWindow {
             anchors.left: parent.left
             anchors.top : parent.top
             anchors.topMargin: 0
-            width : 28
+            width : 43
             height : parent.height
             color : "#d7d7d7"
         }
@@ -145,6 +146,7 @@ ApplicationWindow {
                     width : 28
                     color : syntaxTreeModel.selected === model.index ? "#aaa" : "#ccc"
                 }
+
                 Text{
                     text : model.line
                     anchors.top : parent.top
@@ -154,33 +156,71 @@ ApplicationWindow {
                     color : "#555"
                 }
 
-                width: parent.width;
-                height: 20
                 Rectangle{
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.leftMargin: 28
-                    width : parent.width - 28
                     height : parent.height
-                    color : "#eeeeee"
-                }
+                    width : 15
+                    color : syntaxTreeModel.selected === model.index ? "#aaa" : "#ccc"
+                    Text{
+                        anchors.centerIn: parent
+                        text: model.isCollapsible ? model.isCollapsed ? '+' : '-' : ''
+                        font.pixelSize: 13
+                        font.family: "Courier New"
+                        color: "#000"
+                    }
 
-                Text {
-                    anchors.left : parent.left
-                    anchors.leftMargin: 35 + 15 * model.indent
-                    anchors.top: parent.top
-                    anchors.topMargin: 3
-                    textFormat: Text.RichText;
-                    font.pixelSize: 13
-                    font.family: "Courier New"
-                    color : "#000"
-                    text: {
-                        if ( syntaxTreeModel.selected === model.index )
-                            return '<b><span style="color : #0000cc">' + model.type + ':</span> ' + model.identifier + '</b>';
-                        else
-                            return '<span style="color : #0000cc">' + model.type + ':</span> ' + model.identifier;
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:{
+                            if ( model.isCollapsible )
+                                if ( model.isCollapsed ){
+                                    syntaxTreeModel.expand(model.index)
+                                } else {
+                                    syntaxTreeModel.collapse(model.index)
+                                }
+                        }
                     }
                 }
+
+                width: parent.width;
+                height: 20
+
+                Rectangle{
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.leftMargin: 43
+                    width : parent.width - 43
+                    height : parent.height
+                    color : "#eeeeee"
+
+                    Text{
+                        anchors.left : parent.left
+                        anchors.leftMargin: 10 + 15 * model.indent
+                        anchors.top: parent.top
+                        anchors.topMargin: 3
+                        textFormat: Text.RichText;
+                        font.pixelSize: 13
+                        font.family: "Courier New"
+                        color : "#000"
+                        text: {
+                            if ( syntaxTreeModel.selected === model.index )
+                                return '<b><span style="color : #0000cc">' + model.type + ':</span> ' + model.identifier + '</b>';
+                            else
+                                return '<span style="color : #0000cc">' + model.type + ':</span> ' + model.identifier;
+                        }
+                    }
+
+                    MouseArea{
+                        anchors.fill: parent
+                        onDoubleClicked: {
+                            codeBase.select(model.breadcrumbs)
+                        }
+                    }
+
+                }
+
             }
         }
         ScrollView{

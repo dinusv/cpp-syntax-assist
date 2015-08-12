@@ -18,6 +18,7 @@
 #include "QAnnotatedToken.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "QSourceLocation.hpp"
+#include "QSourceLocation_p.hpp"
 #include "QASTNode.hpp"
 
 namespace csa{
@@ -59,7 +60,7 @@ void QAnnotatedToken::before(const QString& value){
     if ( !node )
         return;
 
-    QSourceLocation locStart(clang_getRangeStart(m_tokenRange));
+    QSourceLocation locStart = createSourceLocation(clang_getRangeStart(m_tokenRange));
     node->insert(value, &locStart);
 }
 
@@ -68,7 +69,7 @@ void QAnnotatedToken::after(const QString& value){
     if ( !node )
         return;
 
-    QSourceLocation locEnd(clang_getRangeEnd(m_tokenRange));
+    QSourceLocation locEnd = createSourceLocation(clang_getRangeEnd(m_tokenRange));
     node->insert(value, &locEnd);
 }
 
@@ -87,7 +88,7 @@ void QAnnotatedToken::afterln(const QString& value){
     unsigned line, column, offset;
     clang_getSpellingLocation(location, &file, &line, &column, &offset);
 
-    QSourceLocation afterLocation(clang_getLocation(
+    QSourceLocation afterLocation = createSourceLocation(clang_getLocation(
                 tokenSet->translationUnit(),
                 file,
                 line + 1,

@@ -31,14 +31,16 @@ QASTNodeStub::~QASTNodeStub(){
 }
 
 int nodeSearch(QASTNode* root, const QString& pattern, const QString& type = "", const QString& identifier = ""){
-    QList<QASTNode*> foundNodes = root->find(pattern, type);
+    QList<QObject*> foundNodes = root->find(pattern, type);
     if ( identifier.isEmpty())
         return foundNodes.size();
 
     unsigned int nrNodes = 0;
-    for ( QList<QASTNode*>::const_iterator it = foundNodes.begin(); it != foundNodes.end(); ++it ){
-        if ( (*it)->identifier() == identifier )
-            ++nrNodes;
+    for ( QList<QObject*>::const_iterator it = foundNodes.begin(); it != foundNodes.end(); ++it ){
+        QASTNode* node = qobject_cast<QASTNode*>(*it);
+        if ( node )
+            if ( node->identifier() == identifier )
+                ++nrNodes;
     }
     return nrNodes;
 }

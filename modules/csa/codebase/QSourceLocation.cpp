@@ -15,6 +15,8 @@
 ****************************************************************************/
 
 #include "QSourceLocation.hpp"
+
+#include "clang-c/Index.h"
 #include <QFileInfo>
 
 namespace csa{
@@ -46,42 +48,16 @@ QSourceLocation::QSourceLocation(
 }
 
 QSourceLocation::QSourceLocation(
-        const CXFile &file,
-        unsigned int line,
-        unsigned int column,
-        unsigned int offset,
+        const QSourceLocation& other,
         QObject* parent)
     : QObject(parent)
-    , m_line(line)
-    , m_column(column)
-    , m_offset(offset){
-
-    CXString fileName = clang_getFileName(file);
-    m_filePath        = clang_getCString(fileName);
-    clang_disposeString(fileName);
-}
-
-QSourceLocation::QSourceLocation(const CXSourceLocation &location, QObject* parent)
-    : QObject(parent){
-    assign(location);
-}
-
-QSourceLocation::QSourceLocation(const QSourceLocation& other, QObject* parent)
-    : QObject(parent){
-    assign(other);
+    , m_filePath(other.m_filePath)
+    , m_line(other.m_line)
+    , m_column(other.m_column)
+    , m_offset(other.m_offset){
 }
 
 QSourceLocation::~QSourceLocation(){
-}
-
-void QSourceLocation::assign(const CXSourceLocation &location){
-    CXFile file;
-    clang_getSpellingLocation(location, &file, &m_line, &m_column, &m_offset);
-
-    CXString fileName = clang_getFileName(file);
-    if (fileName.data != 0)
-        m_filePath = clang_getCString(fileName);
-    clang_disposeString(fileName);
 }
 
 void QSourceLocation::assign(const QSourceLocation &other){
@@ -91,17 +67,9 @@ void QSourceLocation::assign(const QSourceLocation &other){
     m_offset     = other.m_offset;
 }
 
-void QSourceLocation::assign(unsigned int offset, const CXTranslationUnit &translationUnit){
-    CXFile file = clang_getFile(translationUnit, m_filePath.toUtf8());
-    if ( file != 0 ){
-        assign(clang_getLocationForOffset(translationUnit, file, offset));
-    }
-}
-
-void QSourceLocation::assign(unsigned int line, unsigned int column, const CXTranslationUnit& translationUnit){
-    CXFile file = clang_getFile(translationUnit, m_filePath.toUtf8());
-    if ( file != 0 )
-        assign(clang_getLocation(translationUnit, file, line, column));
+QSourceLocation&QSourceLocation::operator =(const QSourceLocation& other){
+    assign(other);
+    return *this;
 }
 
 QString QSourceLocation::fileName() const{

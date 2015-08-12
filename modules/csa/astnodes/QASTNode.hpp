@@ -45,6 +45,8 @@ public:
     static int dumpIndentation;
 
 public:
+    QASTNode(QObject* parent = 0):QObject(parent){}
+
     // Constructor / Destructor
     // ------------------------
 
@@ -59,29 +61,36 @@ public:
     // Callable Methods
     // ----------------
 
+    const QList<csa::ast::QASTNode*>& astChildren() const;
+    QList<csa::ast::QASTNode*> astChildren(const QString& type) const;
+
+    const csa::ast::QASTNode* astParent() const;
+
 public slots:
     QString typeName() const;
     QString identifier() const;
 
+    QString breadcrumbs() const;
+
     virtual QString content() const;
     virtual QString prop(const QString& key) const;
 
-    QList<csa::ast::QASTNode*> astChildren() const;
-    QList<csa::ast::QASTNode*> astChildren(const QString& type) const;
+    QList<QObject*> children() const;
+    QList<QObject*> children(const QString& type);
 
-    virtual QList<csa::ast::QASTNode*> arguments() const;
+    virtual QList<QObject*> arguments() const;
 
-    QList<csa::QAnnotatedToken*> associatedTokens();
+    QList<QObject*> associatedTokens();
 
     csa::ast::QASTNode* astParent();
-    csa::ast::QASTNode* astChild(const QString& identifier);
-    csa::ast::QASTNode* astChild(const QString& typeString, const QString& identif);
+    csa::ast::QASTNode* firstChild(const QString& identifier);
+    csa::ast::QASTNode* firstChild(const QString& typeString, const QString& identif);
 
     csa::ast::QASTNode* next();
     csa::ast::QASTNode* prev();
 
     csa::ast::QASTNode* find(csa::ast::QASTNode *node);
-    QList<csa::ast::QASTNode*> find(const QString& searchData, const QString& type = "");
+    QList<QObject*> find(const QString& searchData, const QString& type = "");
     csa::ast::QASTNode* findFirst(const QString& searchData, const QString& type = "");
     csa::ast::QASTNode* parentFind(const QString& typeString);
 
@@ -131,12 +140,14 @@ public:
 protected:
     void setIdentifier(const QString& identifier);
     csa::ast::QASTNode* findFirst(const QASTSearch& searchPattern, const QString& type = "");
-    QList<csa::ast::QASTNode*> find(const QASTSearch& searchPattern, const QString& type = "");
+    QList<QObject*> find(const QASTSearch& searchPattern, const QString& type = "");
 
     csa::ast::QASTNode* childAfter(csa::ast::QASTNode* child);
     csa::ast::QASTNode* childBefore(csa::ast::QASTNode* child);
 
     QAnnotatedTokenSet* tokenSet();
+
+    static QList<QObject*> castNodeListToObjectList(const QList<QASTNode*>& list);
 
 private:
     // Parameters
@@ -173,24 +184,20 @@ inline QString QASTNode::identifier() const{
     return m_identifier;
 }
 
-inline QList<QASTNode*> QASTNode::astChildren() const{
+inline const QList<QASTNode*>& QASTNode::astChildren() const{
     return m_children;
 }
 
-inline QList<QASTNode *> QASTNode::astChildren(const QString &type) const{
-    QList<QASTNode*> astChildren;
+inline QList<QASTNode*> QASTNode::astChildren(const QString &type) const{
+    QList<QASTNode*> children;
     for ( NodeList::ConstIterator it = m_children.begin(); it != m_children.end(); ++it ){
         if ( (*it)->typeName() == type )
-            astChildren.append(*it);
+            children.append(*it);
     }
-    return astChildren;
+    return children;
 }
 
-inline QList<QASTNode*> QASTNode::arguments() const{
-    return QList<QASTNode*>();
-}
-
-inline QASTNode* QASTNode::astChild(const QString &identifier){
+inline QASTNode* QASTNode::firstChild(const QString &identifier){
     for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
         if ( (*it)->identifier() == identifier )
             return *it;
@@ -198,7 +205,7 @@ inline QASTNode* QASTNode::astChild(const QString &identifier){
     return 0;
 }
 
-inline QASTNode* QASTNode::astChild(const QString &typeString, const QString &identif){
+inline QASTNode* QASTNode::firstChild(const QString &typeString, const QString &identif){
     for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
         if ( (*it)->identifier() == identif && (*it)->typeName() == typeString )
             return *it;

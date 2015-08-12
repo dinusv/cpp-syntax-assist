@@ -41,14 +41,14 @@ public:
     QString content() const;
 
 public slots:
-    virtual QList<csa::ast::QASTNode*> arguments() const;
+    virtual QList<QObject*> arguments() const;
 
 private:
     QList<csa::ast::QASTNode*> m_arguments;
 };
 
-inline QList<QASTNode*> QASTConstructor::arguments() const{
-    return m_arguments;
+inline QList<QObject*> QASTConstructor::arguments() const{
+    return QASTNode::castNodeListToObjectList(m_arguments);
 }
 
 }}// namespace

@@ -21,8 +21,10 @@
 #include <QObject>
 #include "QTestRunner.hpp"
 
+class QJSEngine;
+
 namespace csa{
-class QCSAScriptEngine;
+class QCSAPluginLoader;
 }
 
 class QASTParsingTest : public QObject{
@@ -39,7 +41,8 @@ private slots:
     void unknownTypeDeductionTest();
 
 private:
-    csa::QCSAScriptEngine* m_engine;
+    QJSEngine*             m_engine;
+    csa::QCSAPluginLoader* m_loader;
     QString                m_parserTestPath;
 
 };
