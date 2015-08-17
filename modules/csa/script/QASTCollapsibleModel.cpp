@@ -14,7 +14,7 @@
 **
 ****************************************************************************/
 
-#include "QSyntaxTreeModel.hpp"
+#include "QASTCollapsibleModel.hpp"
 #include "QSourceLocation.hpp"
 #include "QASTNode.hpp"
 #include "QASTFile.hpp"
@@ -35,33 +35,33 @@ public:
     bool      isCollapsed;
 };
 
-QSyntaxTreeModel::QSyntaxTreeModel(QObject *parent)
+QASTCollapsibleModel::QASTCollapsibleModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_expandLevel(3){
 
-    m_roles[QSyntaxTreeModel::Identifier]    = "identifier";
-    m_roles[QSyntaxTreeModel::Indent]        = "indent";
-    m_roles[QSyntaxTreeModel::Type]          = "type";
-    m_roles[QSyntaxTreeModel::Line]          = "line";
-    m_roles[QSyntaxTreeModel::IsCollapsible] = "isCollapsible";
-    m_roles[QSyntaxTreeModel::IsCollapsed]   = "isCollapsed";
-    m_roles[QSyntaxTreeModel::Breadcrumbs]   = "breadcrumbs";
+    m_roles[QASTCollapsibleModel::Identifier]    = "identifier";
+    m_roles[QASTCollapsibleModel::Indent]        = "indent";
+    m_roles[QASTCollapsibleModel::Type]          = "type";
+    m_roles[QASTCollapsibleModel::Line]          = "line";
+    m_roles[QASTCollapsibleModel::IsCollapsible] = "isCollapsible";
+    m_roles[QASTCollapsibleModel::IsCollapsed]   = "isCollapsed";
+    m_roles[QASTCollapsibleModel::Breadcrumbs]   = "breadcrumbs";
 }
 
-void QSyntaxTreeModel::clearAndReset(){
+void QASTCollapsibleModel::clearAndReset(){
     beginResetModel();
     clear();
     endResetModel();
 }
 
-void QSyntaxTreeModel::clear(){
+void QASTCollapsibleModel::clear(){
     for ( QList<QSyntaxTreeItem*>::iterator it = m_items.begin(); it != m_items.end(); ++it ){
         delete (*it);
     }
     m_items.clear();
 }
 
-void QSyntaxTreeModel::parse(const QList<ast::QASTFile *> &files){
+void QASTCollapsibleModel::parse(const QList<ast::QASTFile *> &files){
     beginResetModel();
     clear();
     for ( QList<ast::QASTFile*>::const_iterator it = files.begin(); it != files.end(); ++it ){
@@ -71,7 +71,7 @@ void QSyntaxTreeModel::parse(const QList<ast::QASTFile *> &files){
     endResetModel();
 }
 
-void QSyntaxTreeModel::recursiveParse(QASTNode *node, int indent){
+void QASTCollapsibleModel::recursiveParse(QASTNode *node, int indent){
 
     QSyntaxTreeItem* item = new QSyntaxTreeItem;
     item->display = node->content();
@@ -91,25 +91,25 @@ void QSyntaxTreeModel::recursiveParse(QASTNode *node, int indent){
     }
 }
 
-QVariant QSyntaxTreeModel::data(const QModelIndex &index, int role) const{
-    if ( role == QSyntaxTreeModel::Identifier)
+QVariant QASTCollapsibleModel::data(const QModelIndex &index, int role) const{
+    if ( role == QASTCollapsibleModel::Identifier)
         return m_items[index.row()]->display;
-    else if ( role == QSyntaxTreeModel::Indent )
+    else if ( role == QASTCollapsibleModel::Indent )
         return m_items[index.row()]->indent;
-    else if ( role == QSyntaxTreeModel::Type )
+    else if ( role == QASTCollapsibleModel::Type )
         return m_items[index.row()]->type;
-    else if ( role == QSyntaxTreeModel::Line )
+    else if ( role == QASTCollapsibleModel::Line )
         return m_items[index.row()]->line;
-    else if ( role == QSyntaxTreeModel::IsCollapsed )
+    else if ( role == QASTCollapsibleModel::IsCollapsed )
         return m_items[index.row()]->isCollapsed;
-    else if ( role == QSyntaxTreeModel::IsCollapsible )
+    else if ( role == QASTCollapsibleModel::IsCollapsible )
         return m_items[index.row()]->isCollapsible;
-    else if ( role == QSyntaxTreeModel::Breadcrumbs )
+    else if ( role == QASTCollapsibleModel::Breadcrumbs )
         return m_items[index.row()]->node->breadcrumbs();
     return QVariant();
 }
 
-void QSyntaxTreeModel::collapse(int index){
+void QASTCollapsibleModel::collapse(int index){
     QSyntaxTreeItem* item = m_items[index];
 
     if ( item->isCollapsible && !item->isCollapsed ){
@@ -121,7 +121,7 @@ void QSyntaxTreeModel::collapse(int index){
     }
 }
 
-void QSyntaxTreeModel::recursiveCollapse(int index){
+void QASTCollapsibleModel::recursiveCollapse(int index){
     QSyntaxTreeItem* item = m_items[index];
 
     int totalChildren = item->node->astChildren().size();
@@ -141,7 +141,7 @@ void QSyntaxTreeModel::recursiveCollapse(int index){
     endRemoveRows();
 }
 
-void QSyntaxTreeModel::expand(int index){
+void QASTCollapsibleModel::expand(int index){
     QSyntaxTreeItem* item = m_items[index];
 
     if ( item->isCollapsible && item->isCollapsed ){
@@ -174,7 +174,7 @@ void QSyntaxTreeModel::expand(int index){
     }
 }
 
-void QSyntaxTreeModel::setSelected(csa::ast::QASTNode *node){
+void QASTCollapsibleModel::setSelected(csa::ast::QASTNode *node){
     for ( int i = 0; i < m_items.size(); ++i ){
         QSyntaxTreeItem* item = m_items[i];
         if ( item->node == node ){

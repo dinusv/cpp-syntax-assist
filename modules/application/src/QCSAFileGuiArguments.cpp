@@ -15,14 +15,14 @@
 ****************************************************************************/
 
 
-#include "QCsaCommandLineArguments.hpp"
+#include "QCSAFileGuiArguments.hpp"
 #include <QGuiApplication>
 #include <QCommandLineParser>
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QDir>
 
-QCsaCommandLineArguments::QCsaCommandLineArguments(
+QCSAFileGuiArguments::QCSAFileGuiArguments(
         const QGuiApplication& app,
         const QString& applicationDescription)
     : m_commandLineParser(new QCommandLineParser)
@@ -37,11 +37,11 @@ QCsaCommandLineArguments::QCsaCommandLineArguments(
     initialize(app, applicationDescription);
 }
 
-QCsaCommandLineArguments::~QCsaCommandLineArguments(){
+QCSAFileGuiArguments::~QCSAFileGuiArguments(){
     delete m_commandLineParser;
 }
 
-void QCsaCommandLineArguments::initialize(const QGuiApplication& app, const QString& applicationDescription){
+void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString& applicationDescription){
 
     // Setup parsing
     // -------------
@@ -49,7 +49,8 @@ void QCsaCommandLineArguments::initialize(const QGuiApplication& app, const QStr
     m_commandLineParser->setApplicationDescription(applicationDescription);
     m_commandLineParser->addHelpOption();
     m_commandLineParser->addVersionOption();
-    m_commandLineParser->addPositionalArgument("files and directiories", QGuiApplication::translate("main", "Files and directories to parse."));
+    m_commandLineParser->addPositionalArgument(
+                "paths", QGuiApplication::translate("main", "Files and directories to parse."));
 
     QCommandLineOption cursorOffset("c",
         QCoreApplication::translate("main", "User cursor offset within the file."),

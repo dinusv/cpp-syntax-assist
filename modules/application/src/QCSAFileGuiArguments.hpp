@@ -15,18 +15,18 @@
 ****************************************************************************/
 
 
-#ifndef QCSACOMMANDLINEARGUMENTS_HPP
-#define QCSACOMMANDLINEARGUMENTS_HPP
+#ifndef QCSAFILEGUIARGUMENTS_HPP
+#define QCSAFILEGUIARGUMENTS_HPP
 
 #include <QStringList>
 
 class QGuiApplication;
 class QCommandLineParser;
-class QCsaCommandLineArguments{
+class QCSAFileGuiArguments{
 
 public:
-    QCsaCommandLineArguments(const QGuiApplication& app, const QString& applicationDescription);
-    ~QCsaCommandLineArguments();
+    QCSAFileGuiArguments(const QGuiApplication& app, const QString& applicationDescription);
+    ~QCSAFileGuiArguments();
 
     const QStringList& files() const;
     const QStringList& fileErrors() const;
@@ -45,6 +45,9 @@ public:
     bool  isExecuteAndQuitSet() const;
 
 private:
+    QCSAFileGuiArguments(const QCSAFileGuiArguments& other);
+    QCSAFileGuiArguments& operator =(const QCSAFileGuiArguments& other);
+
     void initialize(const QGuiApplication& app, const QString& applicationDescription);
 
 private:
@@ -68,48 +71,48 @@ private:
     bool    m_executeAndQuitFlag;
 };
 
-inline const QStringList& QCsaCommandLineArguments::files() const{
+inline const QStringList& QCSAFileGuiArguments::files() const{
     return m_files;
 }
 
-inline const QStringList &QCsaCommandLineArguments::fileErrors() const{
+inline const QStringList &QCSAFileGuiArguments::fileErrors() const{
     return m_fileErrors;
 }
 
-inline bool QCsaCommandLineArguments::hasFileErrors() const{
+inline bool QCSAFileGuiArguments::hasFileErrors() const{
     return m_fileErrors.size() > 0;
 }
 
-inline bool QCsaCommandLineArguments::isSelectedFunctionSet() const{
+inline bool QCSAFileGuiArguments::isSelectedFunctionSet() const{
     return m_functionSet;
 }
 
-inline const QString& QCsaCommandLineArguments::selectedFunction() const{
+inline const QString& QCSAFileGuiArguments::selectedFunction() const{
     return m_function;
 }
 
-inline bool QCsaCommandLineArguments::isCursorOffsetSet() const{
+inline bool QCSAFileGuiArguments::isCursorOffsetSet() const{
     return m_cursorOffset != -1;
 }
 
-inline int QCsaCommandLineArguments::cursorOffset() const{
+inline int QCSAFileGuiArguments::cursorOffset() const{
     return m_cursorOffset;
 }
 
-inline bool QCsaCommandLineArguments::isCursorLineColumnSet() const{
+inline bool QCSAFileGuiArguments::isCursorLineColumnSet() const{
     return (m_cursorLine != -1 && m_cursorColumn != -1);
 }
 
-inline int QCsaCommandLineArguments::cursorLine() const{
+inline int QCSAFileGuiArguments::cursorLine() const{
     return m_cursorLine;
 }
 
-inline int QCsaCommandLineArguments::cursorColumn() const{
+inline int QCSAFileGuiArguments::cursorColumn() const{
     return m_cursorColumn;
 }
 
-inline bool QCsaCommandLineArguments::isExecuteAndQuitSet() const{
+inline bool QCSAFileGuiArguments::isExecuteAndQuitSet() const{
     return m_executeAndQuitFlag;
 }
 
-#endif // QCSACOMMANDLINEARGUMENTS_HPP
+#endif // QCSAFILEGUIARGUMENTS_HPP

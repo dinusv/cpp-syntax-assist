@@ -5,3 +5,4 @@ CONFIG  += ordered
 
 SUBDIRS += $$PWD/csa
 SUBDIRS += $$PWD/application
+SUBDIRS += $$PWD/csa-console

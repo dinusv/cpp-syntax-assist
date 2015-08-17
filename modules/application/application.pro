@@ -50,7 +50,7 @@ include($$PWD/../../3rdparty/libclang.pro)
 RESOURCES += \
     $$PWD/resources/resources.qrc
 
-TARGET   = cppsnippetassist
+TARGET   = csa-file-gui
 TEMPLATE = app
 
 win32{
