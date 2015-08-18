@@ -49,17 +49,63 @@ ApplicationWindow {
             selectByMouse : true
             selectionColor : "#886631"
             text : command
+            onTextChanged : {
+                plugins.filter(consoleInput.text)
+                if ( text === "" ){
+                    pluginList.visible = false
+                } else {
+                    pluginList.visible = true
+                    pluginList.currentIndex = 0
+                }
+            }
+
             cursorDelegate: Rectangle{
                 width : 9
                 color : "#585858"
                 opacity : 0.75
             }
+
             Keys.onReturnPressed: {
-                if (configuredEngine.execute(text)){
-                    text = ""
+                if ( pluginList.visible && pluginList.count > 0 ){
+                    event.accepted     = true;
+                    selectIndexedItem()
+
+                } else {
+                    if (configuredEngine.execute(text)){
+                        text = ""
+                    }
                 }
             }
-            Keys.onTabPressed: {
+
+            Keys.onSpacePressed: {
+                if ( event.modifiers & Qt.ControlModifier ){
+                    event.accepted = true;
+                    selectIndexedItem()
+                }
+            }
+
+            Keys.onEscapePressed: {
+                pluginList.visible = false
+            }
+
+            Keys.onDownPressed: {
+                pluginList.incrementCurrentIndex()
+                event.accepted = true
+            }
+            Keys.onUpPressed: {
+                pluginList.decrementCurrentIndex()
+                event.accepted = true
+            }
+
+            function selectIndexedItem(){
+                text               = pluginList.currentItem.usage
+                pluginList.visible = false
+
+                positionCursor()
+                positionCursor()
+            }
+
+            function positionCursor(){
                 if ( text !== "" ){
                     var quoteFlag       = false;
                     var doubleQuoteFlag = false;
@@ -89,6 +135,10 @@ ApplicationWindow {
                     cursorPosition = text.length - 1;
                 else
                     cursorPosition = 0;
+            }
+
+            Keys.onTabPressed: {
+                positionCursor()
             }
 
         }
@@ -223,6 +273,7 @@ ApplicationWindow {
 
             }
         }
+
         ScrollView{
             anchors.fill: parent
             ListView {
@@ -237,6 +288,47 @@ ApplicationWindow {
                 highlight: Rectangle {
                     color: "#ccc";
                 }
+            }
+        }
+
+        ScrollView{
+            anchors.top : parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            height : parent.height > 200 ? parent.height : 200
+
+            ListView{
+                id : pluginList
+                anchors.fill: parent
+                anchors.rightMargin: 2
+                anchors.bottomMargin: 5
+                anchors.topMargin: 0
+                boundsBehavior : Flickable.StopAtBounds
+                model: plugins
+                visible: false
+                delegate: Component{
+
+                    Rectangle{
+                        property string usage: model.usage
+
+                        width : parent.width
+                        height : 30
+                        color : ListView.isCurrentItem ? "#444" : "#3a3a3a"
+                        Text{
+                            anchors.left: parent.left
+                            anchors.leftMargin: 86
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            font.pixelSize: 13
+                            font.family: "Courier New"
+
+                            color: "#fafafa"
+                            text: model.usage
+                        }
+                    }
+                }
+
             }
         }
     }

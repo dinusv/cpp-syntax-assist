@@ -49,6 +49,9 @@ public:
     virtual QASTNode* propagateUserCursor(const QSourceLocation &location);
     virtual QString content() const;
 
+    virtual QSourceLocation* bodyStartLocation();
+    virtual QSourceLocation* bodyEndLocation();
+
 private:
     QSourceLocation* m_bodyStart;
     QSourceLocation* m_bodyEnd;
@@ -58,6 +61,14 @@ private:
 
 inline QString QASTNamespace::content() const{
     return typeName() + " " + identifier();
+}
+
+inline QSourceLocation* QASTNamespace::bodyStartLocation(){
+    return m_bodyStart;
+}
+
+inline QSourceLocation* QASTNamespace::bodyEndLocation(){
+    return m_bodyEnd;
 }
 
 }}// namespace

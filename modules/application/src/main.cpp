@@ -21,6 +21,7 @@
 
 #include "QCodeBase.hpp"
 #include "QCSAPluginLoader.hpp"
+#include "QCSAPluginCollection.hpp"
 
 #include "QASTNode.hpp"
 #include "QASTFile.hpp"
@@ -94,6 +95,9 @@ int main(int argc, char *argv[]){
     qmlRegisterUncreatableType<QCSAPluginLoader>(
         "CSA", 1, 0, "ConfiguredEngine", "Only access to the engine property is allowed.");
 
+    qmlRegisterUncreatableType<QCSAPluginCollection>(
+        "CSA", 1, 0, "PluginCollection", "Only access to the plugins property is allowed.");
+
     qmlRegisterUncreatableType<csa::QCodeBase>(
         "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
 
@@ -103,13 +107,17 @@ int main(int argc, char *argv[]){
     qmlRegisterUncreatableType<csa::ast::QASTNode>(
         "CSA", 1, 0, "ASTNode", "ASTNode is available only as a property.");
 
+    QCSAPluginCollection pluginCollection;
+
     QCSAPluginLoader scriptEngine(new QJSEngine);
     scriptEngine.setContextObject("codeBase", &codeBase);
+    scriptEngine.setContextObject("plugins",  &pluginCollection);
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("syntaxTreeModel",  astTreeModel);
     engine.rootContext()->setContextProperty("configuredEngine", &scriptEngine);
     engine.rootContext()->setContextProperty("codeBase",         &codeBase);
+    engine.rootContext()->setContextProperty("plugins",          &pluginCollection);
     engine.rootContext()->setContextProperty("command",          commandLineArguments.selectedFunction());
 
     int loaderError = scriptEngine.loadPlugins(QGuiApplication::applicationDirPath() + "/plugins");

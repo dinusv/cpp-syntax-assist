@@ -1,5 +1,5 @@
 
-function namespace(name){
+function wrapNamespace(name){
 
     var cursorNode = codeBase.cursorNode();
     var fileNode   = cursorNode.parentFind('file');
@@ -16,3 +16,12 @@ function namespace(name){
 
     codeBase.save();
 }
+
+if ( typeof plugins !== 'undefined' ){
+    plugins.registerPlugin({
+        'name' : 'wrapNamespace',
+        'usage' : 'wrapNamespace("name")',
+        'description' : 'wraps the current class or namespace into the specified namespace "name".'
+    });
+}
+

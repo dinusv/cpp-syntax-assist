@@ -6,6 +6,7 @@ HEADERS += \
     $$PWD/QSourceLocationConvert.hpp \
     $$PWD/QASTFileConvert.hpp \
     $$PWD/QCSAPluginLoader.hpp \
+    $$PWD/QCSAPluginCollection.hpp \
     $$PWD/QASTCollapsibleModel.hpp
 
 SOURCES += \
@@ -14,4 +15,5 @@ SOURCES += \
     $$PWD/QSourceLocationConvert.cpp \
     $$PWD/QASTFileConvert.cpp \
     $$PWD/QCSAPluginLoader.cpp \
+    $$PWD/QCSAPluginCollection.cpp \
     $$PWD/QASTCollapsibleModel.cpp
