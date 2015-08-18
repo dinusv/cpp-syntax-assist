@@ -107,8 +107,8 @@ public slots:
     csa::QSourceLocation* rangeEndLocation();
     csa::QSourceLocation* cursorLocation();
 
-    csa::QSourceLocation* bodyStartLocation();
-    csa::QSourceLocation* bodyEndLocation();
+    virtual csa::QSourceLocation* bodyStartLocation();
+    virtual csa::QSourceLocation* bodyEndLocation();
 
 public:
     // Initializers

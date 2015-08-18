@@ -25,6 +25,7 @@
 #include <QFileInfo>
 #include <QJSEngine>
 #include <QJSValue>
+#include <QJSValueIterator>
 
 namespace csa{
 
@@ -41,30 +42,12 @@ void QCSAPluginDebugger::print(const QString& message){
 }
 
 
-
 QCSAPluginLoader::QCSAPluginLoader(QJSEngine* engine, QObject* parent)
     : QObject(parent)
     , m_engine(engine)
     , m_pluginDebugger(new QCSAPluginDebugger)
 {
     setContextObject("debug", m_pluginDebugger);
-//    m_engine = new QScriptEngine;
-//    qScriptRegisterMetaType<ast::QASTNode*>(m_engine, &nodeToScriptValue, &nodeFromScriptValue);
-//    qScriptRegisterSequenceMetaType<QList<ast::QASTNode*> >(m_engine);
-
-//    qScriptRegisterMetaType<ast::QASTFile*>(m_engine, &fileToScriptValue, &fileFromScriptValue);
-//    qScriptRegisterSequenceMetaType<QList<ast::QASTFile*> >(m_engine);
-
-//    qScriptRegisterMetaType<QSourceLocation*>(m_engine, &sourceLocationToScriptValue, &sourceLocationFromScriptValue);
-
-//    qScriptRegisterMetaType<QAnnotatedToken*>(m_engine, &tokenToScriptValue, &tokenFromScriptValue);
-//    qScriptRegisterSequenceMetaType<QList<QAnnotatedToken*> >(m_engine);
-
-//    qScriptRegisterMetaType(m_engine, &tokenKindToScriptValue, &tokenKindFromScriptValue);
-
-//    QScriptValue metaObject = m_engine->newQMetaObject(
-//                &QAnnotatedToken::staticMetaObject, m_engine->newFunction(&tokenScriptConstructor) );
-//    m_engine->globalObject().setProperty("Token", metaObject);
 }
 
 QCSAPluginLoader::~QCSAPluginLoader(){
@@ -97,9 +80,6 @@ int QCSAPluginLoader::loadPlugins(const QString& path){
                 "%s", qPrintable(("Error opening js configuration file. Make sure the file is present in " + path + ".")));
             return 2;
         }
-
-        qDebug() << configScript.fileName();
-
 
         QTextStream configStream(&configScript);
         QJSValue evaluateResult = engine->evaluate(configStream.readAll(), configScript.fileName());

@@ -207,6 +207,19 @@ bool QCodeBase::select(QASTNode* node){
     return false;
 }
 
+QList<QObject*> QCodeBase::find(const QString& searchData, const QString& type){
+    QList<QObject*> foundNodes;
+
+    for ( QList<ast::QASTFile*>::iterator it = m_files.begin(); it != m_files.end(); ++it ){
+        QASTFile* file = *it;
+        QList<QObject*> foundFileNodes = file->find(searchData, type);
+
+        foundNodes << foundFileNodes;
+    }
+
+    return foundNodes;
+}
+
 void QCodeBase::setHeaderSearchPattern(const QStringList &pattern){
     m_headerSearchPatterns = pattern;
 }

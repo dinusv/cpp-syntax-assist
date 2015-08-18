@@ -76,6 +76,8 @@ public slots:
     bool select(const QString &searchData, const QString &type = "");
     bool select(csa::ast::QASTNode* node);
 
+    QList<QObject*> find(const QString& searchData, const QString& type = "");
+
     csa::ast::QASTFile* findSource(const QString& headerFile);
     csa::ast::QASTFile* findHeader(const QString& sourceFile);
 

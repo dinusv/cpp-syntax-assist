@@ -1,5 +1,5 @@
 
-function property(type, name, options){
+function addProperty(type, name, options){
 
     function capitaliseFirstLetter(str){
         return str.charAt(0).toUpperCase() + str.slice(1);
@@ -23,10 +23,8 @@ function property(type, name, options){
         }
     }
 
-    if ( classNode === null ){
-        print("Cannot find specified class");
-        return;
-    }
+    if ( classNode === null )
+        throw "Cannot find specified class";
 
     var propertyDeclaration = 'm_' + name;
     var isNotifiable        = options.indexOf('n') !== -1;
@@ -71,7 +69,7 @@ function property(type, name, options){
 
     classNode.afterln(methodImpl);
 
-    var privateAccess = classNode.astChild('access', 'private');
+    var privateAccess = classNode.firstChild('access', 'private');
     if ( privateAccess !== null ){
         var nextPrivateMember = privateAccess.next();
 
@@ -92,7 +90,7 @@ function property(type, name, options){
         classNode.append('private:\n' + member);
     }
 
-    var publicAccess = classNode.astChild('access', 'public');
+    var publicAccess = classNode.firstChild('access', 'public');
     if ( publicAccess !== null ){
 
         var nextPublicMember = publicAccess.next();
@@ -116,3 +114,12 @@ function property(type, name, options){
 
     codeBase.save();
 }
+
+if ( typeof plugins !== 'undefined' ){
+    plugins.registerPlugin({
+        'name' : 'addProperty',
+        'usage' : 'addProperty("type", "name", "nrmgs")',
+        'description' : 'adds a property to the given class within the hierarchy.'
+    });
+}
+

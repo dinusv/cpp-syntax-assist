@@ -19,10 +19,8 @@ function preventCopy(){
         }
     }
 
-    if ( classNode === null ){
-        print("Cannot find specified class");
-        return;
-    }
+    if ( classNode === null )
+        throw "Cannot find specified class";
 
     var preventCopyText =
         '\t' + classNode.identifier() + '(const ' + classNode.identifier() + '& other);\n' +
@@ -36,4 +34,12 @@ function preventCopy(){
     }
 
     codeBase.save();
+}
+
+if ( typeof plugins !== 'undefined' ){
+    plugins.registerPlugin({
+        'name' : 'preventCopy',
+        'usage' : 'preventCopy()',
+        'description' : 'adds the private copy constructor and assignment operator to the selected or parent class.'
+    });
 }

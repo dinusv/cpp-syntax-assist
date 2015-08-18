@@ -26,6 +26,7 @@
 namespace csa{
 
 namespace ast{ class QASTNode; class QASTFile; }
+
 class QCodeBase;
 }
 
