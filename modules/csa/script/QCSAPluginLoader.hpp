@@ -52,6 +52,8 @@ public:
 
     QJSEngine* engine();
 
+    bool loadNodeCollection();
+    bool loadNodesFunction();
     int loadPlugins(const QString &path);
 
     bool execute(const QString &jsCode, QJSValue& result);

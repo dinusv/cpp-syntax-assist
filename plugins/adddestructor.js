@@ -14,12 +14,7 @@ function addDestructor(node){
         }
 
         if ( classNode === null ){
-            var loadedFiles = codeBase.files();
-            for (var index = 0; index < loadedFiles.length; ++index) {
-                classNode = loadedFiles[index].findFirst('class');
-                if ( classNode !== null )
-                    break;
-            }
+            debug.printError("Cannot find 'class' node for insertion.")
         }
     } else {
         classNode = node.typeName() === 'class' ? node : null;
@@ -46,35 +41,6 @@ function addDestructor(node){
     }
 
     codeBase.save();
-}
-
-function NodeCollection(nodes){this.nodes = nodes ? nodes : [];}
-
-NodeCollection.prototype.children = function(){
-    var newCollection = new NodeCollection();
-    for ( var i = 0; i < this.nodes.length; ++i )
-        newCollection.nodes.push(nodes[i].children());
-    return newCollection;
-}
-
-NodeCollection.prototype.toString = function(){
-    var ret = 'NodeCollection[';
-    for ( var i = 0; i < this.nodes.length; ++i ){
-        if ( i !== 0 )
-            ret += ', ';
-        ret += '\'' + this.nodes[i].content() + '\'';
-    }
-    return ret + ']';
-}
-
-NodeCollection.registerPlugin = function(properties){
-    if( typeof plugins !== 'undefined' )
-        plugins.registerPlugin(properties);
-    return NodeCollection;
-}
-
-function nodes(selector, type){
-    return new NodeCollection(codeBase.find(selector, type ? type : ''));
 }
 
 NodeCollection.registerPlugin({

@@ -42,7 +42,7 @@ void QCSAPluginDebugger::print(const QString& message){
 }
 
 void QCSAPluginDebugger::printError(const QString &message){
-    qWarning("Script error: %s", qPrintable(message));
+    qCritical("Script error: %s", qPrintable(message));
 }
 
 
@@ -56,6 +56,58 @@ QCSAPluginLoader::QCSAPluginLoader(QJSEngine* engine, QObject* parent)
 
 QCSAPluginLoader::~QCSAPluginLoader(){
     delete m_pluginDebugger;
+}
+
+bool QCSAPluginLoader::loadNodeCollection(){
+
+    QJSValue evaluateResult = m_engine->evaluate(
+        "function NodeCollection(nodes){this.nodes = nodes ? nodes : [];} \n"
+
+        "NodeCollection.prototype.children = function(){ \n"
+        "    var newCollection = new NodeCollection(); \n"
+        "    for ( var i = 0; i < this.nodes.length; ++i ) \n"
+        "        newCollection.nodes.push(nodes[i].children()); \n"
+        "    return newCollection; \n"
+        "} \n"
+
+        "NodeCollection.prototype.toString = function(){ \n"
+        "    var ret = 'NodeCollection['; \n"
+        "    for ( var i = 0; i < this.nodes.length; ++i ){ \n"
+        "        if ( i !== 0 ) \n"
+        "            ret += ', '; \n"
+        "        ret += '\'' + this.nodes[i].content() + '\''; \n"
+        "    } \n"
+        "    return ret + ']'; \n"
+        "} \n"
+
+        "NodeCollection.registerPlugin = function(properties){ \n"
+        "    if( typeof plugins !== 'undefined' ) \n"
+        "        plugins.registerPlugin(properties); \n"
+        "    return NodeCollection; \n"
+        "} \n"
+    );
+
+
+    if ( evaluateResult.isError() ){
+        qCritical("Error loading node collection: %s", qPrintable(evaluateResult.toString()));
+        return false;
+    }
+    return true;
+}
+
+bool QCSAPluginLoader::loadNodesFunction(){
+
+    QJSValue evaluateResult = m_engine->evaluate(
+        "function nodes(selector, type){ \n"
+        "    return new NodeCollection(codeBase.find(selector, type ? type : '')); \n"
+        "} \n"
+    );
+
+    if ( evaluateResult.isError() ){
+        qCritical("Error loading nodes() function: %s", qPrintable(evaluateResult.toString()));
+        return false;
+    }
+    return true;
 }
 
 int QCSAPluginLoader::loadPlugins(const QString& path){

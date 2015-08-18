@@ -4,5 +4,5 @@ CONFIG  += ordered
 # Required modules
 
 SUBDIRS += $$PWD/csa
-SUBDIRS += $$PWD/application
+SUBDIRS += $$PWD/csa-file-gui
 SUBDIRS += $$PWD/csa-console

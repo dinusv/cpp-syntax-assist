@@ -3,9 +3,9 @@
 
 PLUGIN_DEPLOY_FROM = $$PWD/../../plugins
 
-win32:CONFIG(debug, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/debug/plugins
-else:win32:CONFIG(release, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/release/plugins
-else:unix: PLUGIN_DEPLOY_TO = $$OUT_PWD
+win32:CONFIG(debug, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/../build/debug/plugins
+else:win32:CONFIG(release, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/../build/release/plugins
+else:unix: PLUGIN_DEPLOY_TO = $$OUT_PWD/../build
 
 win32:PLUGIN_DEPLOY_TO ~= s,/,\\,g
 win32:PLUGIN_DEPLOY_FROM ~= s,/,\\,g
@@ -36,12 +36,12 @@ DEPENDPATH  += $$PWD/../csa/script
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../csa/release/ -lcsa
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../csa/debug/ -lcsa
-else:unix: LIBS += -L$$OUT_PWD/../application/ -lcsa
+else:unix: LIBS += -L$$OUT_PWD/../build/ -lcsa
 
 # Add source files
 # ----------------
 
-include($$PWD/src/application.pri)
+include($$PWD/src/csa-file-gui.pri)
 include($$PWD/../../3rdparty/libclang.pro)
 
 # Configure name and resources
@@ -59,6 +59,16 @@ win32{
 
 # Deployment
 # ----------
+
+win32:CONFIG(debug, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/../build/debug
+else:win32:CONFIG(release, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/release/plugins
+else:unix: PLUGIN_DEPLOY_TO = $$OUT_PWD
+
+
+win32:CONFIG(release, debug|release): DESTDIR = $$OUT_PWD/../build/release
+else:win32:CONFIG(debug, debug|release): DESTDIR = $$OUT_PWD/../build/debug
+else:unix: DESTDIR = $$OUT_PWD/../build
+
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

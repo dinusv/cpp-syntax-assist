@@ -112,6 +112,8 @@ int main(int argc, char *argv[]){
     QCSAPluginLoader scriptEngine(new QJSEngine);
     scriptEngine.setContextObject("codeBase", &codeBase);
     scriptEngine.setContextObject("plugins",  &pluginCollection);
+    scriptEngine.loadNodeCollection();
+    scriptEngine.loadNodesFunction();
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("syntaxTreeModel",  astTreeModel);
