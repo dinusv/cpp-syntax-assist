@@ -39,6 +39,7 @@ public:
 
 public slots:
     void print(const QString& message);
+    void printError(const QString& message);
 };
 
 class Q_CSA_EXPORT QCSAPluginLoader : public QObject{

@@ -40,6 +40,10 @@ void QCSAPluginDebugger::print(const QString& message){
     qDebug() << message;
 }
 
+void QCSAPluginDebugger::printError(const QString &message){
+    qWarning("Script error: %s", qPrintable(message));
+}
+
 
 
 QCSAPluginLoader::QCSAPluginLoader(QJSEngine* engine, QObject* parent)
