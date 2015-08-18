@@ -2,10 +2,8 @@ INCLUDEPATH += $$PWD
 
 SOURCES += \
     $$PWD/main.cpp \
-    $$PWD/QCsaCommandLineArguments.cpp \
-    $$PWD/QSyntaxTreeModel.cpp
+    $$PWD/QCSAFileGuiArguments.cpp
 
 HEADERS += \
-    $$PWD/QCsaCommandLineArguments.hpp \
-    $$PWD/QSyntaxTreeModel.hpp
+    $$PWD/QCSAFileGuiArguments.hpp
 

@@ -15,13 +15,14 @@
 ****************************************************************************/
 
 
-#ifndef SYNTAXTREEMODEL_HPP
-#define SYNTAXTREEMODEL_HPP
+#ifndef QASTCOLLAPSIBLEMODEL_HPP
+#define QASTCOLLAPSIBLEMODEL_HPP
 
 #include <QAbstractListModel>
 #include <QHash>
 
 #include "QCodeBaseObserver.hpp"
+#include "QCSAGlobal.hpp"
 
 namespace csa{
 
@@ -31,7 +32,7 @@ class QCodeBase;
 }
 
 class QSyntaxTreeItem;
-class QSyntaxTreeModel : public QAbstractListModel, public csa::QCodeBaseObserver{
+class Q_CSA_EXPORT QASTCollapsibleModel : public QAbstractListModel, public csa::QCodeBaseObserver{
 
     Q_OBJECT
     Q_PROPERTY(int selected    READ selected    WRITE setSelected    NOTIFY selectedChanged)
@@ -48,7 +49,7 @@ class QSyntaxTreeModel : public QAbstractListModel, public csa::QCodeBaseObserve
     };
 
 public:
-    explicit QSyntaxTreeModel(QObject *parent = 0);
+    explicit QASTCollapsibleModel(QObject *parent = 0);
 
     void clearAndReset();
     void parse(const QList<csa::ast::QASTFile*>& files);
@@ -83,30 +84,30 @@ private:
     int m_expandLevel;
 };
 
-inline int QSyntaxTreeModel::rowCount(const QModelIndex &) const{
+inline int QASTCollapsibleModel::rowCount(const QModelIndex &) const{
     return m_items.count();
 }
 
-inline QHash<int, QByteArray> QSyntaxTreeModel::roleNames() const{
+inline QHash<int, QByteArray> QASTCollapsibleModel::roleNames() const{
     return m_roles;
 }
 
-inline int QSyntaxTreeModel::selected() const{
+inline int QASTCollapsibleModel::selected() const{
     return m_codebaseSelected;
 }
 
-inline void QSyntaxTreeModel::setSelected(int selected){
+inline void QASTCollapsibleModel::setSelected(int selected){
     if ( m_codebaseSelected != selected ){
         m_codebaseSelected = selected;
         emit selectedChanged();
     }
 }
 
-inline int QSyntaxTreeModel::expandLevel() const{
+inline int QASTCollapsibleModel::expandLevel() const{
     return m_expandLevel;
 }
 
-inline void QSyntaxTreeModel::setExpandLevel(int arg){
+inline void QASTCollapsibleModel::setExpandLevel(int arg){
     if (m_expandLevel == arg)
         return;
 
@@ -114,4 +115,4 @@ inline void QSyntaxTreeModel::setExpandLevel(int arg){
     emit expandLevelChanged();
 }
 
-#endif // SYNTAXTREEMODEL_HPP
+#endif // QASTCOLLAPSIBLEMODEL_HPP

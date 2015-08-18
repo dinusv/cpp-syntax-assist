@@ -26,8 +26,8 @@
 #include "QASTNode.hpp"
 #include "QASTFile.hpp"
 
-#include "QSyntaxTreeModel.hpp"
-#include "QCsaCommandLineArguments.hpp"
+#include "QASTCollapsibleModel.hpp"
+#include "QCSAFileGuiArguments.hpp"
 
 using namespace csa;
 using namespace csa::ast;
@@ -38,11 +38,11 @@ int main(int argc, char *argv[]){
     // ---------------------------------
 
     QGuiApplication app(argc, argv);
-    QGuiApplication::setApplicationName("cpp-snippet-assist");
-    QGuiApplication::setApplicationDisplayName("C++ Snippet Assist");
+    QGuiApplication::setApplicationName("csa-file-gui");
+    QGuiApplication::setApplicationDisplayName("C++ Snippet Assist - File Gui");
     QGuiApplication::setApplicationVersion("0.3.0");
 
-    QCsaCommandLineArguments commandLineArguments(
+    QCSAFileGuiArguments commandLineArguments(
         app,
         "\nA configurable C and C++ code parser that exposes the ast model to javascript for manipulation."
     );
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
     // Create Codebase
     // ---------------
 
-    QSyntaxTreeModel* astTreeModel = new QSyntaxTreeModel;
+    QASTCollapsibleModel* astTreeModel = new QASTCollapsibleModel;
 
     const char* args[] = {"-c", "-x", "c++"};
     QCodeBase codeBase(args, 3, commandLineArguments.files(), "", astTreeModel);
@@ -86,8 +86,8 @@ int main(int argc, char *argv[]){
     // Configure Engine
     // ----------------
 
-
-    qmlRegisterType<QSyntaxTreeModel>("CSA", 1, 0, "SyntaxTree");
+    qmlRegisterUncreatableType<QASTCollapsibleModel>(
+        "CSA", 1, 0, "SyntaxTree", "Only access to the SyntaxTree property is allowed.");
 
     qmlRegisterUncreatableType<QCSAPluginDebugger>(
         "CSA", 1, 0, "ConfiguredDebugger", "Only access to the debug property is allowed.");
