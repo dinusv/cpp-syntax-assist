@@ -52,14 +52,14 @@ public:
     void setParent(QAnnotatedTokenSet* parent);
     const CXToken& token() const;
 
-    void before(const QString& value);
-    void after(const QString& value);
-    void afterln(const QString& value);
-
 public slots:
     csa::ast::QASTNode* associatedNode();
     QString name() const;
     TokenKind kind() const;
+
+    void before(const QString& value);
+    void after(const QString& value);
+    void afterln(const QString& value);
 
 private:
     QAnnotatedTokenSet* m_parent;
