@@ -1,4 +1,4 @@
-# Source Location
+# SourceLocation
 
 The class describes a location within a source code of a file. An instance can be created either from an ASTFile node, or from the main codeBase.
 
@@ -27,11 +27,11 @@ Source locations can become invalid once the codeBase is saved. The creationLoca
 ## INDEX
 
  - [METHODS](#methods)
-	 - [line](line)
-	 - [column](column)
-	 - [offset](offset)
-	 - [filePath](filePath)
-	 - [fileName](fileName) 
+	 - [line](#line)
+	 - [column](#column)
+	 - [offset](#offset)
+	 - [filePath](#filePath)
+	 - [fileName](#fileName) 
 
 ## METHODS
 

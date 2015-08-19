@@ -17,13 +17,13 @@ var associatedTokens = firstClassNode.associatedTokens();
 ## INDEX
 
  - [ENUMS](#enums)
-	 - [TokenKind](TokenKind)
+	 - [TokenKind](#TokenKind)
  - [METHODS](#methods)
-	 - [associatedNode](associatedNode)
-	 - [name](column)
-	 - [offset](offset)
-	 - [filePath](filePath)
-	 - [fileName](fileName) 
+	 - [associatedNode](#associatedNode)
+	 - [name](#column)
+	 - [offset](#offset)
+	 - [filePath](#filePath)
+	 - [fileName](#fileName) 
 
 ## ENUMS
 
