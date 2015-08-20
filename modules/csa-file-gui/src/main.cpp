@@ -89,7 +89,7 @@ int main(int argc, char *argv[]){
     qmlRegisterUncreatableType<QASTCollapsibleModel>(
         "CSA", 1, 0, "SyntaxTree", "Only access to the SyntaxTree property is allowed.");
 
-    qmlRegisterUncreatableType<QCSAPluginDebugger>(
+    qmlRegisterUncreatableType<QCSAPluginConsole>(
         "CSA", 1, 0, "ConfiguredDebugger", "Only access to the debug property is allowed.");
 
     qmlRegisterUncreatableType<QCSAPluginLoader>(

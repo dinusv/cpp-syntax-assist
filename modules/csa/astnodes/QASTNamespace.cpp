@@ -21,8 +21,6 @@
 #include "QSourceLocation_p.hpp"
 #include "clang-c/Index.h"
 
-#include <QDebug>
-
 namespace csa{ namespace ast{
 
 QASTNamespace::QASTNamespace(

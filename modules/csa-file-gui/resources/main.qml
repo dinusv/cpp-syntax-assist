@@ -326,6 +326,10 @@ ApplicationWindow {
                             color: "#fafafa"
                             text: model.usage
                         }
+
+                        MouseArea{
+                            anchors.fill: parent
+                        }
                     }
                 }
 

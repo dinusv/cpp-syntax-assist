@@ -3,18 +3,49 @@
 namespace csa{
 
 QASTSearch::QASTSearch(const QString& searchPattern)
-    : m_searchSegments(searchPattern.split('/'))
-    , m_lastMatchPosition(0)
+    : m_lastMatchPosition(0)
 {
-    if ( !m_searchSegments.isEmpty() )
-        if ( m_searchSegments.last().isEmpty() && m_searchSegments.size() > 1 )
-            m_searchSegments.removeLast();
+    initSearchPattern(searchPattern);
 }
 
 QASTSearch::QASTSearch(const QASTSearch& other)
     : m_searchSegments(other.m_searchSegments)
     , m_lastMatchPosition(other.m_lastMatchPosition)
 {
+}
+
+void QASTSearch::initSearchPattern(const QString &pattern){
+    m_searchSegments.clear();
+
+    bool isEscapeFlag      = false;
+    QString currentSegment = "";
+    for ( QString::const_iterator it = pattern.begin(); it != pattern.end(); ++it ){
+        const QChar& c = *it;
+        if ( c == QChar('\\') ){
+            if (isEscapeFlag)
+                currentSegment.append('\\');
+            isEscapeFlag = !isEscapeFlag;
+        } else {
+            if ( c == QChar('/') ){
+                if ( isEscapeFlag ){
+                    currentSegment.append('/');
+                } else {
+                    m_searchSegments.append(currentSegment);
+                    currentSegment.clear();
+                }
+            } else {
+                currentSegment.append(c);
+            }
+            isEscapeFlag = false;
+        }
+    }
+
+    if ( !currentSegment.isEmpty() )
+        m_searchSegments.append(currentSegment);
+
+    if ( !m_searchSegments.isEmpty() )
+        if ( m_searchSegments.last().isEmpty() && m_searchSegments.size() > 1 )
+            m_searchSegments.removeLast();
 }
 
 QASTSearch::~QASTSearch(){

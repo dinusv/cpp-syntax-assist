@@ -56,6 +56,7 @@ public slots:
     unsigned int offset() const;
     QString filePath() const;
     QString fileName() const;
+    QString toString() const;
 
 private:
     QString      m_filePath;

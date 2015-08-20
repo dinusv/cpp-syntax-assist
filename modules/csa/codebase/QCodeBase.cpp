@@ -27,7 +27,6 @@
 #include "QASTSearch.hpp"
 #include <QMap>
 #include <QHash>
-#include <QDebug>
 
 namespace csa{
 
@@ -153,13 +152,15 @@ csa::ast::QASTFile* QCodeBase::loadFile(const QString &file){
     CXFile   clangFile    = clang_getFile(transUnit, file.toStdString().c_str());
 
     QTokenClassifier* fileClassifier = new QTokenClassifier(transUnit, file.toStdString().c_str());
+    unsigned int fileSize = QTokenClassifier::getFileSize(file.toStdString().c_str());
+
     QASTFile* fileRoot = new QASTFile(
         new QAnnotatedTokenSet(startCursor, transUnit),
         file,
-        new QSourceLocation( createSourceLocation(clang_getLocationForOffset(
+        new QSourceLocation(createSourceLocation(clang_getLocationForOffset(
                 transUnit,
                 clangFile,
-                QTokenClassifier::getFileSize(file.toStdString().c_str())
+                (fileSize > 0 ? fileSize - 1 : fileSize)
             ))
         )
     );

@@ -20,7 +20,6 @@
 
 #include "QCSAGlobal.hpp"
 #include "QASTNode.hpp"
-#include <QDebug>
 
 namespace csa{ namespace ast{
 
@@ -53,7 +52,7 @@ inline QString QASTFile::content() const{
     return QString("file \"") + identifier() + "\"";
 }
 
-}}//namespace
+}}//namespace csa, ast
 
 Q_DECLARE_METATYPE(csa::ast::QASTFile*)
 

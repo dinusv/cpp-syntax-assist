@@ -29,8 +29,6 @@
 #include "QASTConstructor.hpp"
 #include "QASTDestructor.hpp"
 
-#include <QDebug>
-
 namespace csa{
 using namespace ast;
 

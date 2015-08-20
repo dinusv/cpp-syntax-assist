@@ -1,5 +1,5 @@
 
-function addDestructor(node){
+function addDestructor(node, save){
 
     var classNode = null;
 
@@ -14,7 +14,7 @@ function addDestructor(node){
         }
 
         if ( classNode === null ){
-            debug.printError("Cannot find 'class' node for insertion.")
+            console.error("Cannot find 'class' node for insertion.")
         }
     } else {
         classNode = node.typeName() === 'class' ? node : null;
@@ -40,7 +40,9 @@ function addDestructor(node){
         }
     }
 
-    codeBase.save();
+    var saveCodebase = typeof save !== 'undefined' ? save : true;
+    if (save)
+        codeBase.save()
 }
 
 NodeCollection.registerPlugin({
@@ -49,7 +51,7 @@ NodeCollection.registerPlugin({
     'description' : 'Adds a destructor to the current class or parent class.'
 }).prototype.addDestructor = function(){
     this.nodes.forEach(function (v, i){
-        addDestructor(v)
+        addDestructor(v, false)
     });
-    return this;
+    codeBase.save()
 }

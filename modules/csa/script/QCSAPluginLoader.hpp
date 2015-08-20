@@ -29,17 +29,18 @@ namespace csa{
 
 class QCodeBase;
 
-class Q_CSA_EXPORT QCSAPluginDebugger : public QObject{
+class Q_CSA_EXPORT QCSAPluginConsole : public QObject{
 
     Q_OBJECT
 
 public:
-    QCSAPluginDebugger(QObject* parent = 0);
-    ~QCSAPluginDebugger();
+    QCSAPluginConsole(QObject* parent = 0);
+    ~QCSAPluginConsole();
 
 public slots:
-    void print(const QString& message);
-    void printError(const QString& message);
+    void log(const QString& message);
+    void warn(const QString& message);
+    void error(const QString& message);
 };
 
 class Q_CSA_EXPORT QCSAPluginLoader : public QObject{
@@ -59,13 +60,14 @@ public:
     bool execute(const QString &jsCode, QJSValue& result);
 
     void setContextObject(const QString& name, QObject* object);
+    void setContextOwnedObject(const QString& name, QObject* object);
 
 public slots:
     bool execute(const QString& jsCode);
 
 private:
     QJSEngine*          m_engine;
-    QCSAPluginDebugger* m_pluginDebugger;
+    QCSAPluginConsole* m_pluginDebugger;
 };
 
 inline QJSEngine* QCSAPluginLoader::engine(){

@@ -21,8 +21,6 @@
 #include "QSourceLocation.hpp"
 #include "clang-c/Index.h"
 
-#include <QDebug>
-
 namespace csa{ namespace ast{
 
 QASTField::QASTField(

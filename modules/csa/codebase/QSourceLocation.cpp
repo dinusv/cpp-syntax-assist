@@ -76,4 +76,9 @@ QString QSourceLocation::fileName() const{
     return QFileInfo(m_filePath).fileName();
 }
 
+QString QSourceLocation::toString() const{
+    return QString("SourceLocation(offset:") + QString::number(m_offset) + ",line:" + QString::number(m_line) +
+            ",column:" + QString::number(m_column) + ",file: " + fileName() + ")";
+}
+
 }// namespace

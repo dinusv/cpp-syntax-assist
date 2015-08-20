@@ -22,6 +22,7 @@
 #include "QAnnotatedTokenSet.hpp"
 
 #include <QFile>
+#include <QDebug>
 
 namespace csa{ namespace ast{
 
@@ -120,7 +121,7 @@ QString QASTFile::readAll(){
 }
 
 unsigned int QASTFile::size(){
-    return rangeEndLocation()->offset();
+    return rangeEndLocation()->offset() + 1;
 }
 
 QSourceLocation* QASTFile::createLocation(unsigned int offset){

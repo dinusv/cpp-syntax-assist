@@ -30,6 +30,8 @@ public:
     static bool isPattern(const QString& data);
 
 private:
+    void initSearchPattern(const QString& pattern);
+
     static bool matchHere(
         const QString::const_iterator& segmentIt,
         const QString::const_iterator& matchDataIt,

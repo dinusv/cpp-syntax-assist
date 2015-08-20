@@ -24,24 +24,29 @@
 #include <QList>
 #include <QFileInfo>
 #include <QJSEngine>
+#include <QQmlEngine>
 #include <QJSValue>
 #include <QJSValueIterator>
 
 namespace csa{
 
-QCSAPluginDebugger::QCSAPluginDebugger(QObject* parent)
+QCSAPluginConsole::QCSAPluginConsole(QObject* parent)
     : QObject(parent)
 {
 }
 
-QCSAPluginDebugger::~QCSAPluginDebugger(){
+QCSAPluginConsole::~QCSAPluginConsole(){
 }
 
-void QCSAPluginDebugger::print(const QString& message){
-    qDebug() << message;
+void QCSAPluginConsole::log(const QString& message){
+    qDebug("%s", qPrintable(message));
 }
 
-void QCSAPluginDebugger::printError(const QString &message){
+void QCSAPluginConsole::warn(const QString &message){
+    qWarning("Warning: %s", qPrintable(message));
+}
+
+void QCSAPluginConsole::error(const QString &message){
     qCritical("Script error: %s", qPrintable(message));
 }
 
@@ -49,13 +54,17 @@ void QCSAPluginDebugger::printError(const QString &message){
 QCSAPluginLoader::QCSAPluginLoader(QJSEngine* engine, QObject* parent)
     : QObject(parent)
     , m_engine(engine)
-    , m_pluginDebugger(new QCSAPluginDebugger)
+    , m_pluginDebugger(0)
 {
-    setContextObject("debug", m_pluginDebugger);
+    if ( !m_engine->globalObject().hasProperty("console") ){
+        m_pluginDebugger = new QCSAPluginConsole;
+        setContextObject("console", m_pluginDebugger);
+    }
 }
 
 QCSAPluginLoader::~QCSAPluginLoader(){
-    delete m_pluginDebugger;
+    if ( m_pluginDebugger )
+        delete m_pluginDebugger;
 }
 
 bool QCSAPluginLoader::loadNodeCollection(){
@@ -75,7 +84,7 @@ bool QCSAPluginLoader::loadNodeCollection(){
         "    for ( var i = 0; i < this.nodes.length; ++i ){ \n"
         "        if ( i !== 0 ) \n"
         "            ret += ', '; \n"
-        "        ret += '\'' + this.nodes[i].content() + '\''; \n"
+        "        ret += '\\'' + this.nodes[i].content() + '\\''; \n"
         "    } \n"
         "    return ret + ']'; \n"
         "} \n"
@@ -86,7 +95,6 @@ bool QCSAPluginLoader::loadNodeCollection(){
         "    return NodeCollection; \n"
         "} \n"
     );
-
 
     if ( evaluateResult.isError() ){
         qCritical("Error loading node collection: %s", qPrintable(evaluateResult.toString()));
@@ -99,6 +107,8 @@ bool QCSAPluginLoader::loadNodesFunction(){
 
     QJSValue evaluateResult = m_engine->evaluate(
         "function nodes(selector, type){ \n"
+        "    if ( selector.indexOf('/', selector.length - 1) === -1 )\n"
+        "       selector += '/';\n"
         "    return new NodeCollection(codeBase.find(selector, type ? type : '')); \n"
         "} \n"
     );
@@ -163,6 +173,11 @@ bool QCSAPluginLoader::execute(const QString& jsCode, QJSValue& result){
 }
 
 void QCSAPluginLoader::setContextObject(const QString& name, QObject* object){
+    m_engine->globalObject().setProperty(name, m_engine->newQObject(object));
+    QQmlEngine::setObjectOwnership(object, QQmlEngine::CppOwnership);
+}
+
+void QCSAPluginLoader::setContextOwnedObject(const QString &name, QObject *object){
     m_engine->globalObject().setProperty(name, m_engine->newQObject(object));
 }
 
