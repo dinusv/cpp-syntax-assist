@@ -66,7 +66,7 @@ int main(int argc, char *argv[]){
     QASTCollapsibleModel* astTreeModel = new QASTCollapsibleModel;
 
     const char* args[] = {"-c", "-x", "c++"};
-    QCodeBase codeBase(args, 3, commandLineArguments.files(), "", astTreeModel);
+    QCodeBase codeBase(args, 3, commandLineArguments.files(), commandLineArguments.projectDir(), astTreeModel);
 
     if ( commandLineArguments.isCursorOffsetSet() ){
         codeBase.propagateUserCursor(

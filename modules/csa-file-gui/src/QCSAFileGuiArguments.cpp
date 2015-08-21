@@ -75,10 +75,10 @@ void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString&
     );
     m_commandLineParser->addOption(executeAndQuit);
 
-    QCommandLineOption searchDir("dir",
-        QCoreApplication::translate("main", "File search directory.")
+    QCommandLineOption projectDir("dir",
+        QCoreApplication::translate("main", "Project base directory.")
     );
-    m_commandLineParser->addOption(searchDir);
+    m_commandLineParser->addOption(projectDir);
 
     // Process arguments
     // -----------------
@@ -137,7 +137,7 @@ void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString&
         }
     }
 
-    m_searchDir          = m_commandLineParser->isSet(searchDir) ? m_commandLineParser->value(searchDir) : "";
+    m_projectDir          = m_commandLineParser->isSet(projectDir) ? m_commandLineParser->value(projectDir) : "";
     m_executeAndQuitFlag = m_commandLineParser->isSet(executeAndQuit);
 }
 

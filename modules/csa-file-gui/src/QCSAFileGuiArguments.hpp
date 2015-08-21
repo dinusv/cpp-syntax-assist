@@ -44,6 +44,8 @@ public:
 
     bool  isExecuteAndQuitSet() const;
 
+    const QString& projectDir() const;
+
 private:
     QCSAFileGuiArguments(const QCSAFileGuiArguments& other);
     QCSAFileGuiArguments& operator =(const QCSAFileGuiArguments& other);
@@ -59,7 +61,7 @@ private:
     QStringList m_headerSearchPatterns;
     QStringList m_sourceSearchPatterns;
 
-    QString m_searchDir;
+    QString m_projectDir;
 
     bool    m_functionSet;
     QString m_function;
@@ -113,6 +115,10 @@ inline int QCSAFileGuiArguments::cursorColumn() const{
 
 inline bool QCSAFileGuiArguments::isExecuteAndQuitSet() const{
     return m_executeAndQuitFlag;
+}
+
+inline const QString &QCSAFileGuiArguments::projectDir() const{
+    return m_projectDir;
 }
 
 #endif // QCSAFILEGUIARGUMENTS_HPP
