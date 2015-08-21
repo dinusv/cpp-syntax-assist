@@ -114,6 +114,7 @@ int main(int argc, char *argv[]){
     scriptEngine.setContextObject("plugins",  &pluginCollection);
     scriptEngine.loadNodeCollection();
     scriptEngine.loadNodesFunction();
+    scriptEngine.loadFileFunctions();
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("syntaxTreeModel",  astTreeModel);

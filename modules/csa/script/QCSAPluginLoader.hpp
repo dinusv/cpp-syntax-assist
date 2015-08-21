@@ -55,6 +55,7 @@ public:
 
     bool loadNodeCollection();
     bool loadNodesFunction();
+    bool loadFileFunctions();
     int loadPlugins(const QString &path);
 
     bool execute(const QString &jsCode, QJSValue& result);

@@ -135,6 +135,43 @@ bool QCSAPluginLoader::loadNodesFunction(){
     return true;
 }
 
+bool QCSAPluginLoader::loadFileFunctions(){
+
+    QJSValue evaluateResult = m_engine->evaluate(
+        "function createFile(file){ \n"
+        "    return new NodeCollection(codeBase.createFile(file)); \n"
+        "}\n"
+
+        "function reparse(selector){ \n"
+        "    if ( selector.indexOf('/', selector.length - 1) === -1 )\n"
+        "       selector += '/';\n"
+        "    var astFiles = codeBase.find(selector, 'file');\n"
+        "    var ncollect = new NodeCollection();\n"
+        "    for (var i = 0; i < astFiles.length; ++i )\n"
+        "        ncollect.nodes.push(codeBase.reparseFile(astFiles[i]));\n"
+        "    return ncollect; \n"
+        "}\n"
+
+        "function parse(file){\n"
+        "    var astFile = codeBase.parseFile(file);\n"
+        "    if (astFile)\n"
+        "        return new NodeCollection(astFile);\n"
+        "    return new NodeCollection();\n"
+        "}\n"
+
+        "function makePath(path){ \n"
+        "    codeBase.makePath(path); \n"
+        "}\n"
+    );
+
+    if ( evaluateResult.isError() ){
+        qCritical("Error loading file functions: %s", qPrintable(evaluateResult.toString()));
+        return false;
+    }
+    return true;
+
+}
+
 int QCSAPluginLoader::loadPlugins(const QString& path){
     QJSEngine* engine = m_engine;
 

@@ -39,6 +39,7 @@ public:
 public slots:
     bool insert(const QString& value, csa::QSourceLocation* location);
     QString readAll();
+    QString read(csa::QSourceLocation* start, csa::QSourceLocation* end);
     unsigned int size();
     csa::QSourceLocation* createLocation(unsigned int offset);
     csa::QSourceLocation* createLocation(unsigned int line, unsigned int column);

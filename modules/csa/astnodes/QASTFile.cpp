@@ -120,6 +120,19 @@ QString QASTFile::readAll(){
     return QTextStream(&file).readAll();
 }
 
+QString QASTFile::read(QSourceLocation* start, QSourceLocation* end){
+    QFile file(identifier());
+    if ( !file.open(QIODevice::ReadOnly) ){
+        qCritical() << "Cannot open file '" << identifier() << "' for reading.";
+        return "";
+    }
+
+    QTextStream fileStream(&file);
+    fileStream.seek(start->offset());
+
+    return fileStream.read(end->offset() - start->offset() + 1);
+}
+
 unsigned int QASTFile::size(){
     return rangeEndLocation()->offset() + 1;
 }
