@@ -9,5 +9,6 @@ OTHER_FILES += \
     $$PWD/plugins/wrapnamespace.js \
     $$PWD/plugins/preventcopy.js \
     $$PWD/plugins/addproperty.js \
-    $$PWD/plugins/addsetter.js
+    $$PWD/plugins/addsetter.js \
+    $$PWD/plugins/addgetter.js
 

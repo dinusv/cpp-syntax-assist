@@ -69,7 +69,7 @@ function addProperty(type, name, options){
 
     classNode.afterln(methodImpl);
 
-    var privateAccess = classNode.firstChild('access', 'private');
+    var privateAccess = classNode.firstChild('private', 'access');
     if ( privateAccess !== null ){
         var nextPrivateMember = privateAccess.next();
 
@@ -90,7 +90,7 @@ function addProperty(type, name, options){
         classNode.append('private:\n' + member);
     }
 
-    var publicAccess = classNode.firstChild('access', 'public');
+    var publicAccess = classNode.firstChild('private', 'access');
     if ( publicAccess !== null ){
 
         var nextPublicMember = publicAccess.next();

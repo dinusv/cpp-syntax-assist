@@ -32,7 +32,7 @@ function addDestructor(node, save){
     if ( constructorArray.length > 0 ){
         constructorArray[constructorArray.length - 1].afterln(destructorDeclaration + '\n');
     } else {
-        var publicAccess = classNode.firstChild('access', 'public');
+        var publicAccess = classNode.firstChild('public', 'access');
         if ( publicAccess !== null ){
             publicAccess.afterln(destructorDeclaration + '\n');
         } else {

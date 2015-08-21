@@ -50,7 +50,7 @@ function addSetter(isInline, node, save){
     // Add declaration
     // ---------------
 
-    var publicAccess = fieldClass.firstChild('access', 'public');
+    var publicAccess = fieldClass.lastChild('public', 'access');
     if ( publicAccess !== null )
         publicAccess.afterln(setterDeclaration);
     else

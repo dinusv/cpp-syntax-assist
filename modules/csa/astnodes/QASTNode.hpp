@@ -84,7 +84,9 @@ public slots:
 
     csa::ast::QASTNode* astParent();
     csa::ast::QASTNode* firstChild(const QString& identifier);
-    csa::ast::QASTNode* firstChild(const QString& typeString, const QString& identif);
+    csa::ast::QASTNode* firstChild(const QString& identifier, const QString& typeString);
+    csa::ast::QASTNode* lastChild(const QString& identifier);
+    csa::ast::QASTNode* lastChild(const QString& identifier, const QString& typeString);
 
     csa::ast::QASTNode* next();
     csa::ast::QASTNode* prev();
@@ -205,10 +207,28 @@ inline QASTNode* QASTNode::firstChild(const QString &identifier){
     return 0;
 }
 
-inline QASTNode* QASTNode::firstChild(const QString &typeString, const QString &identif){
+inline QASTNode* QASTNode::firstChild(const QString &identif, const QString &typeString){
     for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
         if ( (*it)->identifier() == identif && (*it)->typeName() == typeString )
             return *it;
+    }
+    return 0;
+}
+
+inline QASTNode *QASTNode::lastChild(const QString &identifier){
+    for( int i = m_children.size() - 1; i >= 0; --i ){
+        QASTNode* node = m_children[i];
+        if ( node->identifier() == identifier)
+            return node;
+    }
+    return 0;
+}
+
+inline QASTNode *QASTNode::lastChild(const QString &identif, const QString &typeString){
+    for( int i = m_children.size() - 1; i >= 0; --i ){
+        QASTNode* node = m_children[i];
+        if ( node->identifier() == identif && node->typeName() == typeString)
+            return node;
     }
     return 0;
 }
