@@ -28,6 +28,8 @@
 #include <QMap>
 #include <QHash>
 
+#include <QDebug>
+
 namespace csa{
 
 using namespace ast;
@@ -37,17 +39,16 @@ public:
     CXIndex index;
 };
 
-QCodeBase::QCodeBase(
-        const char* const* translationUnitArgs,
+QCodeBase::QCodeBase(const char* const* translationUnitArgs,
         int                translationUnitNumArgs,
-        const QStringList &files,
+        const QStringList &entries,
         const QString&     searchDir,
         QCodeBaseObserver* observer,
         QObject*           parent)
 
     : QObject(parent)
     , d_ptr(new QCodeBasePrivate)
-    , m_searchDir(searchDir)
+    , m_projectDir(searchDir != "" ? QDir(searchDir).path() : (entries.size() > 0 ? QFileInfo(entries[0]).path() : ""))
     , m_root(0)
     , m_current(0)
     , m_observer(observer){
@@ -67,8 +68,8 @@ QCodeBase::QCodeBase(
 
     d->index = clang_createIndex(0, 0);
 
-    for ( QStringList::const_iterator it = files.begin(); it != files.end(); ++it ){
-        loadFile(*it);
+    for ( QStringList::const_iterator it = entries.begin(); it != entries.end(); ++it ){
+        parseFile(*it);
     }
 
     updateTreeModel();
@@ -83,34 +84,18 @@ QCodeBase::~QCodeBase(){
 }
 
 void QCodeBase::save(){
-    for ( int i = 0; i < m_files.size(); ++i ){
-        QASTFile* root               = m_files[i];
-        QTokenClassifier* classifier = m_classifiers[i];
+    QString currentSelection     = m_current ? m_current->breadcrumbs() : "*";
+    QString currentSelectionType = m_current ? m_current->typeName() : "";
 
+    for ( int i = 0; i < m_files.size(); ++i ){
+        QASTFile* root = m_files[i];
         if ( root->hasInsertions() ){
             root->saveInsertions();
-
-            QString selectionTypeString = m_current->typeName();
-            QString selectionIdentifier = m_current->identifier();
-
-            CXTranslationUnit transUnit = classifier->translationUnit();
-            clang_reparseTranslationUnit(transUnit, 0, 0, clang_defaultReparseOptions(transUnit));
-            CXCursor startCursor        = clang_getTranslationUnitCursor(transUnit);
-            classifier->reparse();
-            if ( m_observer )
-                m_observer->clearAndReset();
-            root->removeChildren();
-            QASTVisitor::createCSANodeTree(startCursor, root, classifier);
-
-            if ( i == 0 )
-                m_current = root;
-
-            updateTreeModel();
-
-            if ( i == 0 )
-                select(selectionTypeString, selectionIdentifier);
+            reparseIndex(i);
         }
     }
+
+    select(currentSelection, currentSelectionType);
 }
 
 void QCodeBase::propagateUserCursor(int offset, const QString &file){
@@ -134,49 +119,6 @@ void QCodeBase::propagateUserCursor(const QSourceLocation &location){
         if ( m_observer )
             m_observer->setSelected(m_current);
     }
-}
-
-csa::ast::QASTFile* QCodeBase::loadFile(const QString &file){
-    Q_D(QCodeBase);
-
-    CXTranslationUnit transUnit  = clang_parseTranslationUnit(
-                d->index,
-                file.toStdString().c_str(),
-                m_translationUnitArgs,
-                m_translationUnitNumArgs,
-                0,
-                0,
-                CXTranslationUnit_Incomplete | CXTranslationUnit_CXXChainedPCH);
-
-    CXCursor startCursor  = clang_getTranslationUnitCursor(transUnit);
-    CXFile   clangFile    = clang_getFile(transUnit, file.toStdString().c_str());
-
-    QTokenClassifier* fileClassifier = new QTokenClassifier(transUnit, file.toStdString().c_str());
-    unsigned int fileSize = QTokenClassifier::getFileSize(file.toStdString().c_str());
-
-    QASTFile* fileRoot = new QASTFile(
-        new QAnnotatedTokenSet(startCursor, transUnit),
-        file,
-        new QSourceLocation(createSourceLocation(clang_getLocationForOffset(
-                transUnit,
-                clangFile,
-                (fileSize > 0 ? fileSize - 1 : fileSize)
-            ))
-        )
-    );
-    fileRoot->setParent(this);
-
-    m_files.append(fileRoot);
-    m_classifiers.append(fileClassifier);
-
-    if ( !m_current )
-        m_current = fileRoot;
-
-    QASTVisitor::createCSANodeTree(startCursor, fileRoot, fileClassifier);
-
-    updateTreeModel();
-
-    return fileRoot;
 }
 
 void QCodeBase::updateTreeModel(){
@@ -232,7 +174,7 @@ void QCodeBase::setSourceSearchPattern(const QStringList &pattern){
 QASTFile *QCodeBase::findSource(const QString &header){
     QString headerBaseName = QFileInfo(header).baseName();
 
-    QString searchLocation = m_searchDir;
+    QString searchLocation = m_projectDir;
     if ( searchLocation == "" )
         searchLocation = QFileInfo(header).path();
 
@@ -242,7 +184,7 @@ QASTFile *QCodeBase::findSource(const QString &header){
         if ( it.fileInfo().baseName() == headerBaseName ){
             QASTFile* astFile = findFile(file);
             if ( !astFile )
-                astFile = loadFile(file);
+                astFile = parseFile(file);
             return astFile;
         }
     }
@@ -253,7 +195,7 @@ QASTFile *QCodeBase::findSource(const QString &header){
 QASTFile *QCodeBase::findHeader(const QString &source){
     QString sourceBaseName = QFileInfo(source).baseName();
 
-    QString searchLocation = m_searchDir;
+    QString searchLocation = m_projectDir;
     if ( searchLocation == "" )
         searchLocation = QFileInfo(source).path();
 
@@ -263,7 +205,7 @@ QASTFile *QCodeBase::findHeader(const QString &source){
         if ( it.fileInfo().baseName() == sourceBaseName ){
             QASTFile* astFile = findFile(file);
             if ( !astFile )
-                astFile = loadFile(file);
+                astFile = parseFile(file);
             return astFile;
         }
     }
@@ -280,8 +222,148 @@ QTokenClassifier *QCodeBase::classifierForFile(const QString &file){
     return 0;
 }
 
+void QCodeBase::reparseIndex(int index){
+    QASTFile* root               = m_files[index];
+    QTokenClassifier* classifier = m_classifiers[index];
+    CXTranslationUnit transUnit  = classifier->translationUnit();
+
+    clang_reparseTranslationUnit(transUnit, 0, 0, clang_defaultReparseOptions(transUnit));
+    CXCursor startCursor = clang_getTranslationUnitCursor(transUnit);
+    classifier->reparse();
+    if ( m_observer )
+        m_observer->clearAndReset();
+    root->removeChildren();
+    QASTVisitor::createCSANodeTree(startCursor, root, classifier);
+
+    updateTreeModel();
+}
+
 const QList<QASTFile*>& QCodeBase::astFiles() const{
     return m_files;
+}
+
+void QCodeBase::parsePath(const QString& path){
+    QFileInfo finfo(path);
+    if ( !finfo.exists() || finfo.isRelative() ){
+        finfo = QFileInfo(m_projectDir + "/" + path);
+        if ( !finfo.exists() ){
+            qCritical("Path %s does not exist. Use createFile() or createDirectory() instead.", qPrintable(path));
+        }
+    }
+    if ( finfo.isDir()){
+        QStringList searchVals = QStringList() << m_headerSearchPatterns << m_sourceSearchPatterns;
+        QDirIterator it(finfo.filePath(), searchVals, QDir::Files, QDirIterator::Subdirectories);
+        while (it.hasNext())
+            parseFile(it.filePath());
+    } else {
+        parseFile(finfo.filePath());
+    }
+}
+
+QASTFile* QCodeBase::parseFile(const QString& file){
+    Q_D(QCodeBase);
+
+    QFileInfo finfo(file);
+    if (!finfo.exists() || finfo.isRelative()){
+        finfo = QFileInfo(m_projectDir + "/" + file);
+        if ( !finfo.exists() ){
+            qCritical("Path %s does not exist. Use createFile() instead.", qPrintable(finfo.filePath()));
+            return 0;
+        }
+    }
+    if (finfo.isDir()){
+        qCritical("Path %s is directory. Use parse() function instead.", qPrintable(finfo.filePath()));
+        return 0;
+    }
+
+    QString filePath = finfo.filePath();
+
+    CXTranslationUnit transUnit  = clang_parseTranslationUnit(
+                d->index,
+                filePath.toStdString().c_str(),
+                m_translationUnitArgs,
+                m_translationUnitNumArgs,
+                0,
+                0,
+                CXTranslationUnit_Incomplete | CXTranslationUnit_CXXChainedPCH);
+
+    CXCursor startCursor  = clang_getTranslationUnitCursor(transUnit);
+    CXFile   clangFile    = clang_getFile(transUnit, filePath.toStdString().c_str());
+
+    QTokenClassifier* fileClassifier = new QTokenClassifier(transUnit, filePath.toStdString().c_str());
+    unsigned int fileSize = QTokenClassifier::getFileSize(filePath.toStdString().c_str());
+
+    QASTFile* fileRoot = new QASTFile(
+        new QAnnotatedTokenSet(startCursor, transUnit),
+        filePath,
+        new QSourceLocation(createSourceLocation(clang_getLocationForOffset(
+                transUnit,
+                clangFile,
+                (fileSize > 0 ? fileSize - 1 : fileSize)
+            ))
+        )
+    );
+    fileRoot->setParent(this);
+
+    m_files.append(fileRoot);
+    m_classifiers.append(fileClassifier);
+
+    if ( !m_current )
+        m_current = fileRoot;
+
+    QASTVisitor::createCSANodeTree(startCursor, fileRoot, fileClassifier);
+
+    updateTreeModel();
+
+    return fileRoot;
+}
+
+QASTFile* QCodeBase::reparseFile(QASTFile* file){
+    for ( int i = 0; i < m_files.size(); ++i ){
+
+        if ( m_files[i] == file ){
+
+            QASTNode* currentFile = m_current;
+            while ( currentFile->astParent() )
+                currentFile = currentFile->astParent();
+
+            QString currentSelection = "", currentSelectionType = "";
+            if ( qobject_cast<QASTFile*>(currentFile) == file ){
+                currentSelection     = m_current ? m_current->breadcrumbs() : "*";
+                currentSelectionType = m_current ? m_current->typeName() : "";
+            }
+
+            reparseIndex(i);
+
+            if ( currentFile == file )
+                select(currentSelection, currentSelectionType);
+
+            return file;
+        }
+    }
+    return 0;
+}
+
+QASTFile* QCodeBase::createFile(const QString& filePath){
+    QFile file(filePath);
+    if ( !file.open(QIODevice::WriteOnly) ){
+        qCritical("Cannot create file %s.", qPrintable(filePath));
+        return 0;
+    }
+    return parseFile(filePath);
+}
+
+bool QCodeBase::makePath(const QString& path){
+    QDir dir(path);
+    if ( dir.isRelative() && m_projectDir == ""){
+        qCritical("Failed to create path. There's no project directory configured and path is not absolute.");
+        return false;
+    }
+    if ( !QDir(m_projectDir).mkpath(path) ){
+        qCritical("Failed to create path %s.", qPrintable(path));
+        return false;
+    }
+    return true;
 }
 
 QASTFile *QCodeBase::findFile(const QString &fileName){
@@ -327,6 +409,14 @@ QSourceLocation* QCodeBase::createLocation(const QString& file, unsigned int lin
     if ( !clang_equalLocations(sourceLocation, clang_getNullLocation()) )
         return new QSourceLocation(createSourceLocation(sourceLocation));
     return 0;
+}
+
+void QCodeBase::setProjectDir(const QString& path){
+    QDir dir(path);
+    if ( dir.isAbsolute() )
+        m_projectDir = dir.path();
+    else
+        m_projectDir += "/" + dir.path();
 }
 
 }// namespace

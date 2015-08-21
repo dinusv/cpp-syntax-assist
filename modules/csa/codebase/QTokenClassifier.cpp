@@ -24,7 +24,7 @@ namespace csa{
 QTokenClassifier::QTokenClassifier(const CXTranslationUnit &transUnit, const char *fileName)
     : m_file(fileName){
 
-    initialize(transUnit, getFileRange(transUnit, fileName));
+    initializeTokens(transUnit, getFileRange(transUnit, fileName));
 }
 
 QTokenClassifier::~QTokenClassifier(){
@@ -43,7 +43,7 @@ void QTokenClassifier::appendTokenSet(QAnnotatedTokenSet* tokenSet){
     m_tokenSets.push_back(tokenSet);
 }
 
-void QTokenClassifier::initialize(const CXTranslationUnit &transUnit, const CXSourceRange &range){
+void QTokenClassifier::initializeTokens(const CXTranslationUnit &transUnit, const CXSourceRange &range){
     m_translationUnit = transUnit;
 
     clang_tokenize(m_translationUnit, range, &m_tokens, &m_tokensCount );
@@ -93,7 +93,7 @@ void QTokenClassifier::disposeTokenSets(){
 
 void QTokenClassifier::reparse(){
     disposeTokenSets();
-    initialize(m_translationUnit, getFileRange(m_translationUnit, m_file.c_str()));
+    initializeTokens(m_translationUnit, getFileRange(m_translationUnit, m_file.c_str()));
 }
 
 void QTokenClassifier::dump(std::string &str){

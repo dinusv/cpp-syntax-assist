@@ -56,7 +56,7 @@ public:
     static CXSourceRange getFileRange(const CXTranslationUnit& tu, const char* file);
 
 private:
-    void initialize(const CXTranslationUnit& transUnit, const CXSourceRange& range);
+    void initializeTokens(const CXTranslationUnit& transUnit, const CXSourceRange& range);
     void disposeTokenSets();
 
     TokenSetVector    m_tokenSets;

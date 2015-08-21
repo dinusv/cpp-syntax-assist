@@ -95,18 +95,10 @@ void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString&
     for ( QStringList::iterator it = positionalArgs.begin(); it != positionalArgs.end(); ++it ){
         QString& val = *it;
 
-        if ( QFileInfo::exists(val) ){
-            if ( QFileInfo(val).isDir() ){
-
-                QStringList searchVals = QStringList() << m_headerSearchPatterns << m_sourceSearchPatterns;
-                QDirIterator it(val, searchVals, QDir::Files, QDirIterator::Subdirectories);
-                while (it.hasNext())
-                    m_files.append(it.next());
-            } else {
-                m_files.append(val);
-            }
-        } else {
+        if ( !QFileInfo::exists(val) ){
             m_fileErrors.append("Error: Path does not exist: " + val);
+        } else {
+            m_files.append(*it);
         }
     }
 

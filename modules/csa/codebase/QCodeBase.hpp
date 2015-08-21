@@ -40,7 +40,7 @@ public:
     explicit QCodeBase(
             const char* const* translationUnitArgs,
             int                translationUnitNumArgs,
-            const QStringList& astFiles,
+            const QStringList& entries,
             const QString&     searchDir = "",
             QCodeBaseObserver* observer = 0,
             QObject*           parent = 0);
@@ -52,8 +52,6 @@ public:
     void propagateUserCursor(int line, int column, const QString& file);
     void propagateUserCursor(const csa::QSourceLocation& location);
 
-    csa::ast::QASTFile* loadFile(const QString& file);
-
     void updateTreeModel();
 
     void setHeaderSearchPattern(const QStringList& pattern);
@@ -64,7 +62,13 @@ public:
 public slots:
     QList<QObject*> files() const;
 
-    csa::ast::QASTFile* file(){ return m_files[0]; }
+    void parsePath(const QString& path);
+    csa::ast::QASTFile* parseFile(const QString& file);
+    csa::ast::QASTFile* reparseFile(csa::ast::QASTFile* file);
+    csa::ast::QASTFile* createFile(const QString& filePath);
+    bool makePath(const QString& path);
+
+    void setProjectDir(const QString& path);
 
     csa::ast::QASTFile* findFile(const QString& fileName);
     csa::ast::QASTNode* cursorNode();
@@ -86,14 +90,17 @@ private:
     QCodeBase(const QCodeBase& other);
     QCodeBase& operator=(const QCodeBase& other);
 
+    // d ptr
     QCodeBasePrivate* const d_ptr;
     Q_DECLARE_PRIVATE(QCodeBase)
 
+
     csa::QTokenClassifier* classifierForFile(const QString& file);
+    void reparseIndex(int index);
 
 private:
     QList<ast::QASTFile*>  m_files;
-    QString                m_searchDir;
+    QString                m_projectDir;
     QStringList            m_headerSearchPatterns;
     QStringList            m_sourceSearchPatterns;
 

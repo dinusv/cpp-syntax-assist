@@ -331,7 +331,7 @@ inline void PushBuffer(WCHAR c)
 // Send the string to the input buffer.
 //-----------------------------------------------------------------------------
 
-inline void SendSequence(LPWSTR seq)
+inline void SendSequence(const wchar_t* seq)
 {
     DWORD out;
     INPUT_RECORD in;
