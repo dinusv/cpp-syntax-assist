@@ -62,7 +62,7 @@ function addSetter(isInline, node, save){
     var breadCrumbs = '';
     var currentNode = fieldClass.astParent();
     while ( currentNode.typeName() !== 'file' ){
-        breadCrumbs += currentNode.identifier() + '/';
+        breadCrumbs = currentNode.identifier() + '/' + breadCrumbs;
         currentNode = currentNode.astParent();
     }
 

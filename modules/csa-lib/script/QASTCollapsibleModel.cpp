@@ -38,7 +38,6 @@ public:
 QASTCollapsibleModel::QASTCollapsibleModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_expandLevel(3){
-
     m_roles[QASTCollapsibleModel::Identifier]    = "identifier";
     m_roles[QASTCollapsibleModel::Indent]        = "indent";
     m_roles[QASTCollapsibleModel::Type]          = "type";

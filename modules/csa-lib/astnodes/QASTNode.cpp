@@ -111,6 +111,18 @@ QASTNode* QASTNode::astParent(){
     return p;
 }
 
+QASTNode* QASTNode::firstChild(){
+    if ( m_children.size() > 0 )
+        return m_children.first();
+    return 0;
+}
+
+QASTNode* QASTNode::lastChild(){
+    if ( m_children.size() > 0 )
+        return m_children.last();
+    return 0;
+}
+
 void QASTNode::append(const QString& value){
     insert(value, bodyEndLocation());
 }

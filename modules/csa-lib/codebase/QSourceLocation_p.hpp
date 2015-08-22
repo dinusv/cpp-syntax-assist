@@ -21,8 +21,10 @@ inline QSourceLocation createSourceLocation(
     clang_getSpellingLocation(location, &file, &line, &column, &offset);
 
     CXString fileName = clang_getFileName(file);
+
     if (fileName.data != 0){
-        QSourceLocation dstLocation(clang_getCString(fileName), line, column, offset);
+        QSourceLocation dstLocation(
+                    QString(clang_getCString(fileName)).replace("//", "/"), line, column, offset);
         clang_disposeString(fileName);
         return dstLocation;
     }

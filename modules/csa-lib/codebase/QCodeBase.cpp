@@ -28,8 +28,6 @@
 #include <QMap>
 #include <QHash>
 
-#include <QDebug>
-
 namespace csa{
 
 using namespace ast;
@@ -299,7 +297,7 @@ QASTFile* QCodeBase::parseFile(const QString& file){
         new QSourceLocation(createSourceLocation(clang_getLocationForOffset(
                 transUnit,
                 clangFile,
-                (fileSize > 0 ? fileSize - 1 : fileSize)
+                fileSize
             ))
         )
     );

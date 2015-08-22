@@ -128,7 +128,9 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #else
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <Windows.h>
 #include <io.h>
 #ifndef STDIN_FILENO
@@ -882,7 +884,7 @@ inline BOOL ParseAndPrintANSIString(HANDLE hDev, LPCVOID lpBuffer, DWORD nNumber
                 }
             else if (*s == ';')
                 {
-                if (es_argc < MAX_ARG - 1) es_argc++;
+                if (es_argc < (int)(MAX_ARG - 1)) es_argc++;
                 es_argv[es_argc] = 0;
                 if (prefix == ']')
                     state = 5;
@@ -909,7 +911,7 @@ inline BOOL ParseAndPrintANSIString(HANDLE hDev, LPCVOID lpBuffer, DWORD nNumber
                 InterpretEscSeq();
                 state = 1;
                 }
-            else if (Pt_len < lenof(Pt_arg) - 1)
+            else if (Pt_len < (int)(lenof(Pt_arg) - 1))
                 Pt_arg[Pt_len++] = *s;
             }
         else if (state == 6)

@@ -1,57 +1,114 @@
 
-function addDestructor(node, save){
+function addDestructor(properties, node, save){
 
-    var classNode = null;
+    var isInline = false;
+    if ( typeof properties !== 'undefinde' )
+        isInline = properties === 'i';
 
-    if ( typeof node === 'undefined' ){
-
-        var cursorNode = codeBase.cursorNode();
-
-        if ( cursorNode.typeName() === 'class' )
-            classNode = cursorNode;
-        else {
-            classNode = cursorNode.parentFind('class');
-        }
-
-        if ( classNode === null ){
-            console.error("Cannot find 'class' node for insertion.")
-        }
-    } else {
-        classNode = node.typeName() === 'class' ? node : null;
-    }
-
-    if ( classNode === null )
-        throw "Cannot find specified class";
-
-    var destructorDeclaration = '\t~' + classNode.identifier() + '();\n';
-    var destructorDefinition  = classNode.identifier() + '::~' + classNode.identifier() + '(){\n}\n';
-
-    classNode.afterln('\n' + destructorDefinition);
-
-    var constructorArray = classNode.children('constructor');
-    if ( constructorArray.length > 0 ){
-        constructorArray[constructorArray.length - 1].afterln(destructorDeclaration + '\n');
-    } else {
-        var publicAccess = classNode.firstChild('public', 'access');
-        if ( publicAccess !== null ){
-            publicAccess.afterln(destructorDeclaration + '\n');
+    function findNode(){
+        if (typeof node === 'undefined'){
+            var cursorNode = codeBase.cursorNode();
+            if ( cursorNode.typeName() === 'class' )
+                return cursorNode;
+            else
+                return cursorNode.parentFind('class');
         } else {
-            classNode.append('\npublic:\n' + destructorDeclaration);
+            return (node.typeName() === 'class' ? node : null);
         }
     }
 
-    var saveCodebase = typeof save !== 'undefined' ? save : true;
-    if (save)
+    function declareDestructor(classNode){
+        var destructorDeclaration = '~' + classNode.identifier() + '();\n';
+        var constructorArray = classNode.children('constructor');
+        if ( constructorArray.length > 0 ){
+            constructorArray[constructorArray.length - 1].afterln(destructorDeclaration + '\n');
+        } else {
+            var publicAccess = classNode.firstChild('public', 'access');
+            if ( publicAccess !== null ){
+                publicAccess.after(destructorDeclaration + '\n');
+            } else {
+                classNode.append('\npublic:\n' + destructorDeclaration);
+            }
+        }
+    }
+
+    function getSourceNamespaceAndPosition(classNode){
+        var breadCrumbs = '';
+        var currentNode = classNode.astParent();
+        while ( currentNode.typeName() !== 'file' || currentNode === null ){
+            breadCrumbs = currentNode.identifier() + '/' + breadCrumbs;
+            currentNode = currentNode.astParent();
+        }
+        if ( currentNode === null )
+            return null;
+
+        var sourceFileNode = codeBase.findSource(currentNode.identifier());
+        if ( sourceFileNode === null )
+            return null;
+
+        var usedNode = sourceFileNode;
+        var cppBreadCrumbs = '';
+        while ( breadCrumbs !== '' ){
+            var foundNode = sourceFileNode.findFirst(breadCrumbs);
+            if ( foundNode === null ){
+                var slashBackIndex = breadCrumbs.lastIndexOf('/', breadCrumbs.length - 2);
+
+                if ( slashBackIndex > 0 ){
+                    cppBreadCrumbs =
+                        cppBreadCrumbs + breadCrumbs.slice(slashBackIndex + 1, breadCrumbs.length - 1) + '::';
+                    breadCrumbs    = breadCrumbs.slice(0, slashBackIndex + 1);
+                } else {
+                    cppBreadCrumbs =
+                        cppBreadCrumbs + breadCrumbs.slice(slashBackIndex + 1, breadCrumbs.length - 1) + '::';
+                    breadCrumbs    = '';
+                }
+
+            } else {
+                usedNode = foundNode;
+                break;
+            }
+        }
+        return { node: usedNode, cppBreadCrumbs: cppBreadCrumbs };
+    }
+
+    var classNode = findNode();
+    if ( classNode === null )
+        throw new Error("Cannot find specified class.");
+
+    // Add destructor declaration
+
+    declareDestructor(classNode)
+
+    // Add destructor definition
+
+    if ( isInline ){
+        classNode.afterln('\ninline ' + classNode.identifier() + '::~' + classNode.identifier() + '(){\n}\n');
+    } else {
+        var namespaceAndPosition = getSourceNamespaceAndPosition(classNode);
+        if ( namespaceAndPosition === null ){
+            classNode.afterln('\ninline ' + classNode.identifier() + '::~' + classNode.identifier() + '(){\n}\n');
+        } else {
+            namespaceAndPosition.node.append(
+                '\n' + namespaceAndPosition.cppBreadCrumbs + classNode.identifier() + '::~' +
+                classNode.identifier() + '(){\n}\n'
+            );
+        }
+    }
+
+    if (typeof save !== 'undefined' ? save : true)
         codeBase.save()
 }
 
 NodeCollection.registerPlugin({
     'name' : 'addDestructor',
     'usage' : 'addDestructor()',
-    'description' : 'Adds a destructor to the current class or parent class.'
-}).prototype.addDestructor = function(){
+    'description' :
+        'Adds a destructor to the current class or parent class.' +
+        'Params:\n' +
+            '\t\'i\' <bool> : \'i\' - to enable inline destructor.'
+}).prototype.addDestructor = function(properties){
     this.nodes.forEach(function (v, i){
-        addDestructor(v, false)
+        addDestructor(properties, v, false)
     });
     codeBase.save()
 }

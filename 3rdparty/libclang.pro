@@ -4,6 +4,16 @@ win32{
     INCLUDEPATH += $$PWD/include/clang-c
 
     LIBS += -L$$PWD/lib -llibclang
+
+    FILE = $$PWD/lib/libclang.dll
+    DDIR = $${DLLDESTDIR}
+
+    win32:FILE ~= s,/,\\,g
+    win32:DDIR ~= s,/,\\,g
+
+    QMAKE_POST_LINK += $$QMAKE_COPY \"$$FILE\" \"$$DDIR\" $$escape_expand(\\n\\t)
+
+    export(QMAKE_POST_LINK)
 }
 
 unix{

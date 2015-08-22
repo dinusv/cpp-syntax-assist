@@ -93,7 +93,7 @@ void QASTFile::saveInsertions(){
         for ( QList<QInsertionElementPrivate*>::iterator it = m_insertions.begin(); it != m_insertions.end(); ++it ){
             QInsertionElementPrivate* el = *it;
             startCut = endCut;
-            endCut = el->location.offset();
+            endCut   = el->location.offset();
             writeStream << fileData.mid(startCut, endCut - startCut) << el->data;
         }
         writeStream << fileData.mid(endCut);
@@ -101,7 +101,7 @@ void QASTFile::saveInsertions(){
 }
 
 bool QASTFile::insert(const QString& value, QSourceLocation* location){
-    if ( location->offset() < size() && location->filePath() == identifier() ){
+    if ( location->offset() <= size() && location->filePath() == identifier() ){
          m_insertions.append(new QInsertionElementPrivate(value, *location));
         return true;
     } else {

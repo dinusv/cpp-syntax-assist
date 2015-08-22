@@ -83,8 +83,10 @@ public slots:
     QList<QObject*> associatedTokens();
 
     csa::ast::QASTNode* astParent();
+    csa::ast::QASTNode* firstChild();
     csa::ast::QASTNode* firstChild(const QString& identifier);
     csa::ast::QASTNode* firstChild(const QString& identifier, const QString& typeString);
+    csa::ast::QASTNode* lastChild();
     csa::ast::QASTNode* lastChild(const QString& identifier);
     csa::ast::QASTNode* lastChild(const QString& identifier, const QString& typeString);
 
