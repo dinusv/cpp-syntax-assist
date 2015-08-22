@@ -16,32 +16,43 @@
 
 
 #include "QAnnotatedToken.hpp"
+#include "QAnnotatedToken_p.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "QSourceLocation.hpp"
 #include "QSourceLocation_p.hpp"
 #include "QASTNode.hpp"
+#include "clang-c/Index.h"
 
 namespace csa{
 
-QAnnotatedToken::QAnnotatedToken(QObject* parent)
-    : QObject(parent)
-{
-}
+class QAnnotatedTokenPrivate{
 
-QAnnotatedToken::QAnnotatedToken(CXToken token, QAnnotatedTokenSet* parent)
+public:
+    QAnnotatedTokenPrivate(const QCXTokenWrapper& tokenWrapper)
+        : tokenWrap(tokenWrapper){}
+
+    QAnnotatedTokenSet* parent;
+    QCXTokenWrapper     tokenWrap;
+    CXSourceRange       tokenRange;
+    QString             tokenName;
+};
+
+QAnnotatedToken::QAnnotatedToken(const QCXTokenWrapper& token, QAnnotatedTokenSet* parent)
     : QObject(parent)
-    , m_token(token)
+    , d_ptr(new QAnnotatedTokenPrivate(token))
 {
+    Q_D(QAnnotatedToken);
     if ( parent ){
-        CXString spelling = clang_getTokenSpelling(parent->translationUnit(), m_token);
-        m_tokenName       = clang_getCString(spelling);
+        CXString spelling = clang_getTokenSpelling(parent->translationUnit(), d->tokenWrap.token);
+        d->tokenName      = clang_getCString(spelling);
         clang_disposeString(spelling);
 
-        m_tokenRange      = clang_getTokenExtent(parent->translationUnit(), m_token);
+        d->tokenRange     = clang_getTokenExtent(parent->translationUnit(), d->tokenWrap.token);
     }
 }
 
 QAnnotatedToken::~QAnnotatedToken(){
+    delete d_ptr;
 }
 
 ast::QASTNode* QAnnotatedToken::associatedNode(){
@@ -52,28 +63,32 @@ ast::QASTNode* QAnnotatedToken::associatedNode(){
 }
 
 QAnnotatedToken::TokenKind QAnnotatedToken::kind() const{
-    return static_cast<QAnnotatedToken::TokenKind>(clang_getTokenKind(m_token));
+    const Q_D(QAnnotatedToken);
+    return static_cast<QAnnotatedToken::TokenKind>(clang_getTokenKind(d->tokenWrap.token));
 }
 
 void QAnnotatedToken::before(const QString& value){
+    Q_D(QAnnotatedToken);
     ast::QASTNode* node = associatedNode();
     if ( !node )
         return;
 
-    QSourceLocation locStart = createSourceLocation(clang_getRangeStart(m_tokenRange));
+    QSourceLocation locStart = createSourceLocation(clang_getRangeStart(d->tokenRange));
     node->insert(value, &locStart);
 }
 
 void QAnnotatedToken::after(const QString& value){
+    Q_D(QAnnotatedToken);
     ast::QASTNode* node = associatedNode();
     if ( !node )
         return;
 
-    QSourceLocation locEnd = createSourceLocation(clang_getRangeEnd(m_tokenRange));
+    QSourceLocation locEnd = createSourceLocation(clang_getRangeEnd(d->tokenRange));
     node->insert(value, &locEnd);
 }
 
 void QAnnotatedToken::afterln(const QString& value){
+    Q_D(QAnnotatedToken);
     QAnnotatedTokenSet* tokenSet = qobject_cast<QAnnotatedTokenSet*>(parent());
     if ( !tokenSet )
         return;
@@ -82,7 +97,7 @@ void QAnnotatedToken::afterln(const QString& value){
     if ( !node )
         return;
 
-    CXSourceLocation location = clang_getRangeEnd(m_tokenRange);
+    CXSourceLocation location = clang_getRangeEnd(d->tokenRange);
 
     CXFile file;
     unsigned line, column, offset;
@@ -96,6 +111,16 @@ void QAnnotatedToken::afterln(const QString& value){
     )); // location will be automatically truncated to max lines
 
     node->insert(value, &afterLocation);
+}
+
+const QCXTokenWrapper& QAnnotatedToken::token() const{
+    const Q_D(QAnnotatedToken);
+    return d->tokenWrap;
+}
+
+QString QAnnotatedToken::name() const{
+    const Q_D(QAnnotatedToken);
+    return d->tokenName;
 }
 
 }// namespace

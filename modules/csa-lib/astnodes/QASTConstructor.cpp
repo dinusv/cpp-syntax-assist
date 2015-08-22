@@ -19,6 +19,7 @@
 #include "QSourceLocation.hpp"
 #include "QSourceLocation_p.hpp"
 #include "QASTMethodArgument.hpp"
+#include "QAnnotatedToken_p.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "QTokenClassifier.hpp"
 #include "clang-c/Index.h"
@@ -64,7 +65,7 @@ QASTConstructor::QASTConstructor(
                 QList<QAnnotatedToken*> currentTokenSetList;
 
                 while ( it != tokenSet->end() ){
-                    CXToken t              = (*it)->token();
+                    CXToken t              = (*it)->token().token;
                     CXString tSpelling     = clang_getTokenSpelling(tokenSet->translationUnit(), t);
                     const char* tCSpelling = clang_getCString(tSpelling);
                     CXTokenKind tKind      = clang_getTokenKind(t);
@@ -99,7 +100,7 @@ QASTConstructor::QASTConstructor(
             argTokenSet = new QAnnotatedTokenSet(argCursor, classifier->translationUnit());
             if ( i < argTokenSetList.size() ){
                 for ( int j = 0; j < argTokenSetList[i].size(); ++j ){
-                    argTokenSet->append(argTokenSetList[i][j]->token());
+                    argTokenSet->append(argTokenSetList[i][j]->token().token);
                 }
             }
 

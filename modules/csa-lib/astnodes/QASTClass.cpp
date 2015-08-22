@@ -17,6 +17,7 @@
 
 #include "QASTClass.hpp"
 #include "QSourceLocation.hpp"
+#include "QAnnotatedToken_p.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "QSourceLocation_p.hpp"
 
@@ -39,12 +40,12 @@ QASTClass::QASTClass(
     // Find '{' and '}' in token set
     for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
         QAnnotatedToken* aToken = *it;
-        CXTokenKind tokenKind = clang_getTokenKind(aToken->token());
+        CXTokenKind tokenKind = clang_getTokenKind(aToken->token().token);
 
         if ( tokenKind == CXToken_Punctuation ){
-            CXString tokenString           = clang_getTokenSpelling(tokenSet->translationUnit(), aToken->token());
+            CXString tokenString           = clang_getTokenSpelling(tokenSet->translationUnit(), aToken->token().token);
             std::string tokenStdString     = clang_getCString(tokenString);
-            CXSourceLocation tokenLocation = clang_getTokenLocation(tokenSet->translationUnit(), aToken->token());
+            CXSourceLocation tokenLocation = clang_getTokenLocation(tokenSet->translationUnit(), aToken->token().token);
             if ( tokenStdString == "{" && !m_bodyStartSet ){
                 QSourceLocation* sl = m_bodyStart;
                 sl->assign(createSourceLocation(tokenLocation));

@@ -26,15 +26,15 @@ CONFIG += console testcase
 ## Configure Dependencies
 ## ----------------------
 
-INCLUDEPATH += $$PWD/../modules/csa/astnodes
-INCLUDEPATH += $$PWD/../modules/csa/codebase
-INCLUDEPATH += $$PWD/../modules/csa/script
-DEPENDPATH  += $$PWD/../modules/csa/astnodes
-DEPENDPATH  += $$PWD/../modules/csa/codebase
-DEPENDPATH  += $$PWD/../modules/csa/script
+INCLUDEPATH += $$PWD/../modules/csa-lib/astnodes
+INCLUDEPATH += $$PWD/../modules/csa-lib/codebase
+INCLUDEPATH += $$PWD/../modules/csa-lib/script
+DEPENDPATH  += $$PWD/../modules/csa-lib/astnodes
+DEPENDPATH  += $$PWD/../modules/csa-lib/codebase
+DEPENDPATH  += $$PWD/../modules/csa-lib/script
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../modules/csa/release/ -lcsa
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../modules/csa/debug/ -lcsa
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../modules/csa-lib/release/ -lcsa
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../modules/csa-lib/debug/ -lcsa
 else:unix: LIBS += -L$$OUT_PWD/../modules/build/ -lcsa
 
 include($$PWD/src/tests.pri)

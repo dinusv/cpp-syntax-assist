@@ -23,6 +23,8 @@
 #include "QCSAPluginLoader.hpp"
 #include "QCSAPluginCollection.hpp"
 
+#include "QSourceLocation.hpp"
+#include "QAnnotatedToken.hpp"
 #include "QASTNode.hpp"
 #include "QASTFile.hpp"
 
@@ -100,6 +102,12 @@ int main(int argc, char *argv[]){
 
     qmlRegisterUncreatableType<csa::QCodeBase>(
         "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
+
+    qmlRegisterUncreatableType<csa::QSourceLocation>(
+        "CSA", 1, 0, "SourceLocation", "Source locations can be created from the codeBase or ASTFiles.");
+
+    qmlRegisterUncreatableType<csa::QAnnotatedToken>(
+        "CSA", 1, 0, "Token", "Only access to Token properties of nodes is allowed.");
 
     qmlRegisterUncreatableType<csa::ast::QASTFile>(
         "CSA", 1, 0, "ASTFile", "ASTFile is available only as a property.");

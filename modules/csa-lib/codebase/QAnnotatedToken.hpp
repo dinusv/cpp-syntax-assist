@@ -18,39 +18,38 @@
 #ifndef QANNOTATEDTOKEN_HPP
 #define QANNOTATEDTOKEN_HPP
 
-#include "clang-c/Index.h"
 #include <QObject>
-#include <QCSAGlobal.hpp>
+#include "QCSAGlobal.hpp"
 
 namespace csa{
 
-namespace ast{
-class QASTNode;
-}
+namespace ast{ class QASTNode; }
+
+class QCXTokenWrapper;
 class QAnnotatedTokenSet;
 
+class QAnnotatedTokenPrivate;
 class Q_CSA_EXPORT QAnnotatedToken : public QObject{
 
     Q_OBJECT
 
 public:
     enum TokenKind{
-        Punctuation = CXToken_Punctuation,
-        Keyword     = CXToken_Keyword,
-        Identifier  = CXToken_Identifier,
-        Literal     = CXToken_Literal,
-        Comment     = CXToken_Comment
+        Punctuation,
+        Keyword,
+        Identifier,
+        Literal,
+        Comment
     };
 
     Q_ENUMS(TokenKind)
 
 public:
-    QAnnotatedToken(QObject* parent = 0);
-    QAnnotatedToken(CXToken token, QAnnotatedTokenSet* parent = 0);
+    QAnnotatedToken(const QCXTokenWrapper& token, QAnnotatedTokenSet* parent = 0);
     ~QAnnotatedToken();
 
     void setParent(QAnnotatedTokenSet* parent);
-    const CXToken& token() const;
+    const QCXTokenWrapper& token() const;
 
 public slots:
     csa::ast::QASTNode* associatedNode();
@@ -62,19 +61,15 @@ public slots:
     void afterln(const QString& value);
 
 private:
-    QAnnotatedTokenSet* m_parent;
-    CXToken             m_token;
-    CXSourceRange       m_tokenRange;
-    QString             m_tokenName;
+    // prevent copy
+    QAnnotatedToken(const QAnnotatedToken& other);
+    QAnnotatedToken& operator=(const QAnnotatedToken& other);
+
+    // d ptr
+    QAnnotatedTokenPrivate* const d_ptr;
+    Q_DECLARE_PRIVATE(QAnnotatedToken)
+
 };
-
-inline const CXToken& QAnnotatedToken::token() const{
-    return m_token;
-}
-
-inline QString QAnnotatedToken::name() const{
-    return m_tokenName;
-}
 
 }// namespace
 

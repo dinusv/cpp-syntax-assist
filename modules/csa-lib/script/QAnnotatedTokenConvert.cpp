@@ -29,11 +29,6 @@ void tokenFromScriptValue(const QScriptValue& obj, QAnnotatedToken*& token){
     token = qobject_cast<QAnnotatedToken*>(obj.toQObject());
 }
 
-QScriptValue tokenScriptConstructor(QScriptContext* context, QScriptEngine* engine){
-    QAnnotatedToken* token = new QAnnotatedToken(context->argument(0).toQObject());
-    return engine->newQObject(token, QScriptEngine::ScriptOwnership);
-}
-
 QScriptValue tokenKindToScriptValue(QScriptEngine* engine, const QAnnotatedToken::TokenKind& tokenKind){
     return engine->newVariant((int)tokenKind);
 }

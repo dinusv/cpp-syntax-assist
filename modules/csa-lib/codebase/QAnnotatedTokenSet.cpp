@@ -14,9 +14,9 @@
 **
 ****************************************************************************/
 
-
 #include "QAnnotatedTokenSet.hpp"
 #include "QAnnotatedToken.hpp"
+#include "QAnnotatedToken_p.hpp"
 #include "QASTNode.hpp"
 
 #include <sstream>
@@ -80,8 +80,8 @@ void QAnnotatedTokenSet::dump(std::string &str){
     clang_disposeString(displayName);
 
     for ( QAnnotatedTokenSet::Iterator it = begin(); it != end(); ++it ){
-        CXString tokenString           = clang_getTokenSpelling(d->translationUnit, (*it)->token());
-        CXSourceLocation tokenLocation = clang_getTokenLocation(d->translationUnit, (*it)->token());
+        CXString tokenString           = clang_getTokenSpelling(d->translationUnit, (*it)->token().token);
+        CXSourceLocation tokenLocation = clang_getTokenLocation(d->translationUnit, (*it)->token().token);
         unsigned int column, line;
         clang_getSpellingLocation(tokenLocation, 0, &line, &column, 0);
         std::stringstream stream;

@@ -17,6 +17,7 @@
 
 #include "QASTMethodArgument.hpp"
 #include "QAnnotatedToken.hpp"
+#include "QAnnotatedToken_p.hpp"
 #include "QAnnotatedTokenSet.hpp"
 #include "clang-c/Index.h"
 
@@ -54,7 +55,7 @@ QASTMethodArgument::QASTMethodArgument(
         bool doubleColonFlag = false;
         for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
 
-            CXToken t              = (*it)->token();
+            CXToken t              = (*it)->token().token;
             CXString tSpelling     = clang_getTokenSpelling(tokenSet->translationUnit(), t);
             const char* tCSpelling = clang_getCString(tSpelling);
             CXTokenKind tKind      = clang_getTokenKind(t);

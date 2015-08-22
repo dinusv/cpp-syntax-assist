@@ -34,7 +34,7 @@ public:
             unsigned int line,
             unsigned int column,
             unsigned int offset,
-            QObject* parent = 0 );
+            QObject* parent = 0);
     QSourceLocation(
             const char* file,
             unsigned int line,
