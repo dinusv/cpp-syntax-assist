@@ -42,8 +42,6 @@ public:
     int   cursorLine() const;
     int   cursorColumn() const;
 
-    bool  isExecuteAndQuitSet() const;
-
     const QString& projectDir() const;
 
 private:
@@ -69,8 +67,6 @@ private:
     int     m_cursorOffset;
     int     m_cursorLine;
     int     m_cursorColumn;
-
-    bool    m_executeAndQuitFlag;
 };
 
 inline const QStringList& QCSAFileGuiArguments::files() const{
@@ -111,10 +107,6 @@ inline int QCSAFileGuiArguments::cursorLine() const{
 
 inline int QCSAFileGuiArguments::cursorColumn() const{
     return m_cursorColumn;
-}
-
-inline bool QCSAFileGuiArguments::isExecuteAndQuitSet() const{
-    return m_executeAndQuitFlag;
 }
 
 inline const QString &QCSAFileGuiArguments::projectDir() const{

@@ -67,7 +67,7 @@ QCodeBase::QCodeBase(const char* const* translationUnitArgs,
     d->index = clang_createIndex(0, 0);
 
     for ( QStringList::const_iterator it = entries.begin(); it != entries.end(); ++it ){
-        parseFile(*it);
+        parsePath(*it);
     }
 
     updateTreeModel();

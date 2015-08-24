@@ -138,11 +138,6 @@ int main(int argc, char *argv[]){
     // Interpret command
     // -----------------
 
-    if( commandLineArguments.isExecuteAndQuitSet() ){
-        engine.evaluate(commandLineArguments.selectedFunction());
-        return 0;
-    }
-
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();

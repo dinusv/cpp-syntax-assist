@@ -1361,7 +1361,7 @@ inline int completeLine(struct linenoiseState *ls) {
 }
 
 /* Register a callback function to be called for tab-completion. */
-void SetCompletionCallback(CompletionCallback fn) {
+inline void SetCompletionCallback(CompletionCallback fn) {
     completionCallback = fn;
 }
 
@@ -1490,7 +1490,7 @@ inline void refreshLine(struct linenoiseState *l) {
 /* Insert the character 'c' at cursor current position.
  *
  * On error writing to the terminal -1 is returned, otherwise 0. */
-int linenoiseEditInsert(struct linenoiseState *l, char c) {
+inline int linenoiseEditInsert(struct linenoiseState *l, char c) {
     if (l->len < l->buflen) {
         if (l->len == l->pos) {
             l->buf[l->pos] = c;
@@ -1517,7 +1517,7 @@ int linenoiseEditInsert(struct linenoiseState *l, char c) {
 }
 
 /* Move cursor on the left. */
-void linenoiseEditMoveLeft(struct linenoiseState *l) {
+inline void linenoiseEditMoveLeft(struct linenoiseState *l) {
     if (l->pos > 0) {
         l->pos--;
         refreshLine(l);
@@ -1525,7 +1525,7 @@ void linenoiseEditMoveLeft(struct linenoiseState *l) {
 }
 
 /* Move cursor on the right. */
-void linenoiseEditMoveRight(struct linenoiseState *l) {
+inline void linenoiseEditMoveRight(struct linenoiseState *l) {
     if (l->pos != l->len) {
         l->pos++;
         refreshLine(l);

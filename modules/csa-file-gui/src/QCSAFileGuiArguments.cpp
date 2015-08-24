@@ -19,8 +19,6 @@
 #include <QGuiApplication>
 #include <QCommandLineParser>
 #include <QFileInfo>
-#include <QDirIterator>
-#include <QDir>
 
 QCSAFileGuiArguments::QCSAFileGuiArguments(
         const QGuiApplication& app,
@@ -29,7 +27,6 @@ QCSAFileGuiArguments::QCSAFileGuiArguments(
     , m_cursorOffset(-1)
     , m_cursorLine(-1)
     , m_cursorColumn(-1)
-    , m_executeAndQuitFlag(false)
 {
     m_headerSearchPatterns << "*.c" << "*.C" << "*.cxx" << "*.cpp" << "*.c++" << "*.cc" << "*.cp";
     m_sourceSearchPatterns << "*.h" << "*.H" << "*.hxx" << "*.hpp" << "*.h++" << "*.hh" << "*.hp";
@@ -50,7 +47,7 @@ void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString&
     m_commandLineParser->addHelpOption();
     m_commandLineParser->addVersionOption();
     m_commandLineParser->addPositionalArgument(
-                "paths", QGuiApplication::translate("main", "Files and directories to parse."));
+                "paths", QCoreApplication::translate("main", "Files and directories to parse."));
 
     QCommandLineOption cursorOffset("c",
         QCoreApplication::translate("main", "User cursor offset within the file."),
@@ -69,11 +66,6 @@ void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString&
         QCoreApplication::translate("main", "function")
     );
     m_commandLineParser->addOption(selectedFunction);
-
-    QCommandLineOption executeAndQuit("f",
-        QCoreApplication::translate("main", "Execute function and quit.")
-    );
-    m_commandLineParser->addOption(executeAndQuit);
 
     QCommandLineOption projectDir("dir",
         QCoreApplication::translate("main", "Project base directory.")
@@ -130,6 +122,5 @@ void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString&
     }
 
     m_projectDir          = m_commandLineParser->isSet(projectDir) ? m_commandLineParser->value(projectDir) : "";
-    m_executeAndQuitFlag = m_commandLineParser->isSet(executeAndQuit);
 }
 

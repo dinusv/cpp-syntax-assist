@@ -3,11 +3,12 @@
 
 #include <QStringList>
 
+class QCoreApplication;
 class QCommandLineParser;
 class QCSAConsoleArguments{
 
 public:
-    explicit QCSAConsoleArguments();
+    explicit QCSAConsoleArguments(const QCoreApplication& application, const QString& applicationDescription);
     ~QCSAConsoleArguments();
 
     const QStringList& files() const;
@@ -26,11 +27,13 @@ public:
 
     bool  isExecuteAndQuitSet() const;
 
+    QString projectDir() const;
+
 private:
     QCSAConsoleArguments(const QCSAConsoleArguments& other);
     QCSAConsoleArguments& operator =(const QCSAConsoleArguments& other);
 
-//    void initialize(const QGuiApplication& app, const QString& applicationDescription);
+    void initialize(const QCoreApplication& app, const QString& applicationDescription);
 
 private:
     QCommandLineParser* m_commandLineParser;
@@ -41,7 +44,7 @@ private:
     QStringList m_headerSearchPatterns;
     QStringList m_sourceSearchPatterns;
 
-    QString m_searchDir;
+    QString m_projectDir;
 
     bool    m_functionSet;
     QString m_function;
@@ -95,6 +98,10 @@ inline int QCSAConsoleArguments::cursorColumn() const{
 
 inline bool QCSAConsoleArguments::isExecuteAndQuitSet() const{
     return m_executeAndQuitFlag;
+}
+
+inline QString QCSAConsoleArguments::projectDir() const{
+    return m_projectDir;
 }
 
 #endif // QCSACONSOLEARGUMENTS_H
