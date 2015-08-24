@@ -375,7 +375,7 @@ QASTFile *QCodeBase::findFile(const QString &fileName){
     return 0;
 }
 
-QASTNode* QCodeBase::cursorNode(){
+QASTNode* QCodeBase::selectedNode(){
     return m_current;
 }
 

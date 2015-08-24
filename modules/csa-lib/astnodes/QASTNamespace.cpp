@@ -34,8 +34,9 @@ QASTNamespace::QASTNamespace(
 
     // Set default offsets
     m_bodyStart = new QSourceLocation(*rangeStartLocation);
+    m_bodyStart->setParent(this);
     m_bodyEnd   = new QSourceLocation(*rangeEndLocation);
-//    m_offsets[QASTNamespace::CURSOR] = 0;
+    m_bodyEnd->setParent(this);
 
     // Find '{' and '}' in token set
     for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){

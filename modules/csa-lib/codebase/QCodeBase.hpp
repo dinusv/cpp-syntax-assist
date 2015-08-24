@@ -71,7 +71,7 @@ public slots:
     void setProjectDir(const QString& path);
 
     csa::ast::QASTFile* findFile(const QString& fileName);
-    csa::ast::QASTNode* cursorNode();
+    csa::ast::QASTNode* selectedNode();
 
     csa::QSourceLocation* createLocation(const QString &file, unsigned int offset);
     csa::QSourceLocation* createLocation(const QString &file, unsigned int line, unsigned int column);
