@@ -251,8 +251,10 @@ void QCodeBase::parsePath(const QString& path){
     if ( finfo.isDir()){
         QStringList searchVals = QStringList() << m_headerSearchPatterns << m_sourceSearchPatterns;
         QDirIterator it(finfo.filePath(), searchVals, QDir::Files, QDirIterator::Subdirectories);
-        while (it.hasNext())
+        while (it.hasNext()){
+            it.next();
             parseFile(it.filePath());
+        }
     } else {
         parseFile(finfo.filePath());
     }
