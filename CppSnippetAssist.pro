@@ -10,5 +10,6 @@ OTHER_FILES += \
     $$PWD/plugins/preventcopy.js \
     $$PWD/plugins/addproperty.js \
     $$PWD/plugins/addsetter.js \
-    $$PWD/plugins/addgetter.js
+    $$PWD/plugins/addgetter.js \
+    $$PWD/plugins/addincludeguard.js
 

@@ -23,6 +23,7 @@
 
 #include <QFile>
 #include <QDebug>
+#include <QFileInfo>
 
 namespace csa{ namespace ast{
 
@@ -148,7 +149,19 @@ QSourceLocation* QASTFile::createLocation(unsigned int line, unsigned int column
     CXFile clangFile = clang_getFile(tokenSet()->translationUnit(), identifier().toLocal8Bit().constData());
     return new QSourceLocation(
         createSourceLocation(clang_getLocation(tokenSet()->translationUnit(), clangFile, line, column))
-    );
+                );
+}
+
+QString QASTFile::fileName(){
+    return QFileInfo(identifier()).fileName();
+}
+
+QString QASTFile::fileNameWithouExtension(){
+    return QFileInfo(identifier()).baseName();
+}
+
+QString QASTFile::extension(){
+    return QFileInfo(identifier()).suffix();
 }
 
 }}//namespace
