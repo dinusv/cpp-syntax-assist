@@ -11,5 +11,7 @@ OTHER_FILES += \
     $$PWD/plugins/addproperty.js \
     $$PWD/plugins/addsetter.js \
     $$PWD/plugins/addgetter.js \
-    $$PWD/plugins/addincludeguard.js
+    $$PWD/plugins/addincludeguard.js \
+    $$PWD/plugins/addnamespace.js \
+    $$PWD/plugins/addclass.js
 
