@@ -13,5 +13,6 @@ OTHER_FILES += \
     $$PWD/plugins/addgetter.js \
     $$PWD/plugins/addincludeguard.js \
     $$PWD/plugins/addnamespace.js \
-    $$PWD/plugins/addclass.js
+    $$PWD/plugins/addclass.js \
+    $$PWD/plugins/addconstructor.js
 
