@@ -94,6 +94,13 @@ bool QCSAPluginLoader::loadNodeCollection(){
         "    return newCollection; \n"
         "} \n"
 
+        "NodeCollection.prototype.remove = function(){ \n"
+        "    for ( var i = 0; i < this.nodes.length; ++i ){\n"
+        "        this.nodes[i].remove();\n"
+        "    }\n"
+        "    codeBase.save()\n"
+        "} \n"
+
         "NodeCollection.prototype.toString = function(){ \n"
         "    var ret = 'NodeCollection['; \n"
         "    for ( var i = 0; i < this.nodes.length; ++i ){ \n"

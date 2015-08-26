@@ -375,10 +375,6 @@ QASTFile *QCodeBase::findFile(const QString &fileName){
     return 0;
 }
 
-QASTNode* QCodeBase::selectedNode(){
-    return m_current;
-}
-
 QSourceLocation* QCodeBase::createLocation(const QString& file, unsigned int offset){
     QTokenClassifier* classifier    = classifierForFile(file);
     if ( !classifier )

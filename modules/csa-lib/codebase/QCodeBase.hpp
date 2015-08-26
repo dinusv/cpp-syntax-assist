@@ -46,8 +46,6 @@ public:
             QObject*           parent = 0);
     ~QCodeBase();
 
-    csa::ast::QASTNode* selected();
-
     void propagateUserCursor(int offset, const QString& file);
     void propagateUserCursor(int line, int column, const QString& file);
     void propagateUserCursor(const csa::QSourceLocation& location);
@@ -115,12 +113,13 @@ private:
     QList<csa::QTokenClassifier*> m_classifiers;
 };
 
-inline csa::ast::QASTNode *QCodeBase::selected(){
-    return m_current;
-}
 
 inline QList<QObject*> QCodeBase::files() const{
     return QObject::children();
+}
+
+inline csa::ast::QASTNode* QCodeBase::selectedNode(){
+    return m_current;
 }
 
 } // namespace

@@ -102,6 +102,8 @@ public slots:
     void after(const QString& value);
     void afterln(const QString& value);
 
+    void remove();
+
     // Location Getters
     // ----------------
 
@@ -131,6 +133,7 @@ public:
     void removeChildren();
 
     virtual bool insert(const QString& value, QSourceLocation* location);
+    virtual bool erase(QSourceLocation* from, QSourceLocation* to);
 
     void setAstParent(csa::ast::QASTNode* parent);
 

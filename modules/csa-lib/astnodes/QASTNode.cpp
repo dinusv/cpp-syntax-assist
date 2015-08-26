@@ -161,6 +161,10 @@ void QASTNode::afterln(const QString& value){
     delete afterLocation;
 }
 
+void QASTNode::remove(){
+    erase(rangeStartLocation(), rangeEndLocation());
+}
+
 void QASTNode::dump(QString& out, int depth) const{
     QString space("");
     for ( int i = 0; i < depth * dumpIndentation; ++i )
@@ -222,9 +226,16 @@ QList<QObject*> QASTNode::find(const QASTSearch& searchPattern, const QString& t
 }
 
 bool QASTNode::insert(const QString& value, QSourceLocation* location){
-    QASTNode* p = qobject_cast<QASTNode*>(parent());
+    QASTNode* p = astParent();
     if ( p )
         return p->insert(value, location);
+    return false;
+}
+
+bool QASTNode::erase(QSourceLocation *from, QSourceLocation *to){
+    QASTNode* p = astParent();
+    if ( p )
+        return p->erase(from, to);
     return false;
 }
 
