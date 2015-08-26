@@ -1,7 +1,7 @@
 
 function preventCopy(){
 
-    var cursorNode = codeBase.cursorNode();
+    var cursorNode = codeBase.selectedNode();
     var classNode  = null;
 
     if ( cursorNode.typeName() === 'class' )

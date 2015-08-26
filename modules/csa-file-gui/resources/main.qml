@@ -59,6 +59,7 @@ ApplicationWindow {
                 }
             }
 
+            clip: true
             cursorDelegate: Rectangle{
                 width : 9
                 color : "#585858"

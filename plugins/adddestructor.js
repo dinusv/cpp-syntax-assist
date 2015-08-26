@@ -7,7 +7,7 @@ function addDestructor(properties, node, save){
 
     function findNode(){
         if (typeof node === 'undefined'){
-            var cursorNode = codeBase.cursorNode();
+            var cursorNode = codeBase.selectedNode();
             if ( cursorNode.typeName() === 'class' )
                 return cursorNode;
             else

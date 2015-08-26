@@ -1,7 +1,7 @@
 
 function wrapNamespace(name){
 
-    var cursorNode = codeBase.cursorNode();
+    var cursorNode = codeBase.selectedNode();
     var fileNode   = cursorNode.parentFind('file');
 
     var astChildren = fileNode.astChildren();

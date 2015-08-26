@@ -22,8 +22,8 @@ function addGetter(properties, node, save){
     function findNode(node){
         if ( typeof node !== 'undefined' )
             return node.typeName() === 'field' ? node : null;
-        else if ( codeBase.cursorNode() !== null )
-            return codeBase.cursorNode().typeName() === 'field' ? codeBase.cursorNode() : null;
+        else if ( codeBase.selectedNode() !== null )
+            return codeBase.selectedNode().typeName() === 'field' ? codeBase.selectedNode() : null;
         return null;
     }
 

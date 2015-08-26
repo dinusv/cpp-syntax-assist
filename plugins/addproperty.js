@@ -1,73 +1,146 @@
 
-function addProperty(type, name, options){
+function addProperty(type, name, options, node, save){
+
+    var isInline     = false
+    var isNotifiable = false
+    var isReference  = false
+    var writeGetter  = false
+    var writeSetter  = false
+    var isQProperty  = false
+    if (typeof options !== 'undefined'){
+        isInline     = options.indexOf('i') !== -1;
+        isNotifiable = options.indexOf('n') !== -1;
+        isReference  = options.indexOf('r') !== -1;
+        writeGetter  = options.indexOf('g') !== -1;
+        writeSetter  = options.indexOf('s') !== -1;
+        isQProperty  = options.indexOf('q') !== -1;
+    }
+
+    function findNode(){
+        console.log('here')
+        if (typeof node === 'undefined'){
+            console.log('here2')
+            var cursorNode = codeBase.selectedNode();
+            console.log(cursorNode.typeName())
+            if ( cursorNode.typeName() === 'class' )
+                return cursorNode;
+            else
+                return cursorNode.parentFind('class');
+        } else {
+            return (node.typeName() === 'class' ? node : null);
+        }
+    }
 
     function capitaliseFirstLetter(str){
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    var cursorNode = codeBase.cursorNode();
-    var classNode  = null;
+    function getSourceNamespaceAndPosition(classNode){
+        var breadCrumbs = '';
+        var currentNode = classNode.astParent();
+        while ( currentNode.typeName() !== 'file' || currentNode === null ){
+            breadCrumbs = currentNode.identifier() + '/' + breadCrumbs;
+            currentNode = currentNode.astParent();
+        }
+        if ( currentNode === null )
+            return null;
 
-    if ( cursorNode.typeName() === 'class' )
-        classNode = cursorNode;
-    else {
-        classNode = cursorNode.parentFind('class');
+        var sourceFileNode = codeBase.findSource(currentNode.identifier());
+        if ( sourceFileNode === null )
+            return null;
+
+        var usedNode = sourceFileNode;
+        var cppBreadCrumbs = '';
+        while ( breadCrumbs !== '' ){
+            var foundNode = sourceFileNode.findFirst(breadCrumbs);
+            if ( foundNode === null ){
+                var slashBackIndex = breadCrumbs.lastIndexOf('/', breadCrumbs.length - 2);
+
+                if ( slashBackIndex > 0 ){
+                    cppBreadCrumbs =
+                        cppBreadCrumbs + breadCrumbs.slice(slashBackIndex + 1, breadCrumbs.length - 1) + '::';
+                    breadCrumbs    = breadCrumbs.slice(0, slashBackIndex + 1);
+                } else {
+                    cppBreadCrumbs =
+                        cppBreadCrumbs + breadCrumbs.slice(slashBackIndex + 1, breadCrumbs.length - 1) + '::';
+                    breadCrumbs    = '';
+                }
+
+            } else {
+                usedNode = foundNode;
+                break;
+            }
+        }
+        return { node: usedNode, cppBreadCrumbs: cppBreadCrumbs };
     }
 
-    if ( classNode === null ){
-        var loadedFiles = codeBase.files();
-        for (var index = 0; index < loadedFiles.length; ++index) {
-            classNode = loadedFiles[index].findFirst('class');
-            if ( classNode !== null )
-                break;
+    var classNode = findNode()
+    if ( classNode === null )
+        throw new Error("Cannot find specified class.");
+
+    var cppSourceNamespace = ''
+    var cppSourceLocation  = null
+    if ( !isInline ){
+        var namespaceAndPosition = getSourceNamespaceAndPosition(classNode)
+        if ( namespaceAndPosition === null ){
+            isInline = true
+        } else {
+            cppSourceNamespace = namespaceAndPosition.cppBreadCrumbs
+            cppSourceLocation  = namespaceAndPosition.node
         }
     }
 
-    if ( classNode === null )
-        throw "Cannot find specified class";
+    var member     = '    ' + type + ' m_' + name + ';\n';
 
-    var propertyDeclaration = 'm_' + name;
-    var isNotifiable        = options.indexOf('n') !== -1;
-    var isReference         = options.indexOf('r') !== -1;
-    var writeMember         = options.indexOf('m') !== -1;
-    var writeGetter         = options.indexOf('g') !== -1;
-    var writeSetter         = options.indexOf('s') !== -1;
-    //var isQProperty         = options.indexOf('q');
-
-    var member     = '\t' + type + ' m_' + name + ';\n';
-    var methodDecl =
-            '\t' + (isReference ? 'const ' : '') + type +
+    var methodDecl = ''
+    if ( writeGetter ){
+        methodDecl +=
+            '    ' + (isReference ? 'const ' : '') + type +
             (isReference ? '& '   : '') + name  +
-            '() const;\n' +
+            '() const;\n'
+    }
 
-            '\tvoid set' + capitaliseFirstLetter(name) + '(' +
+    if ( writeGetter ){
+        methodDecl +=
+            '    void set' + capitaliseFirstLetter(name) + '(' +
             (isReference ? 'const ' : '') +
             type +
             (isReference ? '& ' : ' ') +
             name + ');\n';
-
-    var methodImpl =
-            '\ninline ' + (isReference ? 'const ' : '') + type +
-            (isReference ? '& ' : ' ') + classNode.identifier() + '::' + name +
-            '() const{' + '\n\treturn m_' + name + ';\n}\n\n' +
-
-            'inline void ' + classNode.identifier() + '::set' + capitaliseFirstLetter(name) +
-            '(' + (isReference ? 'const ' : '') + type + (isReference ? '& ' : '') +
-            name + '){\n\t';
-
-    if ( isNotifiable ){
-        methodImpl +=
-                'if (m_' + name  + ' != ' + name + '){\n' +
-                '\t\tm_' + name + ' = ' + name + ';\n' +
-                '\t\temit ' + name + 'Changed();\n' +
-                '\t}\n';
-    } else {
-        methodImpl +=
-                '\tm_' + propertyDeclaration + ' = ' + propertyDeclaration + ';\n';
     }
-    methodImpl += '}\n';
 
-    classNode.afterln(methodImpl);
+    var methodImpl = ''
+
+    if ( writeGetter ){
+        methodImpl +=
+            '\n' + isInline ? 'inline ' : '' +
+            (isReference ? 'const ' : '') + type +
+            (isReference ? '& ' : ' ') +
+            cppSourceLocation +
+            classNode.identifier() + '::' + name +
+            '() const{' + '\n    return m_' + name + ';\n}\n'
+    }
+
+    if ( writeSetter ){
+        methodImpl +=
+                '\n' + isInline ? 'inline ' : '' + 'void ' +
+                cppSourceLocation +
+                classNode.identifier() + '::set' + capitaliseFirstLetter(name) +
+                '(' + (isReference ? 'const ' : '') + type + (isReference ? '& ' : '') +
+                name + '){\n    ';
+
+        if ( isNotifiable ){
+            methodImpl +=
+                    'if (m_' + name  + ' != ' + name + '){\n' +
+                    '        m_' + name + ' = ' + name + ';\n' +
+                    '        emit ' + name + 'Changed();\n' +
+                    '    }\n';
+        } else {
+            methodImpl +=
+                    '    m_' + propertyDeclaration + ' = ' + propertyDeclaration + ';\n';
+        }
+        methodImpl += '}\n';
+    }
 
     var privateAccess = classNode.firstChild('private', 'access');
     if ( privateAccess !== null ){
@@ -90,36 +163,48 @@ function addProperty(type, name, options){
         classNode.append('private:\n' + member);
     }
 
-    var publicAccess = classNode.firstChild('private', 'access');
-    if ( publicAccess !== null ){
+    if ( methodDecl !== '' ){
+        var publicAccess = classNode.firstChild('public', 'access');
+        if ( publicAccess !== null ){
 
-        var nextPublicMember = publicAccess.next();
-        while ( nextPublicMember !== null ){
-            var afterNextPublicMember = nextPublicMember.next();
-            if ( afterNextPublicMember !== null ){
-                if ( afterNextPublicMember.typeName() === 'access' ){
+            var nextPublicMember = publicAccess.next();
+            while ( nextPublicMember !== null ){
+                var afterNextPublicMember = nextPublicMember.next();
+                if ( afterNextPublicMember !== null ){
+                    if ( afterNextPublicMember.typeName() === 'access' ){
+                        nextPublicMember.afterln(methodDecl);
+                        break;
+                    }
+                } else {
                     nextPublicMember.afterln(methodDecl);
                     break;
                 }
-            } else {
-                nextPublicMember.afterln(methodDecl);
-                break;
+                nextPublicMember = nextPublicMember.next();
             }
-            nextPublicMember = nextPublicMember.next();
-        }
 
-    } else {
-        classNode.append('\npublic:\n' + methodDecl);
+        } else {
+            classNode.append('\npublic:\n' + methodDecl);
+        }
     }
 
-    codeBase.save();
+    if ( methodImpl !== '' ){
+        if ( isInline )
+            classNode.afterln(methodImpl)
+        else
+            cppSourceLocation.append(methodImpl)
+    }
+
+    if (typeof save !== 'undefined' ? save : true)
+        codeBase.save();
 }
 
-if ( typeof plugins !== 'undefined' ){
-    plugins.registerPlugin({
-        'name' : 'addProperty',
-        'usage' : 'addProperty("type", "name", "nrmgs")',
-        'description' : 'adds a property to the given class within the hierarchy.'
+NodeCollection.registerPlugin({
+    'name' : 'addProperty',
+    'usage' : 'addProperty("type", "name", "inrgsq")',
+    'description' : 'adds a property to the given class within the hierarchy.'
+}).prototype.addProperty = function(type, name, options){
+    this.nodes.forEach(function (v, i){
+        addProperty(type, name, options, v, false)
     });
+    codeBase.save()
 }
-

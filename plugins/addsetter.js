@@ -19,8 +19,8 @@ function addSetter(isInline, node, save){
 
     if ( typeof node !== 'undefined' )
         fieldNode = node.typeName() === 'field' ? node : null;
-    else if ( codeBase.cursorNode() !== null )
-        fieldNode = codeBase.cursorNode().typeName() === 'field' ? codeBase.cursorNode() : null;
+    else if ( codeBase.selectedNode() !== null )
+        fieldNode = codeBase.selectedNode().typeName() === 'field' ? codeBase.selectedNode() : null;
 
     if ( fieldNode === null )
         throw new Error("Selected node is not of \'field\' type");
