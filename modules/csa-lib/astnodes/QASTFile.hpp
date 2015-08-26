@@ -23,7 +23,7 @@
 
 namespace csa{ namespace ast{
 
-class QInsertionElementPrivate;
+class QModifierElementPrivate;
 
 class Q_CSA_EXPORT QASTFile : public QASTNode{
 
@@ -32,12 +32,13 @@ class Q_CSA_EXPORT QASTFile : public QASTNode{
 public:
     QASTFile(QAnnotatedTokenSet* tokenSet, const QString& file, QSourceLocation* endOfFile);
 
-    bool hasInsertions();
-    void saveInsertions();
+    bool hasModifiers();
+    void save();
     QString content() const;
 
 public slots:
     bool insert(const QString& value, csa::QSourceLocation* location);
+    bool erase(csa::QSourceLocation* from, csa::QSourceLocation* to);
     QString readAll();
     QString read(csa::QSourceLocation* start, csa::QSourceLocation* end);
     unsigned int size();
@@ -45,7 +46,7 @@ public slots:
     csa::QSourceLocation* createLocation(unsigned int line, unsigned int column);
 
 private:
-    QList<QInsertionElementPrivate*> m_insertions;
+    QList<QModifierElementPrivate*> m_modifiers;
 
 };
 

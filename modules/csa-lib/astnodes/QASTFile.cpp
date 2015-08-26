@@ -29,20 +29,33 @@ namespace csa{ namespace ast{
 // QInsertionElementPrivate
 // ------------------------
 
-class QInsertionElementPrivate{
+class QModifierElementPrivate{
 
 public:
-    QInsertionElementPrivate(const QString& pData, const QSourceLocation& pLocation)
-        : data(pData), location(pLocation){}
+    enum Type{
+        Insertion,
+        Erasion
+    };
 
+public:
+    QModifierElementPrivate(
+            const QString& pData,
+            const QSourceLocation& pLocation)
+        : type(Insertion), data(pData), location(pLocation), location2(pLocation){}
+
+    QModifierElementPrivate(const QSourceLocation& pLocation1, const QSourceLocation& pLocation2)
+        : type(Erasion), data(""), location(pLocation1), location2(pLocation2){}
+
+    Type    type;
     QString data;
     QSourceLocation location;
+    QSourceLocation location2;
 
 private:
-    QInsertionElementPrivate();
+    QModifierElementPrivate();
 };
 
-bool offsetCompare(QInsertionElementPrivate* e1, QInsertionElementPrivate* e2){
+bool offsetCompare(QModifierElementPrivate* e1, QModifierElementPrivate* e2){
     if ( e1->location.filePath() == e2->location.filePath() )
         return (e1->location.offset() < e2->location.offset());
 
@@ -64,13 +77,13 @@ QASTFile::QASTFile(QAnnotatedTokenSet* tokenSet, const QString& file, QSourceLoc
     setIdentifier(file);
 }
 
-bool QASTFile::hasInsertions(){
-    return m_insertions.size() > 0;
+bool QASTFile::hasModifiers(){
+    return m_modifiers.size() > 0;
 }
 
-void QASTFile::saveInsertions(){
-    if ( hasInsertions() ){
-        std::sort(m_insertions.begin(), m_insertions.end(), offsetCompare);
+void QASTFile::save(){
+    if ( hasModifiers() ){
+        std::sort(m_modifiers.begin(), m_modifiers.end(), offsetCompare);
 
         QString filePath = identifier();
         QFile file(filePath);
@@ -90,11 +103,19 @@ void QASTFile::saveInsertions(){
         QTextStream writeStream(&file);
         int startCut, endCut = 0;
 
-        for ( QList<QInsertionElementPrivate*>::iterator it = m_insertions.begin(); it != m_insertions.end(); ++it ){
-            QInsertionElementPrivate* el = *it;
-            startCut = endCut;
-            endCut   = el->location.offset();
-            writeStream << fileData.mid(startCut, endCut - startCut) << el->data;
+        for ( QList<QModifierElementPrivate*>::iterator it = m_modifiers.begin(); it != m_modifiers.end(); ++it ){
+            QModifierElementPrivate* el = *it;
+
+            if ( el->type == QModifierElementPrivate::Insertion ){
+                startCut = endCut;
+                endCut   = el->location.offset();
+                writeStream << fileData.mid(startCut, endCut - startCut) << el->data;
+            } else {
+                startCut = endCut;
+                endCut   = el->location.offset();
+                writeStream << fileData.mid(startCut, endCut - startCut);
+                endCut   = el->location2.offset();
+            }
         }
         writeStream << fileData.mid(endCut);
     }
@@ -102,10 +123,26 @@ void QASTFile::saveInsertions(){
 
 bool QASTFile::insert(const QString& value, QSourceLocation* location){
     if ( location->offset() <= size() && location->filePath() == identifier() ){
-         m_insertions.append(new QInsertionElementPrivate(value, *location));
+         m_modifiers.append(new QModifierElementPrivate(value, *location));
         return true;
     } else {
         qCritical() << "Cannot insert :'" <<  value << "'. Incompatible file location.";
+        return false;
+    }
+}
+
+bool QASTFile::erase(QSourceLocation* from, QSourceLocation* to){
+    if ( from->offset() <= size() &&
+         to->offset() <= size() &&
+         from->offset() <= to->offset() &&
+         from->filePath() == identifier() &&
+         to->filePath() == identifier() )
+    {
+        m_modifiers.append(new QModifierElementPrivate(*from, *to));
+        return true;
+    } else {
+        qCritical() << "Cannot erase between positions: " << from->toString() << " and " << to->toString() <<
+                       ". Incompatible file locations.";
         return false;
     }
 }

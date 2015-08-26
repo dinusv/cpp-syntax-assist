@@ -87,8 +87,8 @@ void QCodeBase::save(){
 
     for ( int i = 0; i < m_files.size(); ++i ){
         QASTFile* root = m_files[i];
-        if ( root->hasInsertions() ){
-            root->saveInsertions();
+        if ( root->hasModifiers() ){
+            root->save();
             reparseIndex(i);
         }
     }
