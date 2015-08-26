@@ -67,7 +67,7 @@ QCodeBase::QCodeBase(const char* const* translationUnitArgs,
     d->index = clang_createIndex(0, 0);
 
     for ( QStringList::const_iterator it = entries.begin(); it != entries.end(); ++it ){
-        parseFile(*it);
+        parsePath(*it);
     }
 
     updateTreeModel();
@@ -251,8 +251,10 @@ void QCodeBase::parsePath(const QString& path){
     if ( finfo.isDir()){
         QStringList searchVals = QStringList() << m_headerSearchPatterns << m_sourceSearchPatterns;
         QDirIterator it(finfo.filePath(), searchVals, QDir::Files, QDirIterator::Subdirectories);
-        while (it.hasNext())
+        while (it.hasNext()){
+            it.next();
             parseFile(it.filePath());
+        }
     } else {
         parseFile(finfo.filePath());
     }
@@ -373,7 +375,7 @@ QASTFile *QCodeBase::findFile(const QString &fileName){
     return 0;
 }
 
-QASTNode* QCodeBase::cursorNode(){
+QASTNode* QCodeBase::selectedNode(){
     return m_current;
 }
 

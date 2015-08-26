@@ -45,6 +45,10 @@ public slots:
     csa::QSourceLocation* createLocation(unsigned int offset);
     csa::QSourceLocation* createLocation(unsigned int line, unsigned int column);
 
+    QString fileName();
+    QString fileNameWithouExtension();
+    QString extension();
+
 private:
     QList<QModifierElementPrivate*> m_modifiers;
 

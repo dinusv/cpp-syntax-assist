@@ -1,57 +1,120 @@
-#include <iostream>
-#include "linenoise.hpp"
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <qqml.h>
 
 #include "QCodeBase.hpp"
 #include "QCSAPluginLoader.hpp"
+#include "QCSAConsoleArguments.hpp"
+#include "QCSAPluginCollection.hpp"
+#include "QCSAInputHandler.hpp"
 
-using namespace std;
+#include "QSourceLocation.hpp"
+#include "QAnnotatedToken.hpp"
+#include "QCSAPluginLoader.hpp"
+#include "QASTNode.hpp"
+#include "QASTFile.hpp"
 
 using namespace csa;
 using namespace csa::ast;
 
-void completeFunction(const char* editBuffer, std::vector<std::string>& completions){
+int main(int argc, char* argv[]){
 
-    const char* dotPosition = strrchr(editBuffer, '.');
-    if (dotPosition == NULL)
-        dotPosition = editBuffer;
+    // Initialize command line arguments
+    // ---------------------------------
 
-    std::string searchFilter = dotPosition;
-    size_t i = 0;
-    while ( i < searchFilter.size() ){
-        char& c = searchFilter[i];
-        if ( !isalnum(c) && c != '_' && c != '$' )
-            break;
-        ++i;
-    }
-    if ( i < searchFilter.size() )
-        searchFilter = searchFilter.substr(0, i);
+    QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("csa-console");
+    QCoreApplication::setApplicationVersion("0.3.0");
 
-    if ( std::string("quit").find(searchFilter) != std::string::npos && dotPosition == editBuffer){
-        completions.push_back("quit()");
+    QCSAConsoleArguments commandLineArguments(
+        app,
+        "\nA configurable C and C++ code parser that exposes the ast model to javascript for manipulation."
+    );
 
-    } else if ( std::string("nodes").find(searchFilter) != std::string::npos && dotPosition == editBuffer ){
-        completions.push_back("nodes('");
-    }
+    // Assert Arguments
+    // ----------------
 
-}
-
-int main(){
-
-    linenoise::SetCompletionCallback(&completeFunction);
-    linenoise::SetHistoryMaxLen(10);
-
-    while (true) {
-        size_t suggestionPosition = 0;
-        std::string line = linenoise::Readline("csa> ", false, &suggestionPosition);
-
-        if (line == "quit()")
-            break;
-
-        std::cout <<  "echo: '" << line << "'" << std::endl;
-        std::cout <<  "pos:  "  << suggestionPosition << std::endl;
-
-        linenoise::AddHistory(line.c_str());
+    if ( commandLineArguments.hasFileErrors() ){
+        for ( QStringList::const_iterator it = commandLineArguments.fileErrors().begin();
+              it != commandLineArguments.fileErrors().end();
+              ++it )
+        {
+            qCritical("%s\n", qPrintable(*it));
+        }
+        return -1;
     }
 
-    return 0;
+    // Create Codebase
+    // ---------------
+
+    const char* args[] = {"-c", "-x", "c++"};
+    QCodeBase codeBase(args, 3, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
+
+    if ( commandLineArguments.isCursorOffsetSet() ){
+        codeBase.propagateUserCursor(
+            commandLineArguments.cursorOffset(),
+            commandLineArguments.files().first()
+        );
+    } else if ( commandLineArguments.isCursorLineColumnSet() ){
+        codeBase.propagateUserCursor(
+            commandLineArguments.cursorLine(),
+            commandLineArguments.cursorColumn(),
+            commandLineArguments.files().first()
+        );
+    } else {
+        codeBase.propagateUserCursor(0, commandLineArguments.files().first());
+    }
+
+    // Configure Engine
+    // ----------------
+
+    qmlRegisterUncreatableType<QCSAPluginConsole>(
+        "CSA", 1, 0, "ConfiguredDebugger", "Only access to the debug property is allowed.");
+
+    qmlRegisterUncreatableType<QCSAPluginLoader>(
+        "CSA", 1, 0, "ConfiguredEngine", "Only access to the engine property is allowed.");
+
+    qmlRegisterUncreatableType<QCSAPluginCollection>(
+        "CSA", 1, 0, "PluginCollection", "Only access to the plugins property is allowed.");
+
+    qmlRegisterUncreatableType<csa::QCodeBase>(
+        "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
+
+    qmlRegisterUncreatableType<csa::QSourceLocation>(
+        "CSA", 1, 0, "SourceLocation", "Source locations can be created from the codeBase or ASTFiles.");
+
+    qmlRegisterUncreatableType<csa::QAnnotatedToken>(
+        "CSA", 1, 0, "Token", "Only access to Token properties of nodes is allowed.");
+
+    qmlRegisterUncreatableType<csa::ast::QASTFile>(
+        "CSA", 1, 0, "ASTFile", "ASTFile is available only as a property.");
+
+    qmlRegisterUncreatableType<csa::ast::QASTNode>(
+        "CSA", 1, 0, "ASTNode", "ASTNode is available only as a property.");
+
+    QCSAPluginCollection pluginCollection;
+
+    QCSAPluginLoader scriptEngine(new QJSEngine);
+    scriptEngine.setContextObject("codeBase", &codeBase);
+    scriptEngine.setContextObject("plugins",  &pluginCollection);
+    scriptEngine.loadNodeCollection();
+    scriptEngine.loadNodesFunction();
+    scriptEngine.loadFileFunctions();
+
+    int loaderError = scriptEngine.loadPlugins(QCoreApplication::applicationDirPath() + "/plugins");
+    if ( loaderError != 0 )
+        return loaderError;
+
+    if( commandLineArguments.isExecuteAndQuitSet() ){
+        QJSValue result;
+        if ( scriptEngine.execute(commandLineArguments.selectedFunction(), result) ){
+            if ( !result.isUndefined() )
+                qDebug() << result.toString();
+            return 0;
+        }
+        return 1;
+    }
+
+    QCSAInputHandler::getInstance().initPluginHandlers(&scriptEngine, &pluginCollection);
+    return QCSAInputHandler::getInstance().inputLoop();
 }

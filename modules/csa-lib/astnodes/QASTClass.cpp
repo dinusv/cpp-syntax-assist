@@ -33,9 +33,10 @@ QASTClass::QASTClass(
     : QASTNode("class", tokenSet, cursorLocation, rangeStartLocation, rangeEndLocation, parent)
     , m_bodyStartSet(false)
 {
-
     m_bodyStart = new QSourceLocation(*rangeStartLocation);
+    m_bodyStart->setParent(this);
     m_bodyEnd   = new QSourceLocation(*rangeEndLocation);
+    m_bodyEnd->setParent(this);
 
     // Find '{' and '}' in token set
     for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){

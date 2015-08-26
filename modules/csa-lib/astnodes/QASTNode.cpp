@@ -45,6 +45,13 @@ QASTNode::QASTNode(
 
     if ( m_tokenSet )
         m_tokenSet->setParent(this);
+
+    if ( m_rangeStartLocation )
+        m_rangeStartLocation->setParent(this);
+    if ( m_rangeEndLocation )
+        m_rangeEndLocation->setParent(this);
+    if ( m_cursorLocation )
+        m_cursorLocation->setParent(this);
 }
 
 QASTNode::~QASTNode(){

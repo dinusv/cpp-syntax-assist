@@ -25,7 +25,7 @@ function addDestructor(properties, node, save){
         } else {
             var publicAccess = classNode.firstChild('public', 'access');
             if ( publicAccess !== null ){
-                publicAccess.after(destructorDeclaration + '\n');
+                publicAccess.after('\n' + destructorDeclaration + '\n');
             } else {
                 classNode.append('\npublic:\n' + destructorDeclaration);
             }

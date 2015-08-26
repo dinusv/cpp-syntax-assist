@@ -45,8 +45,6 @@ public:
     static int dumpIndentation;
 
 public:
-    QASTNode(QObject* parent = 0):QObject(parent){}
-
     // Constructor / Destructor
     // ------------------------
 
