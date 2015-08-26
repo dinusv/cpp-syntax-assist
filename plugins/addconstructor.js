@@ -19,28 +19,55 @@ function addConstructor(properties, initFields, node, save){
     }
 
     function declareConstructor(classNode, paramList){
-        var destructorDeclaration = classNode.identifier() + '(' + paramList + ');\n';
+        var constructorDeclaration = classNode.identifier() + '(' + paramList + ');\n';
         var constructorArray = classNode.children('constructor');
         if ( constructorArray.length > 0 ){
-            constructorArray[constructorArray.length - 1].afterln(destructorDeclaration + '\n');
+            constructorArray[constructorArray.length - 1].afterln(constructorDeclaration + '\n');
         } else {
             var publicAccess = classNode.firstChild('public', 'access');
             if ( publicAccess !== null ){
-                publicAccess.after('\n' + destructorDeclaration + '\n');
+                publicAccess.after('\n    ' + constructorDeclaration + '\n');
             } else {
-                classNode.append('\npublic:\n' + destructorDeclaration);
+                classNode.append('\npublic:\n    ' + constructorDeclaration);
             }
         }
     }
 
-    function buildConstructorParamList(params){
-        //TODO: Implement
-        return ''
+    function extractParamName(fieldDeclaration){
+        if ( fieldDeclaration.indexOf('_') === 0 )
+            return fieldDeclaration.slice(1);
+        else if ( fieldDeclaration.indexOf('m_') === 0 )
+            return fieldDeclaration.slice(2);
+        else if ( fieldDeclaration.indexOf('_') === fieldDeclaration.length - 1)
+            return fieldDeclaration.slice(0, fieldDeclaration.length - 1);
+        return fieldDeclaration + 'P';
+    }
+
+    function buildConstructorParamList(fields){
+        var nodes = typeof fields === 'undefined' ? [] : fields instanceof NodeCollection ? fields.nodes : fields
+        var paramList = ''
+        for ( var i = 0; i < nodes.length; ++i ){
+            var currentNode = nodes[i]
+            if ( paramList !== '' )
+                paramList += ', '
+            paramList += 'const ' + currentNode.prop("type") + '& ' + extractParamName(currentNode.identifier())
+        }
+        return paramList
     }
 
     function buildConstructorInitializers(fields){
-        //TODO: Implement
-        return ''
+        var nodes = typeof fields === 'undefined' ? [] : fields instanceof NodeCollection ? fields.nodes : fields
+        var initializers = ''
+        for( var i = 0; i < nodes.length; ++i ){
+            var currentNode = nodes[i]
+            initializers += initializers === '' ? '\n    : ' : '\n    , '
+            initializers += currentNode.identifier() + '(' + extractParamName(currentNode.identifier()) + ')'
+        }
+        return initializers
+    }
+
+    function buildConstructorDefinition(name, paramList, initializers){
+        return name + '(' + paramList + ')' + initializers + '\n{\n}\n'
     }
 
     function getSourceNamespaceAndPosition(classNode){
@@ -86,24 +113,27 @@ function addConstructor(properties, initFields, node, save){
     if ( classNode === null )
         throw new Error("Cannot find specified class.");
 
-    // Add destructor declaration
+    // Add constructor declaration
 
-    var parameterList = buildConstructorParamList(initFields);
+    var parameterList   = buildConstructorParamList(initFields)
+    var initializerList = buildConstructorInitializers(initFields)
 
     declareConstructor(classNode, parameterList)
 
-    // Add destructor definition
+    // Add constructor definition
 
     if ( isInline ){
-        classNode.afterln('\ninline ' + classNode.identifier() + '::' + classNode.identifier() + '(){\n}\n');
+        classNode.afterln('\ninline ' + classNode.identifier() + '::' +
+                          buildConstructorDefinition(classNode.identifier(), parameterList, initializerList))
     } else {
         var namespaceAndPosition = getSourceNamespaceAndPosition(classNode);
         if ( namespaceAndPosition === null ){
-            classNode.afterln('\ninline ' + classNode.identifier() + '::' + classNode.identifier() + '(){\n}\n');
+            classNode.afterln('\ninline ' + classNode.identifier() + '::' +
+                              buildConstructorDefinition(classNode.identifier(), parameterList, initializerList));
         } else {
             namespaceAndPosition.node.append(
                 '\n' + namespaceAndPosition.cppBreadCrumbs + classNode.identifier() + '::' +
-                classNode.identifier() + '(){\n}\n'
+                buildConstructorDefinition(classNode.identifier(), parameterList, initializerList)
             );
         }
     }
