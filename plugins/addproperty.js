@@ -17,11 +17,8 @@ function addProperty(type, name, options, node, save){
     }
 
     function findNode(){
-        console.log('here')
         if (typeof node === 'undefined'){
-            console.log('here2')
             var cursorNode = codeBase.selectedNode();
-            console.log(cursorNode.typeName())
             if ( cursorNode.typeName() === 'class' )
                 return cursorNode;
             else
@@ -90,7 +87,7 @@ function addProperty(type, name, options, node, save){
         }
     }
 
-    var member     = '    ' + type + ' m_' + name + ';\n';
+    var member = '    ' + type + ' m_' + name + ';\n';
 
     var methodDecl = ''
     if ( writeGetter ){
@@ -113,18 +110,18 @@ function addProperty(type, name, options, node, save){
 
     if ( writeGetter ){
         methodImpl +=
-            '\n' + isInline ? 'inline ' : '' +
+            '\n' + (isInline ? 'inline ' : '') +
             (isReference ? 'const ' : '') + type +
             (isReference ? '& ' : ' ') +
-            cppSourceLocation +
+            cppSourceNamespace +
             classNode.identifier() + '::' + name +
             '() const{' + '\n    return m_' + name + ';\n}\n'
     }
 
     if ( writeSetter ){
         methodImpl +=
-                '\n' + isInline ? 'inline ' : '' + 'void ' +
-                cppSourceLocation +
+                '\n' + (isInline ? 'inline ' : '') + 'void ' +
+                cppSourceNamespace +
                 classNode.identifier() + '::set' + capitaliseFirstLetter(name) +
                 '(' + (isReference ? 'const ' : '') + type + (isReference ? '& ' : '') +
                 name + '){\n    ';
@@ -144,7 +141,7 @@ function addProperty(type, name, options, node, save){
 
     var privateAccess = classNode.firstChild('private', 'access');
     if ( privateAccess !== null ){
-        var nextPrivateMember = privateAccess.next();
+        var nextPrivateMember = privateAccess;
 
         while ( nextPrivateMember !== null ){
             var afterNextPrivateMember = nextPrivateMember.next();
