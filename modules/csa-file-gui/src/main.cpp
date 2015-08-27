@@ -65,10 +65,8 @@ int main(int argc, char *argv[]){
     // Create Codebase
     // ---------------
 
-    QASTCollapsibleModel* astTreeModel = new QASTCollapsibleModel;
-
     const char* args[] = {"-c", "-x", "c++"};
-    QCodeBase codeBase(args, 3, commandLineArguments.files(), commandLineArguments.projectDir(), astTreeModel);
+    QCodeBase codeBase(args, 3, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
 
     if ( commandLineArguments.isCursorOffsetSet() ){
         codeBase.propagateUserCursor(
@@ -84,6 +82,21 @@ int main(int argc, char *argv[]){
     } else {
         codeBase.propagateUserCursor(0, commandLineArguments.files().first());
     }
+
+    // Connect Codebase Signals
+    // ------------------------
+
+    QASTCollapsibleModel* astTreeModel = new QASTCollapsibleModel(codeBase.astFiles());
+    astTreeModel->selectNode(codeBase.selectedNode());
+
+    QObject::connect(&codeBase, SIGNAL(fileAdded(csa::ast::QASTFile*)),
+                     astTreeModel, SLOT(addFile(csa::ast::QASTFile*)));
+    QObject::connect(&codeBase, SIGNAL(fileAboutToBeReparsed(csa::ast::QASTFile*)),
+                     astTreeModel, SLOT(collapseFile(csa::ast::QASTFile*)));
+    QObject::connect(&codeBase, SIGNAL(fileReparsed(csa::ast::QASTFile*)),
+                     astTreeModel, SLOT(reparseFile(csa::ast::QASTFile*)));
+    QObject::connect(&codeBase, SIGNAL(nodeSelected(csa::ast::QASTNode*)),
+                     astTreeModel, SLOT(selectNode(csa::ast::QASTNode*)));
 
     // Configure Engine
     // ----------------

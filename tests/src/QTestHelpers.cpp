@@ -116,9 +116,9 @@ QJsonObject parseJsonFile(const QString& filePath, bool* parseOk){
     return fileJsonData.object();
 }
 
-QSharedPointer<csa::QCodeBase> createCodeBaseFromFile(const QString& filePath, csa::QCodeBaseObserver* observer){
+QSharedPointer<csa::QCodeBase> createCodeBaseFromFile(const QString& filePath){
     const char* args[] = {"-c", "-x", "c++"};
-    return QSharedPointer<csa::QCodeBase>(new csa::QCodeBase(args, 3, QStringList() << filePath, "", observer));
+    return QSharedPointer<csa::QCodeBase>(new csa::QCodeBase(args, 3, QStringList() << filePath, ""));
 }
 
 }

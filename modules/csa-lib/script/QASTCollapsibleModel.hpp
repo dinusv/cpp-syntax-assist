@@ -21,7 +21,6 @@
 #include <QAbstractListModel>
 #include <QHash>
 
-#include "QCodeBaseObserver.hpp"
 #include "QCSAGlobal.hpp"
 
 namespace csa{
@@ -32,7 +31,7 @@ class QCodeBase;
 }
 
 class QSyntaxTreeItem;
-class Q_CSA_EXPORT QASTCollapsibleModel : public QAbstractListModel, public csa::QCodeBaseObserver{
+class Q_CSA_EXPORT QASTCollapsibleModel : public QAbstractListModel{
 
     Q_OBJECT
     Q_PROPERTY(int selected    READ selected    WRITE setSelected    NOTIFY selectedChanged)
@@ -49,17 +48,14 @@ class Q_CSA_EXPORT QASTCollapsibleModel : public QAbstractListModel, public csa:
     };
 
 public:
-    explicit QASTCollapsibleModel(QObject *parent = 0);
+    explicit QASTCollapsibleModel(const QList<csa::ast::QASTFile*>& files, QObject *parent = 0);
 
-    void clearAndReset();
-    void parse(const QList<csa::ast::QASTFile*>& files);
     QVariant data(const QModelIndex &index, int role) const;
     int  rowCount(const QModelIndex &) const;
     virtual QHash<int, QByteArray> roleNames() const;
 
     int  selected() const;
     void setSelected(int selected);
-    void setSelected(csa::ast::QASTNode* node);
 
     int  expandLevel() const;
     void setExpandLevel(int arg);
@@ -68,12 +64,17 @@ public slots:
     void collapse(int index);
     void expand(int index);
 
+    void addFile(csa::ast::QASTFile* file);
+    void collapseFile(csa::ast::QASTFile* file);
+    void reparseFile(csa::ast::QASTFile* file);
+    void selectNode(csa::ast::QASTNode* node);
+
 signals:
     void selectedChanged();
     void expandLevelChanged();
 
 private:
-    void recursiveParse(csa::ast::QASTNode* node, int indent = 0);
+    void recursiveParse(int index);
     void recursiveCollapse(int index);
     void clear();
 

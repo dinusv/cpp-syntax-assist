@@ -29,7 +29,6 @@ namespace csa{
 
 class QTokenClassifier;
 class QSourceLocation;
-class QCodeBaseObserver;
 
 class QCodeBasePrivate;
 class Q_CSA_EXPORT QCodeBase : public QObject{
@@ -37,20 +36,16 @@ class Q_CSA_EXPORT QCodeBase : public QObject{
     Q_OBJECT
 
 public:
-    explicit QCodeBase(
-            const char* const* translationUnitArgs,
+    explicit QCodeBase(const char* const* translationUnitArgs,
             int                translationUnitNumArgs,
             const QStringList& entries,
             const QString&     searchDir = "",
-            QCodeBaseObserver* observer = 0,
             QObject*           parent = 0);
     ~QCodeBase();
 
     void propagateUserCursor(int offset, const QString& file);
     void propagateUserCursor(int line, int column, const QString& file);
     void propagateUserCursor(const csa::QSourceLocation& location);
-
-    void updateTreeModel();
 
     void setHeaderSearchPattern(const QStringList& pattern);
     void setSourceSearchPattern(const QStringList& pattern);
@@ -83,6 +78,12 @@ public slots:
     csa::ast::QASTFile* findSource(const QString& headerFile);
     csa::ast::QASTFile* findHeader(const QString& sourceFile);
 
+signals:
+    void fileAdded(csa::ast::QASTFile* file);
+    void fileAboutToBeReparsed(csa::ast::QASTFile* file);
+    void fileReparsed(csa::ast::QASTFile* file);
+    void nodeSelected(csa::ast::QASTNode* node);
+
 private:
     // prevent copy
     QCodeBase(const QCodeBase& other);
@@ -104,8 +105,6 @@ private:
 
     csa::ast::QASTFile*    m_root;
     csa::ast::QASTNode*    m_current;
-
-    QCodeBaseObserver*     m_observer;
 
     int                    m_translationUnitNumArgs;
     char**                 m_translationUnitArgs;

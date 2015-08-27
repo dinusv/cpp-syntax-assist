@@ -16,7 +16,6 @@
 
 
 #include "QCodeBase.hpp"
-#include "QCodeBaseObserver.hpp"
 #include "QSourceLocation.hpp"
 #include "QSourceLocation_p.hpp"
 #include "QTokenClassifier.hpp"
@@ -41,15 +40,13 @@ QCodeBase::QCodeBase(const char* const* translationUnitArgs,
         int                translationUnitNumArgs,
         const QStringList &entries,
         const QString&     searchDir,
-        QCodeBaseObserver* observer,
         QObject*           parent)
 
     : QObject(parent)
     , d_ptr(new QCodeBasePrivate)
     , m_projectDir(searchDir != "" ? QDir(searchDir).path() : (entries.size() > 0 ? QFileInfo(entries[0]).path() : ""))
     , m_root(0)
-    , m_current(0)
-    , m_observer(observer){
+    , m_current(0){
 
     Q_D(QCodeBase);
 
@@ -70,7 +67,7 @@ QCodeBase::QCodeBase(const char* const* translationUnitArgs,
         parsePath(*it);
     }
 
-    updateTreeModel();
+//    updateTreeModel();
 }
 
 QCodeBase::~QCodeBase(){
@@ -114,15 +111,7 @@ void QCodeBase::propagateUserCursor(const QSourceLocation &location){
     QASTNode* deepest = m_current->propagateUserCursor(location);
     if ( deepest != 0 ){
         m_current = deepest;
-        if ( m_observer )
-            m_observer->setSelected(m_current);
-    }
-}
-
-void QCodeBase::updateTreeModel(){
-    if ( m_observer ){
-        m_observer->parse(m_files);
-        m_observer->setSelected(m_current);
+        emit nodeSelected(m_current);
     }
 }
 
@@ -141,8 +130,7 @@ bool QCodeBase::select(const QString &searchData, const QString &type){
 bool QCodeBase::select(QASTNode* node){
     if ( node != 0 ){
         m_current = node;
-        if ( m_observer )
-            m_observer->setSelected(m_current);
+        emit nodeSelected(node);
         return true;
     }
     return false;
@@ -221,19 +209,21 @@ QTokenClassifier *QCodeBase::classifierForFile(const QString &file){
 }
 
 void QCodeBase::reparseIndex(int index){
+
     QASTFile* root               = m_files[index];
     QTokenClassifier* classifier = m_classifiers[index];
     CXTranslationUnit transUnit  = classifier->translationUnit();
 
+    emit fileAboutToBeReparsed(root);
+
     clang_reparseTranslationUnit(transUnit, 0, 0, clang_defaultReparseOptions(transUnit));
     CXCursor startCursor = clang_getTranslationUnitCursor(transUnit);
     classifier->reparse();
-    if ( m_observer )
-        m_observer->clearAndReset();
+
     root->removeChildren();
     QASTVisitor::createCSANodeTree(startCursor, root, classifier);
 
-    updateTreeModel();
+    emit fileReparsed(root);
 }
 
 const QList<QASTFile*>& QCodeBase::astFiles() const{
@@ -308,12 +298,13 @@ QASTFile* QCodeBase::parseFile(const QString& file){
     m_files.append(fileRoot);
     m_classifiers.append(fileClassifier);
 
-    if ( !m_current )
-        m_current = fileRoot;
-
     QASTVisitor::createCSANodeTree(startCursor, fileRoot, fileClassifier);
 
-    updateTreeModel();
+//    updateTreeModel();
+    emit fileAdded(fileRoot);
+
+    if ( !m_current )
+        select(fileRoot);
 
     return fileRoot;
 }

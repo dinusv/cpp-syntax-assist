@@ -30,10 +30,7 @@ namespace helpers{
     bool compareJsonValues(const QJsonValue& val1, const QJsonValue& val2);
     QJsonObject parseJsonFile(const QString& filePath, bool* parseOk = 0);
 
-    QSharedPointer<csa::QCodeBase> createCodeBaseFromFile(
-            const QString& filePath,
-            csa::QCodeBaseObserver* observer = 0
-    );
+    QSharedPointer<csa::QCodeBase> createCodeBaseFromFile(const QString& filePath);
 
 }// namespace
 
