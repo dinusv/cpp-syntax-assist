@@ -81,6 +81,10 @@ QString QASTNode::prop(const QString &) const{
     return "";
 }
 
+QString QASTNode::text(){
+    return text(rangeStartLocation(), rangeEndLocation());
+}
+
 QList<QObject*> QASTNode::children() const{
     return castNodeListToObjectList(m_children);
 }
@@ -237,6 +241,13 @@ bool QASTNode::erase(QSourceLocation *from, QSourceLocation *to){
     if ( p )
         return p->erase(from, to);
     return false;
+}
+
+QString QASTNode::text(QSourceLocation *from, QSourceLocation *to){
+    QASTNode* p = astParent();
+    if ( p )
+        return p->text(from, to);
+    return "";
 }
 
 void QASTNode::setAstParent(QASTNode* parent){

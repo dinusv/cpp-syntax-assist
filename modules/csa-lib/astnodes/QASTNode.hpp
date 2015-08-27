@@ -73,6 +73,8 @@ public slots:
     virtual QString content() const;
     virtual QString prop(const QString& key) const;
 
+    QString text();
+
     QList<QObject*> children() const;
     QList<QObject*> children(const QString& type);
 
@@ -153,6 +155,8 @@ protected:
     QAnnotatedTokenSet* tokenSet();
 
     static QList<QObject*> castNodeListToObjectList(const QList<QASTNode*>& list);
+
+    virtual QString text(QSourceLocation *from, QSourceLocation *to);
 
 private:
     // Parameters

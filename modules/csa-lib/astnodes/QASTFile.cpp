@@ -158,7 +158,7 @@ QString QASTFile::readAll(){
     return QTextStream(&file).readAll();
 }
 
-QString QASTFile::read(QSourceLocation* start, QSourceLocation* end){
+QString QASTFile::read(QSourceLocation* start, QSourceLocation* end) const{
     QFile file(identifier());
     if ( !file.open(QIODevice::ReadOnly) ){
         qCritical() << "Cannot open file '" << identifier() << "' for reading.";
@@ -168,7 +168,7 @@ QString QASTFile::read(QSourceLocation* start, QSourceLocation* end){
     QTextStream fileStream(&file);
     fileStream.seek(start->offset());
 
-    return fileStream.read(end->offset() - start->offset() + 1);
+    return fileStream.read(end->offset() - start->offset());
 }
 
 unsigned int QASTFile::size(){
@@ -199,6 +199,10 @@ QString QASTFile::fileNameWithouExtension(){
 
 QString QASTFile::extension(){
     return QFileInfo(identifier()).suffix();
+}
+
+QString QASTFile::text(QSourceLocation *from, QSourceLocation *to){
+    return read(from, to);
 }
 
 }}//namespace

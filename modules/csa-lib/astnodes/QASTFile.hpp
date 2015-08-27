@@ -40,7 +40,7 @@ public slots:
     bool insert(const QString& value, csa::QSourceLocation* location);
     bool erase(csa::QSourceLocation* from, csa::QSourceLocation* to);
     QString readAll();
-    QString read(csa::QSourceLocation* start, csa::QSourceLocation* end);
+    QString read(csa::QSourceLocation* start, csa::QSourceLocation* end) const;
     unsigned int size();
     csa::QSourceLocation* createLocation(unsigned int offset);
     csa::QSourceLocation* createLocation(unsigned int line, unsigned int column);
@@ -48,6 +48,9 @@ public slots:
     QString fileName();
     QString fileNameWithouExtension();
     QString extension();
+
+protected:
+    virtual QString text(QSourceLocation *from, QSourceLocation *to);
 
 private:
     QList<QModifierElementPrivate*> m_modifiers;
