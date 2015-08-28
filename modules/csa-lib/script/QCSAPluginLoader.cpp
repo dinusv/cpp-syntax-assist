@@ -124,6 +124,13 @@ bool QCSAPluginLoader::loadFileFunctions(){
         "    return new NodeCollection(codeBase.createFile(file)); \n"
         "}\n"
 
+        "function parse(file){\n"
+        "    var astFile = codeBase.parseFile(file);\n"
+        "    if (astFile)\n"
+        "        return new NodeCollection(astFile);\n"
+        "    return new NodeCollection();\n"
+        "}\n"
+
         "function reparse(selector){ \n"
         "    if ( selector.indexOf('/', selector.length - 1) === -1 )\n"
         "       selector += '/';\n"
@@ -132,13 +139,6 @@ bool QCSAPluginLoader::loadFileFunctions(){
         "    for (var i = 0; i < astFiles.length; ++i )\n"
         "        ncollect.nodes.push(codeBase.reparseFile(astFiles[i]));\n"
         "    return ncollect; \n"
-        "}\n"
-
-        "function parse(file){\n"
-        "    var astFile = codeBase.parseFile(file);\n"
-        "    if (astFile)\n"
-        "        return new NodeCollection(astFile);\n"
-        "    return new NodeCollection();\n"
         "}\n"
 
         "function makePath(path){ \n"

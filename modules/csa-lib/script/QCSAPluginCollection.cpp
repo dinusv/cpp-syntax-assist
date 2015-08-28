@@ -51,6 +51,21 @@ int QCSAPluginCollection::rowCount(const QModelIndex&) const{
     return d->filteredPlugins.size();
 }
 
+int QCSAPluginCollection::totalRows() const{
+    const Q_D(QCSAPluginCollection);
+    return d->filteredPlugins.size();
+}
+
+const QString& QCSAPluginCollection::name(int index) const{
+    const Q_D(QCSAPluginCollection);
+    return d->filteredPlugins[index]->name;
+}
+
+const QString& QCSAPluginCollection::usage(int index) const{
+    const Q_D(QCSAPluginCollection);
+    return d->filteredPlugins[index]->usage;
+}
+
 void QCSAPluginCollection::registerPlugin(const QVariantMap& pluginData){
     Q_D(QCSAPluginCollection);
     if ( !pluginData.contains("name") ){

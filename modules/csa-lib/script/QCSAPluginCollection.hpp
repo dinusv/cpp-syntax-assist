@@ -25,6 +25,10 @@ public:
     int  rowCount(const QModelIndex &) const;
     virtual QHash<int, QByteArray> roleNames() const;
 
+    int totalRows() const;
+    const QString& name(int index) const;
+    const QString& usage(int index) const;
+
 signals:
 
 public slots:

@@ -19,17 +19,21 @@ public:
     int inputLoop();
 
     static void completeFunctionDelegate(const char* editBuffer, std::vector<std::string>& completions);
-    void completeFunction(const char* editBuffer, std::vector<std::string>& completions);
+    void completeFunction(const char* editBuffer, std::vector<std::string>& completions, bool nameCompletions = true);
 
 private:
     QCSAInputHandler();
     ~QCSAInputHandler();
+
+    void initCompletionList();
 
     QCSAInputHandler(const QCSAInputHandler&);
     QCSAInputHandler& operator =(const QCSAInputHandler&);
 
     csa::QCSAPluginCollection* m_pluginCollection;
     csa::QCSAPluginLoader*     m_scriptEngine;
+
+    QList<QCSACompletionItemPrivate*> m_completionList;
 
 };
 
