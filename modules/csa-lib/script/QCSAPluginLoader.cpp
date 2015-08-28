@@ -15,6 +15,7 @@
 ****************************************************************************/
 
 #include "QCSAPluginLoader.hpp"
+#include "QCSAConsole.hpp"
 #include "QASTNodeConvert.hpp"
 #include "QASTFileConvert.hpp"
 #include "QSourceLocationConvert.hpp"
@@ -30,41 +31,15 @@
 
 namespace csa{
 
-QCSAPluginConsole::QCSAPluginConsole(QObject* parent)
-    : QObject(parent)
-{
-}
-
-QCSAPluginConsole::~QCSAPluginConsole(){
-}
-
-void QCSAPluginConsole::log(const QString& message){
-    qDebug("%s", qPrintable(message));
-}
-
-void QCSAPluginConsole::warn(const QString &message){
-    qWarning("Warning: %s", qPrintable(message));
-}
-
-void QCSAPluginConsole::error(const QString &message){
-    qCritical("Script error: %s", qPrintable(message));
-}
-
-
 QCSAPluginLoader::QCSAPluginLoader(QJSEngine* engine, QObject* parent)
     : QObject(parent)
     , m_engine(engine)
-    , m_pluginDebugger(0)
 {
-    if ( !m_engine->globalObject().hasProperty("console") ){
-        m_pluginDebugger = new QCSAPluginConsole;
-        setContextObject("console", m_pluginDebugger);
-    }
+    if ( !m_engine->globalObject().hasProperty("console") )
+        setContextObject("console", &QCSAConsole::instance());
 }
 
 QCSAPluginLoader::~QCSAPluginLoader(){
-    if ( m_pluginDebugger )
-        delete m_pluginDebugger;
 }
 
 bool QCSAPluginLoader::loadNodeCollection(){
@@ -119,7 +94,7 @@ bool QCSAPluginLoader::loadNodeCollection(){
     );
 
     if ( evaluateResult.isError() ){
-        qCritical("Error loading node collection: %s", qPrintable(evaluateResult.toString()));
+        QCSAConsole::logError("Error loading node collection: " + evaluateResult.toString());
         return false;
     }
     return true;
@@ -136,7 +111,7 @@ bool QCSAPluginLoader::loadNodesFunction(){
     );
 
     if ( evaluateResult.isError() ){
-        qCritical("Error loading nodes() function: %s", qPrintable(evaluateResult.toString()));
+        QCSAConsole::logError("Error loading nodes() function: " + evaluateResult.toString());
         return false;
     }
     return true;
@@ -172,7 +147,7 @@ bool QCSAPluginLoader::loadFileFunctions(){
     );
 
     if ( evaluateResult.isError() ){
-        qCritical("Error loading file functions: %s", qPrintable(evaluateResult.toString()));
+        QCSAConsole::logError("Error loading file functions: " + evaluateResult.toString());
         return false;
     }
     return true;
@@ -184,7 +159,7 @@ int QCSAPluginLoader::loadPlugins(const QString& path){
 
     QFileInfo fInfo(path);
     if ( !fInfo.exists() ){
-        qCritical("%s", qPrintable("Path does not exist: " + path + "."));
+        QCSAConsole::logError("Path does not exist: " + path + ".");
         return -1;
     }
 
@@ -201,8 +176,8 @@ int QCSAPluginLoader::loadPlugins(const QString& path){
     } else {
         QFile configScript(path);
         if ( !configScript.open(QIODevice::ReadOnly) ){
-            qCritical(
-                "%s", qPrintable(("Error opening js configuration file. Make sure the file is present in " + path + ".")));
+            QCSAConsole::logError(
+                "Error opening js configuration file. Make sure the file is present in " + path + ".");
             return 2;
         }
 
@@ -210,7 +185,7 @@ int QCSAPluginLoader::loadPlugins(const QString& path){
         QJSValue evaluateResult = engine->evaluate(configStream.readAll(), configScript.fileName());
 
         if ( evaluateResult.isError() ){
-            qCritical("Uncaught javascript exception: %s", qPrintable(evaluateResult.toString()));
+            QCSAConsole::logError("Uncaught javascript exception: " + evaluateResult.toString());
             return 3;
         }
     }
@@ -224,7 +199,7 @@ bool QCSAPluginLoader::execute(const QString& jsCode, QJSValue& result){
 
     result = m_engine->evaluate(jsCode);
     if ( result.isError() ){
-        qCritical("Uncaught javascript exception: %s", qPrintable(result.toString()));
+        QCSAConsole::logError("Uncaught javascript exception: " + result.toString());
         return false;
     }
 

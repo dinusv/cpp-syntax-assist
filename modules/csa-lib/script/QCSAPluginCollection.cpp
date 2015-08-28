@@ -1,4 +1,5 @@
 #include "QCSAPluginCollection.hpp"
+#include "QCSAConsole.hpp"
 
 namespace csa{
 
@@ -53,7 +54,7 @@ int QCSAPluginCollection::rowCount(const QModelIndex&) const{
 void QCSAPluginCollection::registerPlugin(const QVariantMap& pluginData){
     Q_D(QCSAPluginCollection);
     if ( !pluginData.contains("name") ){
-        qCritical("Cannot find 'name' property in given arguments.");
+        QCSAConsole::logError("Cannot find \'name\' property in given arguments.");
         return;
     }
 

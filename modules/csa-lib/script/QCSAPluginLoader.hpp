@@ -29,20 +29,6 @@ namespace csa{
 
 class QCodeBase;
 
-class Q_CSA_EXPORT QCSAPluginConsole : public QObject{
-
-    Q_OBJECT
-
-public:
-    QCSAPluginConsole(QObject* parent = 0);
-    ~QCSAPluginConsole();
-
-public slots:
-    void log(const QString& message);
-    void warn(const QString& message);
-    void error(const QString& message);
-};
-
 class Q_CSA_EXPORT QCSAPluginLoader : public QObject{
 
     Q_OBJECT
@@ -68,7 +54,6 @@ public slots:
 
 private:
     QJSEngine*          m_engine;
-    QCSAPluginConsole* m_pluginDebugger;
 };
 
 inline QJSEngine* QCSAPluginLoader::engine(){

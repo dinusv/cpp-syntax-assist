@@ -3,6 +3,7 @@
 #include <qqml.h>
 
 #include "QCodeBase.hpp"
+#include "QCSAConsole.hpp"
 #include "QCSAPluginLoader.hpp"
 #include "QCSAConsoleArguments.hpp"
 #include "QCSAPluginCollection.hpp"
@@ -31,6 +32,11 @@ int main(int argc, char* argv[]){
         "\nA configurable C and C++ code parser that exposes the ast model to javascript for manipulation."
     );
 
+    QCSAConsole::setLogLevel(
+        commandLineArguments.logLevel() > 4 ?
+            QCSAConsole::getLogLevel() : static_cast<QCSAConsole::LogLevel>(commandLineArguments.logLevel())
+    );
+
     // Assert Arguments
     // ----------------
 
@@ -39,7 +45,7 @@ int main(int argc, char* argv[]){
               it != commandLineArguments.fileErrors().end();
               ++it )
         {
-            qCritical("%s\n", qPrintable(*it));
+            QCSAConsole::logError(qPrintable(*it));
         }
         return -1;
     }
@@ -68,7 +74,7 @@ int main(int argc, char* argv[]){
     // Configure Engine
     // ----------------
 
-    qmlRegisterUncreatableType<QCSAPluginConsole>(
+    qmlRegisterUncreatableType<QCSAConsole>(
         "CSA", 1, 0, "ConfiguredDebugger", "Only access to the debug property is allowed.");
 
     qmlRegisterUncreatableType<QCSAPluginLoader>(
@@ -109,7 +115,7 @@ int main(int argc, char* argv[]){
         QJSValue result;
         if ( scriptEngine.execute(commandLineArguments.selectedFunction(), result) ){
             if ( !result.isUndefined() )
-                qDebug() << result.toString();
+                QCSAConsole::log(QCSAConsole::General, result.toString());
             return 0;
         }
         return 1;

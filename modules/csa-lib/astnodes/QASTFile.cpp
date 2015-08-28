@@ -20,10 +20,11 @@
 #include "QSourceLocation_p.hpp"
 #include "QTokenClassifier.hpp"
 #include "QAnnotatedTokenSet.hpp"
+#include "QCSAConsole.hpp"
 
 #include <QFile>
-#include <QDebug>
 #include <QFileInfo>
+#include <QTextStream>
 
 namespace csa{ namespace ast{
 
@@ -89,7 +90,7 @@ void QASTFile::save(){
         QString filePath = identifier();
         QFile file(filePath);
         if ( !file.open(QIODevice::ReadOnly) ){
-            qCritical() << "Cannot open file '" << filePath << "' for reading.";
+            QCSAConsole::logError("Cannot open file \'" + filePath + "\' for reading.");
             return;
         }
 
@@ -97,12 +98,13 @@ void QASTFile::save(){
         file.close();
 
         if ( !file.open(QIODevice::WriteOnly | QIODevice::Truncate ) ){
-            qCritical() << "Cannot open file '" << filePath << "' for writing.";
+            QCSAConsole::logError("Cannot open file \'" + filePath + "\' for writing.");
             return;
         }
 
         QTextStream writeStream(&file);
         int startCut, endCut = 0;
+        int insertions, deletions;
 
         for ( QList<QModifierElementPrivate*>::iterator it = m_modifiers.begin(); it != m_modifiers.end(); ++it ){
             QModifierElementPrivate* el = *it;
@@ -111,14 +113,21 @@ void QASTFile::save(){
                 startCut = endCut;
                 endCut   = el->location.offset();
                 writeStream << fileData.mid(startCut, endCut - startCut) << el->data;
+                ++insertions;
             } else {
                 startCut = endCut;
                 endCut   = el->location.offset();
                 writeStream << fileData.mid(startCut, endCut - startCut);
                 endCut   = el->location2.offset();
+                ++deletions;
             }
         }
         writeStream << fileData.mid(endCut);
+
+        QCSAConsole::log(QCSAConsole::Info1,
+            "Total modifications: " + QString::number(insertions) + " insertions and " + QString::number(deletions) +
+            " in file \'" + identifier() +  "\'"
+        );
     }
 }
 
@@ -127,7 +136,7 @@ bool QASTFile::insert(const QString& value, QSourceLocation* location){
          m_modifiers.append(new QModifierElementPrivate(value, *location));
         return true;
     } else {
-        qCritical() << "Cannot insert :'" <<  value << "'. Incompatible file location.";
+        QCSAConsole::logError("Cannot insert :\'" +  value + "'. Incompatible file location.");
         return false;
     }
 }
@@ -142,8 +151,9 @@ bool QASTFile::erase(QSourceLocation* from, QSourceLocation* to){
         m_modifiers.append(new QModifierElementPrivate(*from, *to));
         return true;
     } else {
-        qCritical() << "Cannot erase between positions: " << from->toString() << " and " << to->toString() <<
-                       ". Incompatible file locations.";
+        QCSAConsole::logError(
+            "Cannot erase between positions: " + from->toString() + " and " + to->toString() +
+            ". Incompatible file locations.");
         return false;
     }
 }
@@ -151,7 +161,7 @@ bool QASTFile::erase(QSourceLocation* from, QSourceLocation* to){
 QString QASTFile::readAll(){
     QFile file(identifier());
     if ( !file.open(QIODevice::ReadOnly) ){
-        qCritical() << "Cannot open file '" << identifier() << "' for reading.";
+        QCSAConsole::logError("Cannot open file \'" + identifier() + "\' for reading.");
         return "";
     }
 
@@ -161,7 +171,7 @@ QString QASTFile::readAll(){
 QString QASTFile::read(QSourceLocation* start, QSourceLocation* end) const{
     QFile file(identifier());
     if ( !file.open(QIODevice::ReadOnly) ){
-        qCritical() << "Cannot open file '" << identifier() << "' for reading.";
+        QCSAConsole::logError("Cannot open file \'" + identifier() + "\' for reading.");
         return "";
     }
 

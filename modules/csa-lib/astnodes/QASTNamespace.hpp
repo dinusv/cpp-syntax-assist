@@ -31,13 +31,6 @@ class Q_CSA_EXPORT QASTNamespace : public QASTNode{
     Q_OBJECT
 
 public:
-    enum OffsetId{
-        BEGIN = 0,
-        END,
-        CURSOR
-    };
-
-public:
     QASTNamespace(
             QAnnotatedTokenSet* tokenSet,
             QSourceLocation* cursorLocation,

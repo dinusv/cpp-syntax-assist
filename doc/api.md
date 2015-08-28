@@ -7,7 +7,7 @@ This section describes the js API used to create CSA plugins.
  - [PROPERTIES](#properties)
 	 - codeBase(#codeBase)
  - [METHODS](#methods)
-	 - [nodes](#nodes)
+	 - [nodes()](#nodes)
  - CLASSES
 	 - [Token](api-token.md)
 	 - [SourceLocation](api-sourcelocation.md)

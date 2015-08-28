@@ -16,6 +16,8 @@
 
 
 #include "QCSAFileGuiArguments.hpp"
+#include "QCSAConsole.hpp"
+
 #include <QGuiApplication>
 #include <QCommandLineParser>
 #include <QFileInfo>
@@ -27,6 +29,7 @@ QCSAFileGuiArguments::QCSAFileGuiArguments(
     , m_cursorOffset(-1)
     , m_cursorLine(-1)
     , m_cursorColumn(-1)
+    , m_logLevel(csa::QCSAConsole::getLogLevel())
 {
     m_headerSearchPatterns << "*.c" << "*.C" << "*.cxx" << "*.cpp" << "*.c++" << "*.cc" << "*.cp";
     m_sourceSearchPatterns << "*.h" << "*.H" << "*.hxx" << "*.hpp" << "*.h++" << "*.hh" << "*.hp";
@@ -71,6 +74,13 @@ void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString&
         QCoreApplication::translate("main", "Project base directory.")
     );
     m_commandLineParser->addOption(projectDir);
+
+    QCommandLineOption logLevel("loglevel",
+        QCoreApplication::translate("main", "Log level of the application. (0 - General, 1 - Warning, 2 - Debug, "
+                                            "3 - Info_Level_1, 4 - Info_Level_2"),
+        QCoreApplication::translate("main", "0-4")
+    );
+    m_commandLineParser->addOption(logLevel);
 
     // Process arguments
     // -----------------
@@ -121,6 +131,7 @@ void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString&
         }
     }
 
-    m_projectDir          = m_commandLineParser->isSet(projectDir) ? m_commandLineParser->value(projectDir) : "";
+    m_projectDir = m_commandLineParser->isSet(projectDir) ? m_commandLineParser->value(projectDir) : "";
+    m_logLevel   = m_commandLineParser->isSet(logLevel) ? m_commandLineParser->value(logLevel).toInt() : m_logLevel;
 }
 

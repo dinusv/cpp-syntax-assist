@@ -36,7 +36,8 @@ class Q_CSA_EXPORT QCodeBase : public QObject{
     Q_OBJECT
 
 public:
-    explicit QCodeBase(const char* const* translationUnitArgs,
+    explicit QCodeBase(
+            const char* const* translationUnitArgs,
             int                translationUnitNumArgs,
             const QStringList& entries,
             const QString&     searchDir = "",

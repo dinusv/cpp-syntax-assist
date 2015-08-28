@@ -25,6 +25,8 @@ public:
     int   cursorLine() const;
     int   cursorColumn() const;
 
+    int   logLevel() const;
+
     bool  isExecuteAndQuitSet() const;
 
     QString projectDir() const;
@@ -52,6 +54,8 @@ private:
     int     m_cursorOffset;
     int     m_cursorLine;
     int     m_cursorColumn;
+
+    int     m_logLevel;
 
     bool    m_executeAndQuitFlag;
 };
@@ -94,6 +98,10 @@ inline int QCSAConsoleArguments::cursorLine() const{
 
 inline int QCSAConsoleArguments::cursorColumn() const{
     return m_cursorColumn;
+}
+
+inline int QCSAConsoleArguments::logLevel() const{
+    return m_logLevel;
 }
 
 inline bool QCSAConsoleArguments::isExecuteAndQuitSet() const{

@@ -1,12 +1,14 @@
 #include "QCSAInputHandler.hpp"
 #include "QCSAPluginLoader.hpp"
 #include "QCSAPluginCollection.hpp"
+#include "QCSAConsole.hpp"
 
 #include "linenoise.hpp"
 #include <iostream>
 
 #include <QJSValue>
-#include <QDebug>
+
+using namespace csa;
 
 class QCSACompletionItemPrivate{
 public:
@@ -53,12 +55,12 @@ int QCSAInputHandler::inputLoop(){
                 QJSValue result;
                 if ( m_scriptEngine->execute(QString::fromStdString(line), result) ){
                     loadLastHistory = false;
-                    qDebug() << result.toString();
+                    QCSAConsole::log(QCSAConsole::General, result.toString());
                 } else {
                     loadLastHistory = true;
                 }
             } else {
-                qCritical("\nFatal error: Failed to initialize script engine.");
+                QCSAConsole::logError("Fatal error: Failed to initialize script engine.");
                 return -1;
             }
             linenoise::AddHistory(line.c_str());

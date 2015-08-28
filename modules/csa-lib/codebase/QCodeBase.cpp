@@ -24,6 +24,7 @@
 #include "QASTNode.hpp"
 #include "QASTVisitor.hpp"
 #include "QASTSearch.hpp"
+#include "QCSAConsole.hpp"
 #include <QMap>
 #include <QHash>
 
@@ -36,7 +37,8 @@ public:
     CXIndex index;
 };
 
-QCodeBase::QCodeBase(const char* const* translationUnitArgs,
+QCodeBase::QCodeBase(
+        const char* const* translationUnitArgs,
         int                translationUnitNumArgs,
         const QStringList &entries,
         const QString&     searchDir,
@@ -66,8 +68,6 @@ QCodeBase::QCodeBase(const char* const* translationUnitArgs,
     for ( QStringList::const_iterator it = entries.begin(); it != entries.end(); ++it ){
         parsePath(*it);
     }
-
-//    updateTreeModel();
 }
 
 QCodeBase::~QCodeBase(){
@@ -86,6 +86,7 @@ void QCodeBase::save(){
         QASTFile* root = m_files[i];
         if ( root->hasModifiers() ){
             root->save();
+            QCSAConsole::log(QCSAConsole::Info1, "Saved: " + root->identifier());
             reparseIndex(i);
         }
     }
@@ -235,7 +236,8 @@ void QCodeBase::parsePath(const QString& path){
     if ( !finfo.exists() || finfo.isRelative() ){
         finfo = QFileInfo(m_projectDir + "/" + path);
         if ( !finfo.exists() ){
-            qCritical("Path %s does not exist. Use createFile() or createDirectory() instead.", qPrintable(path));
+            QCSAConsole::logError(
+                "Path \'" + path + "\' does not exist. Use createFile() or createDirectory() instead.");
         }
     }
     if ( finfo.isDir()){
@@ -257,12 +259,12 @@ QASTFile* QCodeBase::parseFile(const QString& file){
     if (!finfo.exists() || finfo.isRelative()){
         finfo = QFileInfo(m_projectDir + "/" + file);
         if ( !finfo.exists() ){
-            qCritical("Path %s does not exist. Use createFile() instead.", qPrintable(finfo.filePath()));
+            QCSAConsole::logError("Path \'" + finfo.filePath() + "\' does not exist. Use createFile() instead.");
             return 0;
         }
     }
     if (finfo.isDir()){
-        qCritical("Path %s is directory. Use parse() function instead.", qPrintable(finfo.filePath()));
+        QCSAConsole::logError("Path \'" + finfo.filePath() + "\' is directory. Use parse() function instead.");
         return 0;
     }
 
@@ -300,7 +302,7 @@ QASTFile* QCodeBase::parseFile(const QString& file){
 
     QASTVisitor::createCSANodeTree(startCursor, fileRoot, fileClassifier);
 
-//    updateTreeModel();
+    QCSAConsole::log(QCSAConsole::Info1, "Parsed: " + fileRoot->identifier());
     emit fileAdded(fileRoot);
 
     if ( !m_current )
@@ -338,7 +340,7 @@ QASTFile* QCodeBase::reparseFile(QASTFile* file){
 QASTFile* QCodeBase::createFile(const QString& filePath){
     QFile file(filePath);
     if ( !file.open(QIODevice::WriteOnly) ){
-        qCritical("Cannot create file %s.", qPrintable(filePath));
+        QCSAConsole::logError("Cannot create file \'" + filePath + "\'.");
         return 0;
     }
     return parseFile(filePath);
@@ -347,11 +349,12 @@ QASTFile* QCodeBase::createFile(const QString& filePath){
 bool QCodeBase::makePath(const QString& path){
     QDir dir(path);
     if ( dir.isRelative() && m_projectDir == ""){
-        qCritical("Failed to create path. There's no project directory configured and path is not absolute.");
+        QCSAConsole::logError(
+            "Failed to create path. There's no project directory configured and path is not absolute.");
         return false;
     }
     if ( !QDir(m_projectDir).mkpath(path) ){
-        qCritical("Failed to create path %s.", qPrintable(path));
+        QCSAConsole::logError("Failed to create path \'" + path + "\'%s.");
         return false;
     }
     return true;

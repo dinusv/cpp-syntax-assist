@@ -42,6 +42,8 @@ public:
     int   cursorLine() const;
     int   cursorColumn() const;
 
+    int   logLevel() const;
+
     const QString& projectDir() const;
 
 private:
@@ -67,6 +69,8 @@ private:
     int     m_cursorOffset;
     int     m_cursorLine;
     int     m_cursorColumn;
+
+    int     m_logLevel;
 };
 
 inline const QStringList& QCSAFileGuiArguments::files() const{
@@ -111,6 +115,10 @@ inline int QCSAFileGuiArguments::cursorColumn() const{
 
 inline const QString &QCSAFileGuiArguments::projectDir() const{
     return m_projectDir;
+}
+
+inline int QCSAFileGuiArguments::logLevel() const{
+    return m_logLevel;
 }
 
 #endif // QCSAFILEGUIARGUMENTS_HPP

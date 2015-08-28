@@ -19,8 +19,6 @@
 #include "QASTNode.hpp"
 #include "QASTFile.hpp"
 
-#include <QDebug>
-
 using namespace csa;
 using namespace csa::ast;
 

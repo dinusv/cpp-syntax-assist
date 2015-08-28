@@ -1,4 +1,6 @@
 #include "QCSAConsoleArguments.hpp"
+#include "QCSAConsole.hpp"
+
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QFileInfo>
@@ -8,6 +10,7 @@ QCSAConsoleArguments::QCSAConsoleArguments(const QCoreApplication &application, 
     , m_cursorOffset(-1)
     , m_cursorLine(-1)
     , m_cursorColumn(-1)
+    , m_logLevel(csa::QCSAConsole::getLogLevel())
     , m_executeAndQuitFlag(false){
 
     m_headerSearchPatterns << "*.c" << "*.C" << "*.cxx" << "*.cpp" << "*.c++" << "*.cc" << "*.cp";
@@ -53,6 +56,13 @@ void QCSAConsoleArguments::initialize(const QCoreApplication &app, const QString
         QCoreApplication::translate("main", "Project base directory.")
     );
     m_commandLineParser->addOption(projectDir);
+
+    QCommandLineOption logLevel("loglevel",
+        QCoreApplication::translate("main", "Log level of the application. (0 - General, 1 - Warning, 2 - Debug, "
+                                            "3 - Info_Level_1, 4 - Info_Level_2"),
+        QCoreApplication::translate("main", "0-4")
+    );
+    m_commandLineParser->addOption(logLevel);
 
     QCommandLineOption executeAndQuit("f",
         QCoreApplication::translate("main", "Execute function and quit.")
@@ -107,6 +117,8 @@ void QCSAConsoleArguments::initialize(const QCoreApplication &app, const QString
             m_cursorLine   = -1;
         }
     }
+
+    m_logLevel = m_commandLineParser->isSet(logLevel) ? m_commandLineParser->value(logLevel).toInt() : m_logLevel;
 
     m_projectDir          = m_commandLineParser->isSet(projectDir) ? m_commandLineParser->value(projectDir) : "";
     m_executeAndQuitFlag  = m_commandLineParser->isSet(executeAndQuit);
