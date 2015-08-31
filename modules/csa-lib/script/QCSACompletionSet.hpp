@@ -64,6 +64,8 @@ public:
     virtual void registerItem(QCSACompletionItem* item);
     void registerItem(int type, const QString& name, const QString& usage, const QString& description);
 
+    QString getDescription(const QString& name, QCSACompletionItem::Type type);
+
     QString getCompletionContext(const QString& text, QCSACompletionItem::Type* type) const;
     QList<QCSACompletionItem*> getCompletionItems(const QString& context, QCSACompletionItem::Type type);
 

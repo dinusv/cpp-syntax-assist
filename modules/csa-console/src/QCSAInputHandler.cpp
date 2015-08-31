@@ -48,22 +48,48 @@ int QCSAInputHandler::inputLoop(){
         std::string line = linenoise::Readline("csa> ", loadLastHistory, &suggestionPosition);
 
         if ( suggestionPosition ){
-            QCSACompletionItem::Type completionType;
-            QString subline = QString::fromStdString(line.substr(0, suggestionPosition));
-            QString context = m_completionSet->getCompletionContext(subline, &completionType);
+            loadLastHistory = true;
+            if ( suggestionPosition > 0 ? line[suggestionPosition - 1] == '?' : false){
+                QString contextSubline = QString::fromStdString(line.substr(0, suggestionPosition - 1));
 
-            QList<QCSACompletionItem*> items = m_completionSet->getCompletionItems(context, completionType);
+                QCSACompletionItem::Type completionType;
+                QString context = m_completionSet->getCompletionContext(contextSubline, &completionType);
+                if ( context != "" ){
+                    std::string::iterator it = line.begin() +  suggestionPosition;
+                    while ( it != line.end() ){
+                        if ( isalnum(*it) || *it == '$' || *it == '_')
+                            context += QChar(*it);
+                        else
+                            break;
+                        ++it;
+                    }
+                }
+                QString description = m_completionSet->getDescription(context, completionType);
+                QCSAConsole::log(QCSAConsole::General, context + "\n" + description);
 
-            for ( QList<QCSACompletionItem*>::iterator it = items.begin(); it != items.end(); ++it ){
-                QCSAConsole::log(QCSAConsole::General, (*it)->name());
+                line = line.substr(0, suggestionPosition - 1) + line.substr(suggestionPosition);
+
+            } else {
+                QCSACompletionItem::Type completionType;
+                QString subline = QString::fromStdString(line.substr(0, suggestionPosition));
+                QString context = m_completionSet->getCompletionContext(subline, &completionType);
+
+                QList<QCSACompletionItem*> items = m_completionSet->getCompletionItems(context, completionType);
+
+                for ( QList<QCSACompletionItem*>::iterator it = items.begin(); it != items.end(); ++it ){
+                    QCSAConsole::log(QCSAConsole::General, (*it)->name());
+                }
             }
+            linenoise::AddHistory(line.c_str());
+
         } else {
-            if (line == "quit()")
+            QString strLine = QString::fromStdString(line).trimmed();
+            if (strLine == "quit()")
                 break;
 
             if ( m_scriptEngine ){
                 QJSValue result;
-                if ( m_scriptEngine->execute(QString::fromStdString(line), result) ){
+                if ( m_scriptEngine->execute(strLine, result) ){
                     loadLastHistory = false;
                     QCSAConsole::log(QCSAConsole::General, result.toString());
                 } else {

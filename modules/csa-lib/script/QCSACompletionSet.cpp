@@ -47,6 +47,14 @@ void QCSACompletionSet::registerItem(int type, const QString &name, const QStrin
     registerItem(new QCSACompletionItem(type, name, usage, description));
 }
 
+QString QCSACompletionSet::getDescription(const QString &name, QCSACompletionItem::Type type){
+    for ( QList<QCSACompletionItem*>::iterator it = m_items.begin(); it != m_items.end(); ++it ){
+        if ( (*it)->name() == name && (*it)->type() & type)
+            return (*it)->description();
+    }
+    return "";
+}
+
 QString QCSACompletionSet::getCompletionContext(const QString &text, QCSACompletionItem::Type *type) const{
 
     bool isEscapeFlag      = false;
