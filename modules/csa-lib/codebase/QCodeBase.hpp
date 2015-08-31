@@ -67,12 +67,11 @@ public slots:
     csa::ast::QASTFile* findFile(const QString& fileName);
     csa::ast::QASTNode* selectedNode();
 
-    csa::QSourceLocation* createLocation(const QString &file, unsigned int offset);
-    csa::QSourceLocation* createLocation(const QString &file, unsigned int line, unsigned int column);
+    csa::QSourceLocation* createLocation(const QString &file, unsigned int lineOrOffset, unsigned int column);
 
     void save();
     bool select(const QString &searchData, const QString &type = "");
-    bool select(csa::ast::QASTNode* node);
+    bool selectNode(csa::ast::QASTNode* node);
 
     QList<QObject*> find(const QString& searchData, const QString& type = "");
 

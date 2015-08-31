@@ -42,8 +42,8 @@ public slots:
     QString readAll();
     QString read(csa::QSourceLocation* start, csa::QSourceLocation* end) const;
     unsigned int size();
-    csa::QSourceLocation* createLocation(unsigned int offset);
-    csa::QSourceLocation* createLocation(unsigned int line, unsigned int column);
+
+    csa::QSourceLocation* createLocation(unsigned int lineOrOffset, unsigned int column = 0);
 
     QString fileName();
     QString fileNameWithouExtension();

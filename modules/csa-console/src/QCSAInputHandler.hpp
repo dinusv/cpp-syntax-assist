@@ -31,7 +31,7 @@ private:
     QCSAInputHandler& operator =(const QCSAInputHandler&);
 
     csa::QCSACompletionSet* m_completionSet;
-    csa::QCSAPluginLoader*   m_scriptEngine;
+    csa::QCSAPluginLoader*  m_scriptEngine;
 
 };
 

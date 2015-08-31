@@ -185,18 +185,13 @@ unsigned int QASTFile::size(){
     return rangeEndLocation()->offset() + 1;
 }
 
-QSourceLocation* QASTFile::createLocation(unsigned int offset){
+QSourceLocation* QASTFile::createLocation(unsigned int lineOrOffset, unsigned int column){
     CXFile clangFile = clang_getFile(tokenSet()->translationUnit(), identifier().toLocal8Bit().constData());
     return new QSourceLocation(
-        createSourceLocation(clang_getLocationForOffset(tokenSet()->translationUnit(), clangFile, offset))
+        createSourceLocation(
+            column == 0 ? clang_getLocationForOffset(tokenSet()->translationUnit(), clangFile, lineOrOffset) :
+                          clang_getLocation(tokenSet()->translationUnit(), clangFile, lineOrOffset, column))
     );
-}
-
-QSourceLocation* QASTFile::createLocation(unsigned int line, unsigned int column){
-    CXFile clangFile = clang_getFile(tokenSet()->translationUnit(), identifier().toLocal8Bit().constData());
-    return new QSourceLocation(
-        createSourceLocation(clang_getLocation(tokenSet()->translationUnit(), clangFile, line, column))
-                );
 }
 
 QString QASTFile::fileName(){
