@@ -1,6 +1,6 @@
 #include "QCSAInputHandler.hpp"
 #include "QCSAPluginLoader.hpp"
-#include "QCSAPluginCollection.hpp"
+#include "QCSACompletionSet.hpp"
 #include "QCSAConsole.hpp"
 
 #include "linenoise.hpp"
@@ -11,66 +11,13 @@
 
 using namespace csa;
 
-class QCSACompletionItemPrivate{
-
-public:
-    enum Type{
-        Object,
-        Global
-    };
-
-    QCSACompletionItemPrivate(
-            QCSACompletionItemPrivate::Type ptype,
-            const std::string& pname,
-            const std::string& pusage)
-        : type(ptype)
-        , name(pname)
-        , usage(pusage)
-    {
-    }
-
-    static QCSACompletionItemPrivate* createGlobal(const std::string& pname, const std::string& pusage);
-    static QCSACompletionItemPrivate* createForObject(const std::string& pname, const std::string& pusage);
-
-    Type        type;
-    std::string name;
-    std::string usage;
-
-    bool match(const char* data, Type ptype);
-};
-
-inline QCSACompletionItemPrivate *QCSACompletionItemPrivate::createGlobal(
-        const std::string &pname,
-        const std::string &pusage)
-{
-    return new QCSACompletionItemPrivate(QCSACompletionItemPrivate::Global, pname, pusage);
-}
-
-inline QCSACompletionItemPrivate *QCSACompletionItemPrivate::createForObject(
-        const std::string &pname,
-        const std::string &pusage)
-{
-    return new QCSACompletionItemPrivate(QCSACompletionItemPrivate::Object, pname, pusage);
-}
-
-inline bool QCSACompletionItemPrivate::match(const char *data, QCSACompletionItemPrivate::Type ptype){
-    if ( ptype == type && name.find(data) == 0 )
-        return true;
-
-    return false;
-}
 
 QCSAInputHandler::QCSAInputHandler(){
     linenoise::SetCompletionCallback(&QCSAInputHandler::completeFunctionDelegate);
     linenoise::SetHistoryMaxLen(20);
-    initCompletionList();
 }
 
 QCSAInputHandler::~QCSAInputHandler(){
-    for(QList<QCSACompletionItemPrivate*>::iterator it = m_completionList.begin(); it != m_completionList.end(); ++it){
-        delete *it;
-    }
-    m_completionList.clear();
 }
 
 QCSAInputHandler &QCSAInputHandler::getInstance(){
@@ -80,26 +27,16 @@ QCSAInputHandler &QCSAInputHandler::getInstance(){
 
 void QCSAInputHandler::initPluginHandlers(
         csa::QCSAPluginLoader *scriptEngine,
-        csa::QCSAPluginCollection *pluginCollection)
+        csa::QCSACompletionSet *pluginCollection)
 {
-    m_scriptEngine     = scriptEngine;
-    m_pluginCollection = pluginCollection;
+    m_scriptEngine  = scriptEngine;
+    m_completionSet = pluginCollection;
+
+    initCompletionList();
 }
 
 void QCSAInputHandler::initCompletionList(){
-    m_completionList.append(QCSACompletionItemPrivate::createGlobal("quit()", "quit()"));
-    m_completionList.append(QCSACompletionItemPrivate::createGlobal("console", "console"));
-    m_completionList.append(QCSACompletionItemPrivate::createGlobal("cl", "console.log("));
-    m_completionList.append(QCSACompletionItemPrivate::createGlobal("nodes(selector)", "nodes("));
-    m_completionList.append(QCSACompletionItemPrivate::createGlobal("createFile(file)", "createFile(\'"));
-    m_completionList.append(QCSACompletionItemPrivate::createGlobal("reparse(file)", "reparse(\'"));
-    m_completionList.append(QCSACompletionItemPrivate::createGlobal("parse(file)", "parse(\'"));
-    m_completionList.append(QCSACompletionItemPrivate::createGlobal("makePath(path)", "makePath(\'"));
-    m_completionList.append(QCSACompletionItemPrivate::createGlobal("codeBase", "codeBase"));
-
-    m_completionList.append(QCSACompletionItemPrivate::createForObject("children()", "children()"));
-    m_completionList.append(QCSACompletionItemPrivate::createForObject("find(selector, typename)", "find(\'"));
-    m_completionList.append(QCSACompletionItemPrivate::createForObject("remove()", "remove()"));
+    m_completionSet->initDefaultCompletions();
 }
 
 int QCSAInputHandler::inputLoop(){
@@ -111,11 +48,14 @@ int QCSAInputHandler::inputLoop(){
         std::string line = linenoise::Readline("csa> ", loadLastHistory, &suggestionPosition);
 
         if ( suggestionPosition ){
-            std::string subline = line.substr(0, suggestionPosition);
-            std::vector<std::string> completions;
-            completeFunction(subline.c_str(), completions);
-            for ( std::vector<std::string>::iterator it = completions.begin(); it != completions.end(); ++it ){
-                QCSAConsole::log(QCSAConsole::General, QString(it->c_str()));
+            QCSACompletionItem::Type completionType;
+            QString subline = QString::fromStdString(line.substr(0, suggestionPosition));
+            QString context = m_completionSet->getCompletionContext(subline, &completionType);
+
+            QList<QCSACompletionItem*> items = m_completionSet->getCompletionItems(context, completionType);
+
+            for ( QList<QCSACompletionItem*>::iterator it = items.begin(); it != items.end(); ++it ){
+                QCSAConsole::log(QCSAConsole::General, (*it)->name());
             }
         } else {
             if (line == "quit()")
@@ -140,98 +80,22 @@ int QCSAInputHandler::inputLoop(){
 }
 
 void QCSAInputHandler::completeFunctionDelegate(const char *editBuffer, std::vector<std::string> &completions){
-    getInstance().completeFunction(editBuffer, completions, false);
+    getInstance().completeFunction(editBuffer, completions);
 }
 
-void QCSAInputHandler::completeFunction(
-        const char *editBuffer,
-        std::vector<std::string> &completions,
-        bool nameCompletions)
-{
+void QCSAInputHandler::completeFunction(const char *editBuffer, std::vector<std::string> &completions){
 
-    bool isEscapeFlag      = false;
-    bool isQuoteFlag       = false;
-    bool isDoubleQuoteFlag = false;
-    bool isGlobalFlag      = true;
+    QCSACompletionItem::Type completionType;
+    QString editBufferStr = editBuffer;
+    QString context = m_completionSet->getCompletionContext(editBufferStr, &completionType);
+    QString preffix = editBufferStr.mid(0, editBufferStr.length() - context.length());
 
-    int  lastPunctuationPosition = 0;
+    QList<QCSACompletionItem*> items = m_completionSet->getCompletionItems(context, completionType);
 
-    int position = 0;
-    const char* c = editBuffer;
-    while (*c){
-        switch(*c){
-        case '\\':
-            if ( isQuoteFlag || isDoubleQuoteFlag ){
-                isEscapeFlag = !isEscapeFlag;
-            }
-            break;
-        case '\'':
-            if ( !isEscapeFlag && isQuoteFlag ){
-                isQuoteFlag = false;
-            } else if ( !isQuoteFlag ){
-                isQuoteFlag = true;
-            }
-            isEscapeFlag = false;
-            break;
-        case '\"':
-            if ( !isEscapeFlag && isDoubleQuoteFlag ){
-                isDoubleQuoteFlag = false;
-            } else if ( !isDoubleQuoteFlag ){
-                isDoubleQuoteFlag = true;
-            }
-            isEscapeFlag = false;
-            break;
-        case '(':
-        case ')':
-        case '{':
-        case '}':
-        case ';':
-        case ',':
-        case '+':
-        case '-':
-        case '*':
-        case ' ':
-        case '/':
-            if ( !isQuoteFlag && !isDoubleQuoteFlag ){
-                lastPunctuationPosition = position + 1;
-                isGlobalFlag = true;
-            }
-            break;
-        case '.':
-            if ( !isQuoteFlag && !isDoubleQuoteFlag ){
-                lastPunctuationPosition = position + 1;
-                isGlobalFlag = false;
-            }
-            break;
-        }
-
-        ++position;
-        ++c;
-    }
-
-    const char* editBufferCut = &editBuffer[lastPunctuationPosition];
-    if ( strlen(editBufferCut) > 0 && !isQuoteFlag && !isDoubleQuoteFlag ){
-
-        // Search local completions
-
-        for ( QList<QCSACompletionItemPrivate*>::iterator it = m_completionList.begin();
-              it != m_completionList.end();++it
-        ){
-            if ( (*it)->match(
-                     editBufferCut,
-                    isGlobalFlag ? QCSACompletionItemPrivate::Global : QCSACompletionItemPrivate::Object) )
-            {
-                completions.push_back(nameCompletions ? (*it)->name : (*it)->usage);
-            }
-        }
-
-        // Search plugin completions
-
-        m_pluginCollection->filter(QString(editBufferCut));
-        for ( int i = 0; i < m_pluginCollection->totalRows(); ++i ){
-            completions.push_back(
-                nameCompletions ? m_pluginCollection->name(i).toStdString() : m_pluginCollection->usage(i).toStdString()
-            );
-        }
+    for ( QList<QCSACompletionItem*>::iterator it = items.begin(); it != items.end(); ++it ){
+        int bracketIndex = (*it)->usage().indexOf('(');
+        if ( bracketIndex > -1 )
+            ++bracketIndex;
+        completions.push_back( (preffix + (*it)->usage().mid(0, bracketIndex)).toStdString() );
     }
 }
