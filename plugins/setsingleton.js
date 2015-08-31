@@ -106,3 +106,13 @@ function setSingleton(node, save){
         codeBase.save()
 }
 
+NodeCollection.registerPlugin({
+    'name' : 'setSinleton()',
+    'usage' : 'setSingleton()',
+    'description' : 'Generates singleton features to the current class.'
+}).prototype.setSingleton = function(properties){
+    this.nodes.forEach(function (v, i){
+        setSingleton(v, false)
+    });
+    codeBase.save()
+}
