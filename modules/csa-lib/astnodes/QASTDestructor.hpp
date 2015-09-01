@@ -33,10 +33,10 @@ public:
             QSourceLocation* rangeEndLocation,
             QASTNode* parent = 0);
 
-    QString content() const;
+    QString description() const;
 };
 
-inline QString QASTDestructor::content() const{
+inline QString QASTDestructor::description() const{
     return identifier();
 }
 

@@ -73,7 +73,7 @@ QString QASTNode::breadcrumbs() const{
     return identifier().replace('/', "\\/");
 }
 
-QString QASTNode::content() const{
+QString QASTNode::description() const{
     return identifier();
 }
 
@@ -161,7 +161,7 @@ void QASTNode::dump(QString& out, int depth) const{
     for ( int i = 0; i < depth * dumpIndentation; ++i )
         space.append(" ");
 
-    out.append(space + content() + "\n");
+    out.append(space + description() + "\n");
     for ( NodeList::const_iterator it = m_children.begin(); it != m_children.end(); ++it ){
         (*it)->dump(out, depth + 1);
     }

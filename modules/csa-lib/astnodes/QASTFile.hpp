@@ -34,7 +34,7 @@ public:
 
     bool hasModifiers();
     void save();
-    QString content() const;
+    QString description() const;
 
 public slots:
     bool insert(const QString& value, csa::QSourceLocation* location);
@@ -57,7 +57,7 @@ private:
 
 };
 
-inline QString QASTFile::content() const{
+inline QString QASTFile::description() const{
     return QString("file \"") + identifier() + "\"";
 }
 

@@ -65,25 +65,29 @@ public:
     const csa::ast::QASTNode* astParent() const;
 
 public slots:
+    // Property Getters
+    // ----------------
+
     QString typeName() const;
     QString identifier() const;
 
     QString breadcrumbs() const;
 
-    virtual QString content() const;
+    virtual QString description() const;
     virtual QString prop(const QString& key) const;
 
     QString text();
 
-    QList<QObject*> children(const QString& type = "");
-
     virtual QList<QObject*> arguments() const;
-
     QList<QObject*> associatedTokens();
+
+    // Traversal
+    // ---------
 
     csa::ast::QASTNode* astParent();
     csa::ast::QASTNode* firstChild(const QString& identifier = "", const QString& typeString = "");
     csa::ast::QASTNode* lastChild(const QString& identifier = "", const QString& typeString = "");
+    QList<QObject*> children(const QString& type = "");
 
     csa::ast::QASTNode* next();
     csa::ast::QASTNode* prev();
@@ -92,6 +96,9 @@ public slots:
     QList<QObject*> find(const QString& searchData, const QString& type = "");
     csa::ast::QASTNode* findFirst(const QString& searchData, const QString& type = "");
     csa::ast::QASTNode* parentFind(const QString& typeString);
+
+    // Modifiers
+    // ---------
 
     void append(const QString& value);
     void prepend(const QString& value);
