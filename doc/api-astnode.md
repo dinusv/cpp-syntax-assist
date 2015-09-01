@@ -230,58 +230,162 @@ var text = codeBase.findFile(nodeStart.filePath()).read(nodeStart, nodeEnd);
 
 ### find(searchData, [type])
 
+> Search for a node recursively using a specified search pattern.
+
+##### PARAMETERS
+
+ * **searchData** `String` Search pattern
+ * **type** `String` Only nodes of the speicifed type will be returned if the type is present.
+
+##### RETURNS
+
+ * `Array` List of found ASTNodes.
+
 ---
 
 ### findFirst(searchData, [type])
+
+> Search for the first node matching the search pattern.
+
+##### PARAMETERS
+
+ * **searchData** `String` Search pattern.
+ * **type** The node will be matched against the type property if present.
+
+##### RETURNS
+
+ * `ASTNode` Found node, `null` if none is found.
 
 ---
 
 ### parentFind(type)
 
+> Find the first parent of the specified type recursively.
+
+##### PARAMETERS
+
+ * **type** `String` Type to search for.
+
+##### RETURNS
+
+ * `ASTNode` Found node, `null` if none is found.
+
 ---
 
 ### append(value)
+
+> Append the value within the nodes body.
+
+##### PARAMETERS
+
+ * **value** `String` The value to append
 
 ---
 
 ### prepend(value)
 
+> Prepend the value within the nodes body.
+
+##### PARAMETERS
+
+ * **value** `String` The value to prepend.
+
 ---
 
 ### before(value)
+
+> Insert the value just before the node start range.
+
+##### PARAMETERS
+
+ * **value** `String` The value to insert.
 
 ---
 
 ### after(value)
 
+> Insert the value after the node end range.
+
+##### PARAMETERS
+
+ * **value** `String` The value to insert.
+
 ---
 
 ### afterln(value)
+
+> Insert the value within the line succeeding the node end range.
+
+Equivalent to:
+
+```js
+var nodeStart = node.rangeStartLocation()
+var nodeEnd   = node.rangeEndLocation()
+var file      = node.findFile(nodeStart.filePath());
+
+var nodeEndl  = file.createLocation(nodeEnd.line() + 1, 1);
+
+var text = codeBase.findFile(nodeStart.filePath()).insert(value, nodeEndl);
+```
+
+##### PARAMETERS
+
+ * **value** `String` The value to insert.
 
 ---
 
 ### remove()
 
+> Remove the current node.
+
 ---
 
 ### rangeStartLocation()
+
+> Get the location the node starts from.
+
+##### RETURNS
+
+ * `SourceLocation`
 
 ---
 
 ### rangeEndLocation()
 
+> Get the location where the node ends.
+
+##### RETURNS
+
+ * `SourceLocation`
+
 ---
 
 ### cursorLocation()
 
+> If this node contains a user cursor, retrieve the cursor location.
+
+##### RETURNS
+
+ * `SourceLocation` The location of the cursor, `null` if the node does not contain a cursor. 
+
 ---
 
 ### bodyStartLocation()
+
+> If the node contains a body (e.g. a 'class' or 'namespace' node), get the body start location. The rangeStartLocation() is returned otherwise.
+
+##### RETURNS
+
+ * `SourceLocation` 
 
 ---
 
 ### bodyEndLocation()
 
 
+> If the node contains a body (e.g. a 'class' or 'namespace' node), get the body end location. The rangeEndLocation() is returned otherwise.
 
-		
+##### RETURNS
+
+ * `SouceLocation`
+
