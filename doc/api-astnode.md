@@ -230,7 +230,7 @@ var text = codeBase.findFile(nodeStart.filePath()).read(nodeStart, nodeEnd);
 
 ### find(searchData, [type])
 
-> Search for a node recursively using a specified search pattern.
+> Search for the set of nodes recursively using a specified search pattern.
 
 ##### PARAMETERS
 
