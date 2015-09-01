@@ -49,6 +49,7 @@ var associatedTokens = firstClassNode.associatedTokens();
 
  * `ASTNode`
 
+---
 
 ### name()
 
@@ -58,6 +59,7 @@ var associatedTokens = firstClassNode.associatedTokens();
 
  * `String`
 
+---
 
 ### kind()
 
@@ -67,6 +69,7 @@ var associatedTokens = firstClassNode.associatedTokens();
 
  * `Token.TokenKind`
 
+---
 
 ### before(value)
 
@@ -76,6 +79,7 @@ var associatedTokens = firstClassNode.associatedTokens();
 
  * **value** `String` Value to be inserted.
 
+---
 
 ### after(value)
 
@@ -85,6 +89,7 @@ var associatedTokens = firstClassNode.associatedTokens();
 
  * **value** `String` Value to be inserted.
 
+---
 
 ### afterln(value)
 

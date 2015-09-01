@@ -43,6 +43,7 @@ Source locations can become invalid once the codeBase is saved. The creationLoca
 
  * `Number` 
 
+---
 
 ### column()
 
@@ -52,6 +53,7 @@ Source locations can become invalid once the codeBase is saved. The creationLoca
 
  * `Number` 
 
+---
 
 ### offset()
 
@@ -61,6 +63,8 @@ Source locations can become invalid once the codeBase is saved. The creationLoca
 
  * `Number`
 
+---
+
 ### fileName()
 
 > Returns the file name associated with this location.
@@ -68,6 +72,8 @@ Source locations can become invalid once the codeBase is saved. The creationLoca
 ##### RETURNS
 
  * `String` 
+
+---
 
 ### filePath()
 
