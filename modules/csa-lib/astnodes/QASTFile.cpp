@@ -104,7 +104,7 @@ void QASTFile::save(){
 
         QTextStream writeStream(&file);
         int startCut, endCut = 0;
-        int insertions, deletions;
+        int insertions = 0, deletions = 0;
 
         for ( QList<QModifierElementPrivate*>::iterator it = m_modifiers.begin(); it != m_modifiers.end(); ++it ){
             QModifierElementPrivate* el = *it;

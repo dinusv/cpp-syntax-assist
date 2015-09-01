@@ -23,6 +23,7 @@ else:unix: LIBS += -L$$OUT_PWD/../build/ -lcsa
 
 include(linenoise/cpplinenoise.pri)
 include(src/csa-console.pri)
+include($$PWD/../../3rdparty/libclang.pro)
 
 # Add Deployment
 # --------------
