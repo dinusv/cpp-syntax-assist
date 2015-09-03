@@ -79,7 +79,7 @@ function addDestructor(properties, node, save){
 
     declareDestructor(classNode)
 
-    // Add destructor definition
+    // Add destructor definitionr
 
     if ( isInline ){
         classNode.afterln('\ninline ' + classNode.identifier() + '::~' + classNode.identifier() + '(){\n}\n');
