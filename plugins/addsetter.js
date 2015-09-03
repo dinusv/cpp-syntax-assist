@@ -42,7 +42,7 @@ function addSetter(isInline, node, save){
 
     if ( nodeArgName === nodeName )
         nodeArgName = 'arg';
-    var setterDeclaration =  'void ' + setterName + '(' + fieldNode.prop("type") + ' ' + nodeArgName + ');\n';
+    var setterDeclaration =  '    void ' + setterName + '(' + fieldNode.prop("type") + ' ' + nodeArgName + ');\n';
 
     var fieldClass = fieldNode.astParent();
     var fieldClassName = fieldClass.identifier();
@@ -118,7 +118,7 @@ function addSetter(isInline, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addSetter',
+    'name' : 'addSetter(flags)',
     'usage' : 'addSetter()',
     'description' :
         'Adds a setter to the class field node.\n' +

@@ -49,7 +49,7 @@ void QCSACompletionSet::registerItem(int type, const QString &name, const QStrin
 
 QString QCSACompletionSet::getDescription(const QString &name, QCSACompletionItem::Type type){
     for ( QList<QCSACompletionItem*>::iterator it = m_items.begin(); it != m_items.end(); ++it ){
-        if ( (*it)->name() == name && (*it)->type() & type)
+        if ( (*it)->name().mid(0, (*it)->name().indexOf('(')) == name && (*it)->type() & type)
             return (*it)->description();
     }
     return "";

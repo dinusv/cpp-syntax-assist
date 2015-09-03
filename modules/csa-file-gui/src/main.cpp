@@ -72,6 +72,8 @@ int main(int argc, char *argv[]){
     // Create Codebase
     // ---------------
 
+    //"-include", "/home/dinu/CSADemo/macro.h"
+
     const char* args[] = {"-c", "-x", "c++"};
     QCodeBase codeBase(args, 3, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
 

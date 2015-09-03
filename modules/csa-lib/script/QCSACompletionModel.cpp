@@ -58,7 +58,7 @@ void QCSACompletionModel::filter(const QString& text){
 
     QCSACompletionItem::Type completionType;
     QString context = d->completion->getCompletionContext(text, &completionType);
-    if ( d->lastFilter != context ){
+    if ( d->lastFilter != context && context != ""){
         d->lastFilter = context;
         d->completionPrefix = text.mid(0, text.length() - context.length());
         emit completionPrefixChanged();

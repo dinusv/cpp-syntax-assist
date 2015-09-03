@@ -81,7 +81,7 @@ bool QCSAPluginLoader::loadNodeCollection(){
         "    for ( var i = 0; i < this.nodes.length; ++i ){ \n"
         "        if ( i !== 0 ) \n"
         "            ret += ', '; \n"
-        "        ret += '\\'' + this.nodes[i].content() + '\\''; \n"
+        "        ret += '\\'' + this.nodes[i].description() + '\\''; \n"
         "    } \n"
         "    return ret + ']'; \n"
         "} \n"

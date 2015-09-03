@@ -42,7 +42,7 @@ function addNamespace(name, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addNamespace',
+    'name' : 'addNamespace()',
     'usage' : 'addNamespace()',
     'description' :
         'Adds a namespace to the selected file or namespace.'

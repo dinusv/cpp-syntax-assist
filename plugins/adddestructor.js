@@ -18,7 +18,7 @@ function addDestructor(properties, node, save){
     }
 
     function declareDestructor(classNode){
-        var destructorDeclaration = '~' + classNode.identifier() + '();\n';
+        var destructorDeclaration = '    ~' + classNode.identifier() + '();\n';
         var constructorArray = classNode.children('constructor');
         if ( constructorArray.length > 0 ){
             constructorArray[constructorArray.length - 1].afterln(destructorDeclaration + '\n');
@@ -100,7 +100,7 @@ function addDestructor(properties, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addDestructor',
+    'name' : 'addDestructor()',
     'usage' : 'addDestructor()',
     'description' :
         'Adds a destructor to the current class or parent class.' +

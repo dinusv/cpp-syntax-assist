@@ -31,10 +31,14 @@ class Q_CSA_EXPORT QASTFile : public QASTNode{
 
 public:
     QASTFile(QAnnotatedTokenSet* tokenSet, const QString& file, QSourceLocation* endOfFile);
+    ~QASTFile();
 
     bool hasModifiers();
+    void clearModifiers();
     void save();
     QString description() const;
+
+    void reparseSize();
 
 public slots:
     bool insert(const QString& value, csa::QSourceLocation* location);

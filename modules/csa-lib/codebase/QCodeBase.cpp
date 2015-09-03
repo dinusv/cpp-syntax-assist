@@ -46,7 +46,7 @@ QCodeBase::QCodeBase(
 
     : QObject(parent)
     , d_ptr(new QCodeBasePrivate)
-    , m_projectDir(searchDir != "" ? QDir(searchDir).path() : (entries.size() > 0 ? QFileInfo(entries[0]).path() : ""))
+    , m_projectDir(searchDir != "" ? QDir(searchDir).path() : "")
     , m_root(0)
     , m_current(0){
 
@@ -61,6 +61,17 @@ QCodeBase::QCodeBase(
     for ( int i = 0 ;i < m_translationUnitNumArgs; ++i ){
         m_translationUnitArgs[i] = new char[strlen(translationUnitArgs[i]) + 1];
         strcpy(m_translationUnitArgs[i], translationUnitArgs[i]);
+    }
+
+    if ( m_projectDir == "" ){
+        if ( entries.size() > 0 ){
+            QFileInfo entryInfo(entries[0]);
+            if ( entryInfo.isAbsolute() )
+                m_projectDir = entryInfo.path();
+            else
+                m_projectDir = QDir::currentPath();
+        } else
+            m_projectDir = QDir::currentPath();
     }
 
     d->index = clang_createIndex(0, 0);
@@ -223,6 +234,7 @@ void QCodeBase::reparseIndex(int index){
 
     root->removeChildren();
     QASTVisitor::createCSANodeTree(startCursor, root, classifier);
+    root->reparseSize();
 
     emit fileReparsed(root);
 }

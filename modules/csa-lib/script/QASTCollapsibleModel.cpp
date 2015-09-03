@@ -162,7 +162,6 @@ void QASTCollapsibleModel::expand(int index){
         }
 
         endInsertRows();
-
     }
 }
 
@@ -179,7 +178,7 @@ void QASTCollapsibleModel::addFile(QASTFile *file){
 
 void QASTCollapsibleModel::collapseFile(QASTFile *file){
     for ( int i = 0; i < m_items.size(); ++i ){
-        if ( m_items[i]->node == file ){
+        if ( m_items[i]->node == file && !m_items[i]->isCollapsed ){
             recursiveCollapse(i);
             return;
         }

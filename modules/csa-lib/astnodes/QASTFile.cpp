@@ -26,6 +26,8 @@
 #include <QFileInfo>
 #include <QTextStream>
 
+#include <QDebug>
+
 namespace csa{ namespace ast{
 
 // QInsertionElementPrivate
@@ -79,8 +81,19 @@ QASTFile::QASTFile(QAnnotatedTokenSet* tokenSet, const QString& file, QSourceLoc
     setIdentifier(file);
 }
 
+QASTFile::~QASTFile(){
+    clearModifiers();
+}
+
 bool QASTFile::hasModifiers(){
     return m_modifiers.size() > 0;
+}
+
+void QASTFile::clearModifiers(){
+    for ( QList<QModifierElementPrivate*>::iterator it = m_modifiers.begin(); it != m_modifiers.end(); ++it ){
+        delete *it;
+    }
+    m_modifiers.clear();
 }
 
 void QASTFile::save(){
@@ -128,7 +141,17 @@ void QASTFile::save(){
             "Total modifications: " + QString::number(insertions) + " insertions and " + QString::number(deletions) +
             " in file \'" + identifier() +  "\'"
         );
+
+        clearModifiers();
     }
+}
+
+void QASTFile::reparseSize(){
+    rangeEndLocation()->assign( createSourceLocation(
+        identifier(),
+        QTokenClassifier::getFileSize(identifier().toStdString().c_str()),
+        tokenSet()->translationUnit()
+    ));
 }
 
 bool QASTFile::insert(const QString& value, QSourceLocation* location){
