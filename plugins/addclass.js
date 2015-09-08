@@ -48,7 +48,7 @@ function addClass(name, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addClass',
+    'name' : 'addClass()',
     'usage' : 'addClass(\'name\')',
     'description' :
         'Adds a class to the selected file, namespace or class.'

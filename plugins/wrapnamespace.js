@@ -19,8 +19,8 @@ function wrapNamespace(name){
 
 if ( typeof plugins !== 'undefined' ){
     plugins.registerPlugin({
-        'name' : 'wrapNamespace',
-        'usage' : 'wrapNamespace("name")',
+        'name' : 'wrapNamespace(name)',
+        'usage' : 'wrapNamespace(\'name\')',
         'description' : 'wraps the current class or namespace into the specified namespace "name".'
     });
 }

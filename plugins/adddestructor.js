@@ -100,10 +100,10 @@ function addDestructor(properties, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addDestructor',
+    'name' : 'addDestructor()',
     'usage' : 'addDestructor()',
     'description' :
-        'Adds a destructor to the current class or parent class.' +
+        'Adds a destructor to the current class or parent class.\n' +
         'Params:\n' +
             '\t\'i\' <bool> : \'i\' - to enable inline destructor.'
 }).prototype.addDestructor = function(properties){

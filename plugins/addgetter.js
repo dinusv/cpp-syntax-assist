@@ -137,7 +137,7 @@ function addGetter(properties, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addGetter',
+    'name' : 'addGetter()',
     'usage' : 'addGetter(\'\')',
     'description' :
         'Adds a getter to the class field node.\n' +

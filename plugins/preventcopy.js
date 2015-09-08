@@ -38,7 +38,7 @@ function preventCopy(){
 
 if ( typeof plugins !== 'undefined' ){
     plugins.registerPlugin({
-        'name' : 'preventCopy',
+        'name' : 'preventCopy()',
         'usage' : 'preventCopy()',
         'description' : 'adds the private copy constructor and assignment operator to the selected or parent class.'
     });

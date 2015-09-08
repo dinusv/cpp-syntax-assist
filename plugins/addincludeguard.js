@@ -31,7 +31,7 @@ function addIncludeGuard(node, save){
 
 
 NodeCollection.registerPlugin({
-    'name' : 'addIncludeGuard',
+    'name' : 'addIncludeGuard()',
     'usage' : 'addIncludeGuard()',
     'description' : 'Adds an include guard to the current file.'
 }).prototype.addIncludeGuard = function(properties){

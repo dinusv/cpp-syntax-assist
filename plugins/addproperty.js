@@ -196,9 +196,20 @@ function addProperty(type, name, options, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addProperty',
+    'name' : 'addProperty(type, name, flags)',
     'usage' : 'addProperty("type", "name", "inrgsq")',
-    'description' : 'adds a property to the given class within the hierarchy.'
+    'description' :
+        'Adds a property (field, setter, getter) to the given class within the hierarchy.\n' +
+        'Params:\n' +
+            '\ttype <string> : Type of the property.\n' +
+            '\tname <string> : Name of the property.\n' +
+            '\tflags <string> : Property flags : \n' +
+                '\t\t\'g\' : Create getter.\n' +
+                '\t\t\'s\' : Create setter.\n' +
+                '\t\t\'i\' : Use inline getter and setter.\n' +
+                '\t\t\'r\' : Use reference for setters and getters.\n' +
+                '\t\t\'q\' : Add Q_PROPERTY for QObject classes.\n' +
+                '\t\t\'n\' : Added notify signal if property changes.'
 }).prototype.addProperty = function(type, name, options){
     this.nodes.forEach(function (v, i){
         addProperty(type, name, options, v, false)

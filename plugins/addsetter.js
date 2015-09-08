@@ -118,8 +118,8 @@ function addSetter(isInline, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addSetter',
-    'usage' : 'addSetter()',
+    'name' : 'addSetter()',
+    'usage' : 'addSetter(\'i\')',
     'description' :
         'Adds a setter to the class field node.\n' +
         'Params:\n' +

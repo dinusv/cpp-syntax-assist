@@ -42,10 +42,9 @@ function addNamespace(name, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addNamespace',
-    'usage' : 'addNamespace()',
-    'description' :
-        'Adds a namespace to the selected file or namespace.'
+    'name' : 'addNamespace(name)',
+    'usage' : 'addNamespace(\'name\')',
+    'description' : 'Adds a namespace to the selected file or namespace.'
 }).prototype.addNamespace = function(name){
     this.nodes.forEach(function (name, v, i){
         addNamespace(name, v, false)

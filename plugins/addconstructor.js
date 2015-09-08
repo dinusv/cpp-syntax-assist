@@ -143,12 +143,12 @@ function addConstructor(properties, initFields, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addConstructor',
-    'usage' : 'addConstructor()',
+    'name' : 'addConstructor()',
+    'usage' : 'addConstructor(\'i\')',
     'description' :
-        'Adds a constructor to the current class or parent class.' +
+        'Adds a constructor to the current class or parent class.\n' +
         'Params:\n' +
-            '\tproperties <bool> : \'i\' - to enable inline constructor.' +
+            '\tflags <bool> : \'i\' - to enable inline constructor.\n' +
             '\tinitFields <Array> : array of node fields to initialize.'
 
 }).prototype.addConstructor = function(properties, initFields){
