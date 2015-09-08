@@ -22,7 +22,8 @@
 #include "QCodeBase.hpp"
 #include "QCSAConsole.hpp"
 #include "QCSAPluginLoader.hpp"
-#include "QCSAPluginCollection.hpp"
+#include "QCSACompletionSet.hpp"
+#include "QCSACompletionModel.hpp"
 
 #include "QSourceLocation.hpp"
 #include "QAnnotatedToken.hpp"
@@ -71,6 +72,8 @@ int main(int argc, char *argv[]){
     // Create Codebase
     // ---------------
 
+    //"-include", "/home/dinu/CSADemo/macro.h"
+
     const char* args[] = {"-c", "-x", "c++"};
     QCodeBase codeBase(args, 3, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
 
@@ -116,7 +119,10 @@ int main(int argc, char *argv[]){
     qmlRegisterUncreatableType<QCSAPluginLoader>(
         "CSA", 1, 0, "ConfiguredEngine", "Only access to the engine property is allowed.");
 
-    qmlRegisterUncreatableType<QCSAPluginCollection>(
+    qmlRegisterUncreatableType<csa::QCSACompletionSet>(
+        "CSA", 1, 0, "CompletionSet", "Only access to the plugins property is allowed.");
+
+    qmlRegisterUncreatableType<csa::QCSACompletionModel>(
         "CSA", 1, 0, "PluginCollection", "Only access to the plugins property is allowed.");
 
     qmlRegisterUncreatableType<csa::QCodeBase>(
@@ -134,7 +140,9 @@ int main(int argc, char *argv[]){
     qmlRegisterUncreatableType<csa::ast::QASTNode>(
         "CSA", 1, 0, "ASTNode", "ASTNode is available only as a property.");
 
-    QCSAPluginCollection pluginCollection;
+    QCSACompletionSet set;
+    QCSACompletionModel pluginCollection(&set);
+    set.initDefaultCompletions();
 
     QCSAPluginLoader scriptEngine(new QJSEngine);
     scriptEngine.setContextObject("codeBase", &codeBase);

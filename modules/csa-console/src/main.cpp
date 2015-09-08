@@ -6,12 +6,12 @@
 #include "QCSAConsole.hpp"
 #include "QCSAPluginLoader.hpp"
 #include "QCSAConsoleArguments.hpp"
-#include "QCSAPluginCollection.hpp"
 #include "QCSAInputHandler.hpp"
 
 #include "QSourceLocation.hpp"
 #include "QAnnotatedToken.hpp"
 #include "QCSAPluginLoader.hpp"
+#include "QCSACompletionSet.hpp"
 #include "QASTNode.hpp"
 #include "QASTFile.hpp"
 
@@ -80,8 +80,8 @@ int main(int argc, char* argv[]){
     qmlRegisterUncreatableType<QCSAPluginLoader>(
         "CSA", 1, 0, "ConfiguredEngine", "Only access to the engine property is allowed.");
 
-    qmlRegisterUncreatableType<QCSAPluginCollection>(
-        "CSA", 1, 0, "PluginCollection", "Only access to the plugins property is allowed.");
+    qmlRegisterUncreatableType<QCSACompletionSet>(
+        "CSA", 1, 0, "CompletinoSet", "Only access to the plugins property is allowed.");
 
     qmlRegisterUncreatableType<csa::QCodeBase>(
         "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
@@ -98,11 +98,11 @@ int main(int argc, char* argv[]){
     qmlRegisterUncreatableType<csa::ast::QASTNode>(
         "CSA", 1, 0, "ASTNode", "ASTNode is available only as a property.");
 
-    QCSAPluginCollection pluginCollection;
+    QCSACompletionSet completionSet;
 
     QCSAPluginLoader scriptEngine(new QJSEngine);
     scriptEngine.setContextObject("codeBase", &codeBase);
-    scriptEngine.setContextObject("plugins",  &pluginCollection);
+    scriptEngine.setContextObject("plugins",  &completionSet);
     scriptEngine.loadNodeCollection();
     scriptEngine.loadNodesFunction();
     scriptEngine.loadFileFunctions();
@@ -121,6 +121,6 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    QCSAInputHandler::getInstance().initPluginHandlers(&scriptEngine, &pluginCollection);
+    QCSAInputHandler::getInstance().initPluginHandlers(&scriptEngine, &completionSet);
     return QCSAInputHandler::getInstance().inputLoop();
 }

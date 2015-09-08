@@ -73,7 +73,7 @@ QString QASTNode::breadcrumbs() const{
     return identifier().replace('/', "\\/");
 }
 
-QString QASTNode::content() const{
+QString QASTNode::description() const{
     return identifier();
 }
 
@@ -85,11 +85,10 @@ QString QASTNode::text(){
     return text(rangeStartLocation(), rangeEndLocation());
 }
 
-QList<QObject*> QASTNode::children() const{
-    return castNodeListToObjectList(m_children);
-}
-
 QList<QObject*> QASTNode::children(const QString& type){
+    if ( type == "" )
+        return castNodeListToObjectList(m_children);
+
     QList<QObject*> foundChildren;
     for ( ConstIterator it = m_children.begin(); it != m_children.end(); ++it ){
         if ( (*it)->typeName() == type )
@@ -120,18 +119,6 @@ QList<QObject*> QASTNode::associatedTokens(){
 QASTNode* QASTNode::astParent(){
     QASTNode* p = qobject_cast<QASTNode*>(parent());
     return p;
-}
-
-QASTNode* QASTNode::firstChild(){
-    if ( m_children.size() > 0 )
-        return m_children.first();
-    return 0;
-}
-
-QASTNode* QASTNode::lastChild(){
-    if ( m_children.size() > 0 )
-        return m_children.last();
-    return 0;
 }
 
 void QASTNode::append(const QString& value){
@@ -174,7 +161,7 @@ void QASTNode::dump(QString& out, int depth) const{
     for ( int i = 0; i < depth * dumpIndentation; ++i )
         space.append(" ");
 
-    out.append(space + content() + "\n");
+    out.append(space + description() + "\n");
     for ( NodeList::const_iterator it = m_children.begin(); it != m_children.end(); ++it ){
         (*it)->dump(out, depth + 1);
     }
@@ -269,12 +256,12 @@ QASTNode *QASTNode::propagateUserCursor(const QSourceLocation &location){
     return base;
 }
 
-QASTNode *QASTNode::find(QASTNode* node){
+QASTNode *QASTNode::findNode(QASTNode* node){
     for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
         QASTNode* child = *it;
         if ( child == node )
             return child;
-        QASTNode* childFind = child->find(node);
+        QASTNode* childFind = child->findNode(node);
         if ( childFind != 0 )
             return childFind;
     }

@@ -72,7 +72,9 @@ ApplicationWindow {
                     selectIndexedItem()
 
                 } else {
-                    if (configuredEngine.execute(text)){
+                    if ( text.trim() === "quit()" )
+                        Qt.quit();
+                    else if (configuredEngine.execute(text)){
                         text = ""
                     }
                 }
@@ -99,7 +101,7 @@ ApplicationWindow {
             }
 
             function selectIndexedItem(){
-                text               = pluginList.currentItem.usage
+                text               = plugins.completionPrefix + pluginList.currentItem.usage
                 pluginList.visible = false
 
                 positionCursor()

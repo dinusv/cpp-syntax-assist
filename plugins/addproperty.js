@@ -93,7 +93,7 @@ function addProperty(type, name, options, node, save){
     if ( writeGetter ){
         methodDecl +=
             '    ' + (isReference ? 'const ' : '') + type +
-            (isReference ? '& '   : '') + name  +
+            (isReference ? '& '   : ' ') + name  +
             '() const;\n'
     }
 
@@ -124,17 +124,17 @@ function addProperty(type, name, options, node, save){
                 cppSourceNamespace +
                 classNode.identifier() + '::set' + capitaliseFirstLetter(name) +
                 '(' + (isReference ? 'const ' : '') + type + (isReference ? '& ' : '') +
-                name + '){\n    ';
+                name + '){\n';
 
         if ( isNotifiable ){
             methodImpl +=
-                    'if (m_' + name  + ' != ' + name + '){\n' +
+                    '    if (m_' + name  + ' != ' + name + '){\n' +
                     '        m_' + name + ' = ' + name + ';\n' +
                     '        emit ' + name + 'Changed();\n' +
                     '    }\n';
         } else {
             methodImpl +=
-                    '    m_' + propertyDeclaration + ' = ' + propertyDeclaration + ';\n';
+                    '    m_' + name + ' = ' + name + ';\n';
         }
         methodImpl += '}\n';
     }

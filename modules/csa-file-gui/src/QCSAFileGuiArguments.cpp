@@ -122,7 +122,7 @@ void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString&
             bool lineConvertOk, colConvertOk;
             m_cursorLine   = lineColSplit[0].toInt(&lineConvertOk);
             m_cursorColumn = lineColSplit[1].toInt(&colConvertOk);
-            if ( lineConvertOk || colConvertOk )
+            if ( !lineConvertOk || !colConvertOk )
                 m_commandLineParser->showHelp(3);
 
         } else {

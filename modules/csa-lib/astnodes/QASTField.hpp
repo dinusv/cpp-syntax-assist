@@ -33,14 +33,14 @@ public:
             QSourceLocation* rangeEndLocation,
             QASTNode* parent = 0);
 
-    virtual QString content() const;
+    virtual QString description() const;
     virtual QString prop(const QString &key) const;
 
 private:
     QString m_fieldType;
 };
 
-inline QString QASTField::content() const{
+inline QString QASTField::description() const{
     return m_fieldType + " " + identifier();
 }
 

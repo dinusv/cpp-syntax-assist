@@ -6,7 +6,7 @@
 #include <QList>
 
 namespace csa{
-    class QCSAPluginCollection;
+    class QCSACompletionSet;
     class QCSAPluginLoader;
 }
 
@@ -15,7 +15,7 @@ class QCSAInputHandler{
 
 public:
     static QCSAInputHandler& getInstance();
-    void initPluginHandlers(csa::QCSAPluginLoader* scriptEngine, csa::QCSAPluginCollection* pluginCollection);
+    void initPluginHandlers(csa::QCSAPluginLoader* scriptEngine, csa::QCSACompletionSet *pluginCollection);
     int inputLoop();
 
     static void completeFunctionDelegate(const char* editBuffer, std::vector<std::string>& completions);
@@ -25,11 +25,13 @@ private:
     QCSAInputHandler();
     ~QCSAInputHandler();
 
+    void initCompletionList();
+
     QCSAInputHandler(const QCSAInputHandler&);
     QCSAInputHandler& operator =(const QCSAInputHandler&);
 
-    csa::QCSAPluginCollection* m_pluginCollection;
-    csa::QCSAPluginLoader*     m_scriptEngine;
+    csa::QCSACompletionSet* m_completionSet;
+    csa::QCSAPluginLoader*  m_scriptEngine;
 
 };
 

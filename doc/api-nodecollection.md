@@ -6,7 +6,7 @@ The NodeCollection class defines a collection of nodes to apply plugins to. The 
 nodes('Date', 'class').addField('int', 'm_month');
 ```
 
-The collection also manages the actual plugins, by providing a function for them to register and describe themselves for CSA's auto-completion feature.
+The collection also manages the actual plugins, by providing a function for them to register and describe themselves for CSAs auto-completion feature.
 
 The prototype property is then used to add the actual function. The local nodes stored within the collection are then sent to the function as arguments. If the function can process only a single node at a time, the nodes need to be iterated and sent separately.
 

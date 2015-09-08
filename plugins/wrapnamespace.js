@@ -14,14 +14,17 @@ function wrapNamespace(name){
         last.afterln('\n} // namespace\n');
     }
 
-    codeBase.save();
+    if (typeof save !== 'undefined' ? save : true)
+        codeBase.save()
 }
 
-if ( typeof plugins !== 'undefined' ){
-    plugins.registerPlugin({
-        'name' : 'wrapNamespace(name)',
-        'usage' : 'wrapNamespace(\'name\')',
-        'description' : 'wraps the current class or namespace into the specified namespace "name".'
+NodeCollection.registerPlugin({
+    'name' : 'wrapNamespace(name)',
+    'usage' : 'wrapNamespace(\'name\')',
+    'description' : 'Wraps the current class or namespace into the specified namespace "name".'
+}).prototype.wrapNamespace = function(){
+    this.nodes.forEach(function (v, i){
+        wrapNamespace(v, false)
     });
+    codeBase.save()
 }
-

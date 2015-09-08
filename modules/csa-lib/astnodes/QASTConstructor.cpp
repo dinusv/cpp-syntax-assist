@@ -128,7 +128,7 @@ QASTConstructor::QASTConstructor(
     clang_disposeString(id);
 }
 
-QString QASTConstructor::content() const{
+QString QASTConstructor::description() const{
     QString base = "";
     base += identifier();
     base += "(";
@@ -136,10 +136,10 @@ QString QASTConstructor::content() const{
     bool firstArg = true;
     for ( QList<csa::ast::QASTNode*>::const_iterator it = m_arguments.begin(); it != m_arguments.end(); ++it ){
         if ( firstArg ){
-            base    += (*it)->content();
+            base    += (*it)->description();
             firstArg = false;
         } else {
-            base    += ", " + (*it)->content();
+            base    += ", " + (*it)->description();
         }
     }
     base += ")";

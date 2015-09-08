@@ -81,7 +81,7 @@ QASTMethodArgument::QASTMethodArgument(
 QASTMethodArgument::~QASTMethodArgument(){
 }
 
-QString QASTMethodArgument::content() const{
+QString QASTMethodArgument::description() const{
     return m_type + " " + identifier();
 }
 

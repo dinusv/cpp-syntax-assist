@@ -1,45 +1,44 @@
 
-function preventCopy(){
+function preventCopy(node, save){
 
-    var cursorNode = codeBase.selectedNode();
-    var classNode  = null;
-
-    if ( cursorNode.typeName() === 'class' )
-        classNode = cursorNode;
-    else {
-        classNode = cursorNode.parentFind('class');
-    }
-
-    if ( classNode === null ){
-        var loadedFiles = codeBase.files();
-        for (var index = 0; index < loadedFiles.length; ++index) {
-            classNode = loadedFiles[index].findFirst('class');
-            if ( classNode !== null )
-                break;
+    function findNode(){
+        if (typeof node === 'undefined'){
+            var cursorNode = codeBase.selectedNode();
+            if ( cursorNode.typeName() === 'class' )
+                return cursorNode;
+            else
+                return cursorNode.parentFind('class');
+        } else {
+            return (node.typeName() === 'class' ? node : null);
         }
     }
 
+    var classNode = findNode()
     if ( classNode === null )
-        throw "Cannot find specified class";
+        throw new Error("Cannot find specified class");
 
     var preventCopyText =
-        '\t' + classNode.identifier() + '(const ' + classNode.identifier() + '& other);\n' +
-        '\t' + classNode.identifier() + '& operator = (const ' + classNode.identifier() + '& other);\n\n';
+        '    ' + classNode.identifier() + '(const ' + classNode.identifier() + '& other);\n' +
+        '    ' + classNode.identifier() + '& operator = (const ' + classNode.identifier() + '& other);\n\n';
 
-    var privateAccess = classNode.astChild('access', 'private');
+    var privateAccess = classNode.firstChild('access', 'private');
     if ( privateAccess !== null ){
         privateAccess.afterln(preventCopyText);
     } else {
         classNode.append('\nprivate:\n' + preventCopyText);
     }
 
-    codeBase.save();
+    if (typeof save !== 'undefined' ? save : true)
+        codeBase.save()
 }
 
-if ( typeof plugins !== 'undefined' ){
-    plugins.registerPlugin({
-        'name' : 'preventCopy()',
-        'usage' : 'preventCopy()',
-        'description' : 'adds the private copy constructor and assignment operator to the selected or parent class.'
+NodeCollection.registerPlugin({
+    'name' : 'preventCopy()',
+    'usage' : 'preventCopy()',
+    'description' : "Adds private copy constructor to class."
+}).prototype.preventCopy = function(){
+    this.nodes.forEach(function (v, i){
+        preventCopy(v, false)
     });
+    codeBase.save()
 }

@@ -42,6 +42,7 @@ else:unix: LIBS += -L$$OUT_PWD/../build/ -lcsa
 # ----------------
 
 include($$PWD/src/csa-file-gui.pri)
+CONFIG(static):include($$PWD/../../3rdparty/libclang.pro)
 
 # Configure name and resources
 # ----------------------------

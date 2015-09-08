@@ -31,10 +31,14 @@ class Q_CSA_EXPORT QASTFile : public QASTNode{
 
 public:
     QASTFile(QAnnotatedTokenSet* tokenSet, const QString& file, QSourceLocation* endOfFile);
+    ~QASTFile();
 
     bool hasModifiers();
+    void clearModifiers();
     void save();
-    QString content() const;
+    QString description() const;
+
+    void reparseSize();
 
 public slots:
     bool insert(const QString& value, csa::QSourceLocation* location);
@@ -42,8 +46,8 @@ public slots:
     QString readAll();
     QString read(csa::QSourceLocation* start, csa::QSourceLocation* end) const;
     unsigned int size();
-    csa::QSourceLocation* createLocation(unsigned int offset);
-    csa::QSourceLocation* createLocation(unsigned int line, unsigned int column);
+
+    csa::QSourceLocation* createLocation(unsigned int lineOrOffset, unsigned int column = 0);
 
     QString fileName();
     QString fileNameWithouExtension();
@@ -57,7 +61,7 @@ private:
 
 };
 
-inline QString QASTFile::content() const{
+inline QString QASTFile::description() const{
     return QString("file \"") + identifier() + "\"";
 }
 

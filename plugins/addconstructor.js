@@ -20,16 +20,12 @@ function addConstructor(properties, initFields, node, save){
 
     function declareConstructor(classNode, paramList){
         var constructorDeclaration = classNode.identifier() + '(' + paramList + ');\n';
-        var constructorArray = classNode.children('constructor');
-        if ( constructorArray.length > 0 ){
-            constructorArray[constructorArray.length - 1].afterln(constructorDeclaration + '\n');
+
+        var publicAccess = classNode.firstChild('public', 'access');
+        if ( publicAccess !== null ){
+            publicAccess.after('\n    ' + constructorDeclaration + '\n');
         } else {
-            var publicAccess = classNode.firstChild('public', 'access');
-            if ( publicAccess !== null ){
-                publicAccess.after('\n    ' + constructorDeclaration + '\n');
-            } else {
-                classNode.append('\npublic:\n    ' + constructorDeclaration);
-            }
+            classNode.append('\npublic:\n    ' + constructorDeclaration);
         }
     }
 
@@ -143,14 +139,13 @@ function addConstructor(properties, initFields, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addConstructor()',
-    'usage' : 'addConstructor(\'i\')',
+    'name' : 'addConstructor(properties, initFields)',
+    'usage' : 'addConstructor()',
     'description' :
         'Adds a constructor to the current class or parent class.\n' +
         'Params:\n' +
-            '\tflags <bool> : \'i\' - to enable inline constructor.\n' +
-            '\tinitFields <Array> : array of node fields to initialize.'
-
+            '\tproperties <String> : \'i\' - to enable inline constructor.\n' +
+            '\tinitFields <Array> : Array or NodeCollection of node fields to initialize.\n'
 }).prototype.addConstructor = function(properties, initFields){
     this.nodes.forEach(function (v, i){
         addConstructor(properties, initFields, v, false)

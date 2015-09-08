@@ -40,7 +40,7 @@ function addClass(name, node, save){
             usedNode.append('\nclass ' + name + '{\n};');
         }
     } else {
-        lastParentNodeChild.after('\nclass ' + name + '{\n};')
+        lastParentNodeChild.afterln('class ' + name + '{\n};\n')
     }
 
     if (typeof save !== 'undefined' ? save : true)
@@ -48,7 +48,7 @@ function addClass(name, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addClass()',
+    'name' : 'addClass(name)',
     'usage' : 'addClass(\'name\')',
     'description' :
         'Adds a class to the selected file, namespace or class.'

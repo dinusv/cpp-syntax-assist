@@ -46,7 +46,7 @@ QCodeBase::QCodeBase(
 
     : QObject(parent)
     , d_ptr(new QCodeBasePrivate)
-    , m_projectDir(searchDir != "" ? QDir(searchDir).path() : (entries.size() > 0 ? QFileInfo(entries[0]).path() : ""))
+    , m_projectDir(searchDir != "" ? QDir(searchDir).path() : "")
     , m_root(0)
     , m_current(0){
 
@@ -61,6 +61,17 @@ QCodeBase::QCodeBase(
     for ( int i = 0 ;i < m_translationUnitNumArgs; ++i ){
         m_translationUnitArgs[i] = new char[strlen(translationUnitArgs[i]) + 1];
         strcpy(m_translationUnitArgs[i], translationUnitArgs[i]);
+    }
+
+    if ( m_projectDir == "" ){
+        if ( entries.size() > 0 ){
+            QFileInfo entryInfo(entries[0]);
+            if ( entryInfo.isAbsolute() )
+                m_projectDir = entryInfo.path();
+            else
+                m_projectDir = QDir::currentPath();
+        } else
+            m_projectDir = QDir::currentPath();
     }
 
     d->index = clang_createIndex(0, 0);
@@ -121,14 +132,14 @@ bool QCodeBase::select(const QString &searchData, const QString &type){
         QASTFile* file = *it;
         QASTNode* foundChild = file->findFirst(searchData, type);
         if ( foundChild ){
-            select(foundChild);
+            selectNode(foundChild);
             return true;
         }
     }
     return false;
 }
 
-bool QCodeBase::select(QASTNode* node){
+bool QCodeBase::selectNode(QASTNode* node){
     if ( node != 0 ){
         m_current = node;
         emit nodeSelected(node);
@@ -223,6 +234,7 @@ void QCodeBase::reparseIndex(int index){
 
     root->removeChildren();
     QASTVisitor::createCSANodeTree(startCursor, root, classifier);
+    root->reparseSize();
 
     emit fileReparsed(root);
 }
@@ -306,7 +318,7 @@ QASTFile* QCodeBase::parseFile(const QString& file){
     emit fileAdded(fileRoot);
 
     if ( !m_current )
-        select(fileRoot);
+        selectNode(fileRoot);
 
     return fileRoot;
 }
@@ -369,35 +381,12 @@ QASTFile *QCodeBase::findFile(const QString &fileName){
     return 0;
 }
 
-QSourceLocation* QCodeBase::createLocation(const QString& file, unsigned int offset){
-    QTokenClassifier* classifier    = classifierForFile(file);
-    if ( !classifier )
-        return 0;
-
-    CXTranslationUnit transUnit     = classifier->translationUnit();
-    CXSourceLocation sourceLocation = clang_getLocationForOffset(
-                transUnit,
-                clang_getFile(transUnit, file.toStdString().c_str()),
-                offset);
-    if ( !clang_equalLocations(sourceLocation, clang_getNullLocation()) )
-        return new QSourceLocation(createSourceLocation(sourceLocation));
-
-    return 0;
-}
-
-QSourceLocation* QCodeBase::createLocation(const QString& file, unsigned int line, unsigned int column){
-    QTokenClassifier* classifier    = classifierForFile(file);
-    if ( !classifier )
-        return 0;
-
-    CXTranslationUnit transUnit     = classifier->translationUnit();
-    CXSourceLocation sourceLocation = clang_getLocation(
-                transUnit,
-                clang_getFile(transUnit, file.toStdString().c_str()),
-                line,
-                column);
-    if ( !clang_equalLocations(sourceLocation, clang_getNullLocation()) )
-        return new QSourceLocation(createSourceLocation(sourceLocation));
+QSourceLocation* QCodeBase::createLocation(const QString& file, unsigned int lineOrOffset, unsigned int column){
+    for ( int i = 0; i < m_files.size(); ++i ){
+        if ( m_files[i]->identifier() == file ){
+            return m_files[i]->createLocation(lineOrOffset, column);
+        }
+    }
     return 0;
 }
 

@@ -54,6 +54,19 @@ public:
     const QList<csa::ast::QASTFile*>& astFiles() const;
 
 public slots:
+    csa::QSourceLocation* createLocation(const QString &file, unsigned int lineOrOffset, unsigned int column);
+
+    void save();
+
+    bool select(const QString &searchData, const QString &type = "");
+    bool selectNode(csa::ast::QASTNode* node);
+    csa::ast::QASTNode* selectedNode();
+
+    void setProjectDir(const QString& path);
+    QList<QObject*> find(const QString& searchData, const QString& type = "");
+    csa::ast::QASTFile* findFile(const QString& fileName);
+    csa::ast::QASTFile* findSource(const QString& headerFile);
+    csa::ast::QASTFile* findHeader(const QString& sourceFile);
     QList<QObject*> files() const;
 
     void parsePath(const QString& path);
@@ -61,23 +74,6 @@ public slots:
     csa::ast::QASTFile* reparseFile(csa::ast::QASTFile* file);
     csa::ast::QASTFile* createFile(const QString& filePath);
     bool makePath(const QString& path);
-
-    void setProjectDir(const QString& path);
-
-    csa::ast::QASTFile* findFile(const QString& fileName);
-    csa::ast::QASTNode* selectedNode();
-
-    csa::QSourceLocation* createLocation(const QString &file, unsigned int offset);
-    csa::QSourceLocation* createLocation(const QString &file, unsigned int line, unsigned int column);
-
-    void save();
-    bool select(const QString &searchData, const QString &type = "");
-    bool select(csa::ast::QASTNode* node);
-
-    QList<QObject*> find(const QString& searchData, const QString& type = "");
-
-    csa::ast::QASTFile* findSource(const QString& headerFile);
-    csa::ast::QASTFile* findHeader(const QString& sourceFile);
 
 signals:
     void fileAdded(csa::ast::QASTFile* file);

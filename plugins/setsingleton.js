@@ -1,9 +1,5 @@
 
-function addDestructor(properties, node, save){
-
-    var isInline = false;
-    if ( typeof properties !== 'undefinde' )
-        isInline = properties === 'i';
+function setSingleton(node, save){
 
     function findNode(){
         if (typeof node === 'undefined'){
@@ -17,18 +13,28 @@ function addDestructor(properties, node, save){
         }
     }
 
-    function declareDestructor(classNode){
-        var destructorDeclaration = '    ~' + classNode.identifier() + '();\n';
-        var constructorArray = classNode.children('constructor');
-        if ( constructorArray.length > 0 ){
-            constructorArray[constructorArray.length - 1].afterln(destructorDeclaration + '\n');
+    function declarePrivateMembers(classNode){
+        var privateMemberDeclaration =
+                '    ' + classNode.identifier() + '(' + ');\n' +
+                '    ' + classNode.identifier() + '(const ' + classNode.identifier() + '&);\n' +
+                '    ' + classNode.identifier() + '& operator =(const ' + classNode.identifier() + '&);\n';
+
+        var privateAccess = classNode.firstChild('private', 'access');
+        if ( privateAccess !== null ){
+            privateAccess.after('\n' + privateMemberDeclaration + '\n');
         } else {
-            var publicAccess = classNode.firstChild('public', 'access');
-            if ( publicAccess !== null ){
-                publicAccess.after('\n' + destructorDeclaration + '\n');
-            } else {
-                classNode.append('\npublic:\n' + destructorDeclaration);
-            }
+            classNode.append('\nprivate:\n    ' + privateMemberDeclaration);
+        }
+    }
+
+    function declarePublicMembers(classNode){
+        var publicMemberDeclaration = 'static ' + classNode.identifier() + '& instance();';
+
+        var privateAccess = classNode.firstChild('public', 'access');
+        if ( privateAccess !== null ){
+            privateAccess.after('\n    ' + publicMemberDeclaration + '\n');
+        } else {
+            classNode.append('\npublic:\n    ' + publicMemberDeclaration + '\n');
         }
     }
 
@@ -75,24 +81,25 @@ function addDestructor(properties, node, save){
     if ( classNode === null )
         throw new Error("Cannot find specified class.");
 
-    // Add destructor declaration
+    declarePrivateMembers(classNode)
+    declarePublicMembers(classNode)
 
-    declareDestructor(classNode)
-
-    // Add destructor definitionr
-
-    if ( isInline ){
-        classNode.afterln('\ninline ' + classNode.identifier() + '::~' + classNode.identifier() + '(){\n}\n');
+    var namespaceAndPosition = getSourceNamespaceAndPosition(classNode);
+    if ( namespaceAndPosition === null ){
+        classNode.afterln(
+            '\ninline ' + classNode.identifier() + '& ' + classNode.identifier() + '::' + 'instance(){\n' +
+            '    static ' + classNode.identifier() + ' inst;\n' +
+            '    return inst;\n' +
+            '}'
+        );
     } else {
-        var namespaceAndPosition = getSourceNamespaceAndPosition(classNode);
-        if ( namespaceAndPosition === null ){
-            classNode.afterln('\ninline ' + classNode.identifier() + '::~' + classNode.identifier() + '(){\n}\n');
-        } else {
-            namespaceAndPosition.node.append(
-                '\n' + namespaceAndPosition.cppBreadCrumbs + classNode.identifier() + '::~' +
-                classNode.identifier() + '(){\n}\n'
-            );
-        }
+        namespaceAndPosition.node.append(
+            '\n' + classNode.identifier() + '& ' + namespaceAndPosition.cppBreadCrumbs +
+            classNode.identifier() + '::' + 'instance(){\n' +
+            '    static ' + classNode.identifier() + ' inst;\n' +
+            '    return inst;\n' +
+            '}'
+        );
     }
 
     if (typeof save !== 'undefined' ? save : true)
@@ -100,15 +107,12 @@ function addDestructor(properties, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addDestructor()',
-    'usage' : 'addDestructor()',
-    'description' :
-        'Adds a destructor to the current class or parent class.\n' +
-        'Params:\n' +
-            '\t\'i\' <bool> : \'i\' - to enable inline destructor.'
-}).prototype.addDestructor = function(properties){
+    'name' : 'setSinleton()',
+    'usage' : 'setSingleton()',
+    'description' : 'Generates singleton features to the current class.'
+}).prototype.setSingleton = function(properties){
     this.nodes.forEach(function (v, i){
-        addDestructor(properties, v, false)
+        setSingleton(v, false)
     });
     codeBase.save()
 }

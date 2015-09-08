@@ -20,6 +20,7 @@ unix{
     LLVM_CONFIG_INCLUDE_DIR = $$system(llvm-config --includedir)
     LLVM_CONFIG_LIB_DIR     = $$system(llvm-config --libdir)
 
-    INCLUDEPATH += $$LLVM_CONFIG_INCLUDE_DIR
-    LIBS        += -L$$LLVM_CONFIG_LIB_DIR -lclang
+    INCLUDEPATH    += $$LLVM_CONFIG_INCLUDE_DIR
+    LIBS           += -L$$LLVM_CONFIG_LIB_DIR -lclang
+    PRE_TARGETDEPS += $$LLVM_CONFIG_LIB_DIR/libclang.a
 }

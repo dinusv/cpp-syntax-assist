@@ -6,8 +6,9 @@ HEADERS += \
     $$PWD/QSourceLocationConvert.hpp \
     $$PWD/QASTFileConvert.hpp \
     $$PWD/QCSAPluginLoader.hpp \
-    $$PWD/QCSAPluginCollection.hpp \
-    $$PWD/QASTCollapsibleModel.hpp
+    $$PWD/QASTCollapsibleModel.hpp \
+    $$PWD/QCSACompletionSet.hpp \
+    $$PWD/QCSACompletionModel.hpp
 
 SOURCES += \
     $$PWD/QAnnotatedTokenConvert.cpp \
@@ -15,5 +16,6 @@ SOURCES += \
     $$PWD/QSourceLocationConvert.cpp \
     $$PWD/QASTFileConvert.cpp \
     $$PWD/QCSAPluginLoader.cpp \
-    $$PWD/QCSAPluginCollection.cpp \
-    $$PWD/QASTCollapsibleModel.cpp
+    $$PWD/QASTCollapsibleModel.cpp \
+    $$PWD/QCSACompletionSet.cpp \
+    $$PWD/QCSACompletionModel.cpp

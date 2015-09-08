@@ -30,7 +30,7 @@ function addGetter(properties, node, save){
     function declareGetter(classNode, declaration){
         var publicAccess = classNode.lastChild('public', 'access');
         if ( publicAccess !== null )
-            publicAccess.afterln('\n    ' + declaration + '\n');
+            publicAccess.afterln('    ' + declaration + '\n');
         else
             classNode.append('\npublic:\n    ' + declaration + '\n');
     }
@@ -137,7 +137,7 @@ function addGetter(properties, node, save){
 }
 
 NodeCollection.registerPlugin({
-    'name' : 'addGetter()',
+    'name' : 'addGetter(options)',
     'usage' : 'addGetter(\'\')',
     'description' :
         'Adds a getter to the class field node.\n' +

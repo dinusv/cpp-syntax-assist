@@ -38,6 +38,7 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../modules/csa-lib/
 else:unix: LIBS += -L$$OUT_PWD/../modules/build/ -lcsa
 
 include($$PWD/src/tests.pri)
+include($$PWD/../3rdparty/libclang.pro)
 
 TARGET   = test_csa
 TEMPLATE = app

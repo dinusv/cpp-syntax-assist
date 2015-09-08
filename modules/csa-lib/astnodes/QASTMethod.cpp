@@ -191,7 +191,7 @@ QList<QObject*> QASTMethod::arguments() const{
     return QASTNode::castNodeListToObjectList(m_arguments);
 }
 
-QString QASTMethod::content() const{
+QString QASTMethod::description() const{
     QString base = "";
     base += m_isStatic ? "static " : "";
     base += m_isVirtual ? "virtual " : "";
@@ -202,10 +202,10 @@ QString QASTMethod::content() const{
     bool firstArg = true;
     for( QList<csa::ast::QASTNode*>::const_iterator it = m_arguments.begin(); it != m_arguments.end(); ++it ){
         if ( firstArg ){
-            base    += (*it)->content();
+            base    += (*it)->description();
             firstArg = false;
         } else {
-            base    += ", " + (*it)->content();
+            base    += ", " + (*it)->description();
         }
     }
     base += ")";

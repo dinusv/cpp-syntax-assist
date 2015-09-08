@@ -14,5 +14,5 @@ OTHER_FILES += \
     $$PWD/plugins/addincludeguard.js \
     $$PWD/plugins/addnamespace.js \
     $$PWD/plugins/addclass.js \
-    $$PWD/plugins/addconstructor.js
-
+    $$PWD/plugins/addconstructor.js \
+    $$PWD/plugins/setsingleton.js
