@@ -17,7 +17,7 @@ var associatedTokens = firstClassNode.associatedTokens();
 ## INDEX
 
  - [ENUMS](#enums)
-	 - [TokenKind](#TokenKind)
+	 - [TokenKind](#tokenkind)
  - [METHODS](#methods)
 	 - [associatedNode()](#associatednode)
 	 - [name()](#name)

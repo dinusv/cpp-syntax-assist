@@ -1,6 +1,6 @@
 # ASTFile
 
-**EXTENDS**: [ASTNode](#ASTNode)
+**EXTENDS**: [ASTNode](api-astnode)
 
 Describes a c/c++ header or source file. Its located at the root of the Abstract Syntax Tree for each file. Use the codeBase to get the ASTFile for a parsed path:
 
@@ -13,15 +13,15 @@ Adding or reparsing ASTFiles is done through the codeBase property.
 ## INDEX
 
  - [METHODS](#methods)
-     - [insert](#insert)
-     - [erase](#erase)
-     - [readAll](#readAll)
-     - [read](#read)
-     - [size](#size)
-     - [createLocation](#createLocation)
-     - [fileName](#fileName)
-     - [fileNameWithoutExtension](#fileNameWithoutExtension)
-     - [extension](#extension)
+     - [insert(value, location](#insertvaluelocation)
+     - [erase(from, to)](#erasefromto)
+     - [readAll()](#readall)
+     - [read(from, to)](#readfromto)
+     - [size()](#size)
+     - [createLocation(lineOrOffset, column)](#createlocationlineoroffsetcolumn)
+     - [fileName()](#filename)
+     - [fileNameWithoutExtension()](#filenamewithoutextension)
+     - [extension()](#extension)
 
 ## METHODS
 
