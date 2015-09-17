@@ -1,6 +1,6 @@
 # SourceLocation
 
-The class describes a location within a source code of a file. An instance can be created either from an ASTFile node, or from the main codeBase.
+The class describes a location within a source code of a file. An instance can be created either from an (ASTFile)[api-astfile.md] node, or from the main (codeBase)[api-codebase.md] object.
 
 ```js
 
@@ -11,27 +11,26 @@ var location = codeBase.createLocation('date.h', 100);
 var location = codeBase.createLocation('date.h', 10, 10);
 ```
 
-
 ```js
 var loadedFile = codeBase.findFile('Date.hpp');
 
 // Location from file offset
-var location   = loadedFile.createLocation(100); 
+var location   = loadedFile.createLocation(100);
 
 // Location from line, column
 var location   = loadedFile.createLocation(10, 10);
 ```
 
-Source locations can become invalid once the codeBase is saved. The creationLocation functions return null if the file does not exist, and the offset, line or colum values will be truncated to create a valid location within the file. 
+Source locations can become invalid once the codeBase is saved. The creationLocation functions return null if the file does not exist, otherwise if the offset, line or colum values are incompatible, they will be truncated to create a valid location within the file.
 
 ## INDEX
 
  - [METHODS](#methods)
-	 - [line](#line)
-	 - [column](#column)
-	 - [offset](#offset)
-	 - [filePath](#filePath)
-	 - [fileName](#fileName) 
+	 - [line()](#line)
+	 - [column()](#column)
+	 - [offset()](#offset)
+	 - [filePath()](#filepath)
+	 - [fileName()](#filename)
 
 ## METHODS
 
@@ -41,7 +40,7 @@ Source locations can become invalid once the codeBase is saved. The creationLoca
 
 ##### RETURNS
 
- * `Number` 
+ * `Number`
 
 ---
 
@@ -51,7 +50,7 @@ Source locations can become invalid once the codeBase is saved. The creationLoca
 
 ##### RETURNS
 
- * `Number` 
+ * `Number`
 
 ---
 
@@ -71,7 +70,7 @@ Source locations can become invalid once the codeBase is saved. The creationLoca
 
 ##### RETURNS
 
- * `String` 
+ * `String`
 
 ---
 

@@ -36,12 +36,12 @@ Examples and more information on how to create and add plugins is available in t
 ## INDEX
 
  - [PROPERTIES](#properties)
-	 - [nodes](#nodes)
+	 - [nodes()](#nodes)
  - [METHODS](#methods)
 	 - [children()](#children)
-	 - [find()](#find-selector-type)
-	 - [toString()](#toString)
-	 - [registerPlugin(properties) `static`](#registerPlugin-properties-static)
+	 - [find(selector, type)](#findselectortype)
+	 - [toString()](#tostring)
+	 - [registerPlugin(properties) `static`](#registerpluginpropertiesstatic)
 
 
 ## PROPERTIES
@@ -50,7 +50,7 @@ Examples and more information on how to create and add plugins is available in t
 
 `Array`
 
-> Selected nodes found within this collection. 
+> Selected nodes found within this collection.
 
 ## METHODS
 
