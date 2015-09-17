@@ -1,6 +1,6 @@
 # ASTFile
 
-**EXTENDS**: [ASTNode](api-astnode)
+**EXTENDS**: [ASTNode](api-astnode.md)
 
 Describes a c/c++ header or source file. Its located at the root of the Abstract Syntax Tree for each file. Use the codeBase to get the ASTFile for a parsed path:
 
