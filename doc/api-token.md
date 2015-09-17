@@ -22,9 +22,9 @@ var associatedTokens = firstClassNode.associatedTokens();
 	 - [associatedNode()](#associatednode)
 	 - [name()](#name)
 	 - [kind()](#kind)
-	 - [before(value)](#before-value)
-	 - [after(value)](#after-value) 
-	 - [afterln(value)](#afterln-value)
+	 - [before(value)](#beforevalue)
+	 - [after(value)](#aftervalue) 
+	 - [afterln(value)](#afterlnvalue)
 
 ## ENUMS
 
