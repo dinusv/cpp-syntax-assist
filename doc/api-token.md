@@ -19,11 +19,12 @@ var associatedTokens = firstClassNode.associatedTokens();
  - [ENUMS](#enums)
 	 - [TokenKind](#TokenKind)
  - [METHODS](#methods)
-	 - [associatedNode](#associatedNode)
-	 - [name](#column)
-	 - [offset](#offset)
-	 - [filePath](#filePath)
-	 - [fileName](#fileName) 
+	 - [associatedNode()](#associatednode)
+	 - [name()](#name)
+	 - [kind()](#kind)
+	 - [before(value)](#before-value)
+	 - [after(value)](#after-value) 
+	 - [afterln(value)](#afterln-value)
 
 ## ENUMS
 
