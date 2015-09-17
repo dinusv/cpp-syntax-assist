@@ -29,8 +29,8 @@ Source locations can become invalid once the codeBase is saved. The creationLoca
 	 - [line()](#line)
 	 - [column()](#column)
 	 - [offset()](#offset)
-	 - [filePath()](#filepath)
 	 - [fileName()](#filename)
+	 - [filePath()](#filepath)
 
 ## METHODS
 
