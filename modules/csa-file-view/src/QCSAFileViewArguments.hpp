@@ -15,18 +15,18 @@
 ****************************************************************************/
 
 
-#ifndef QCSAFILEGUIARGUMENTS_HPP
-#define QCSAFILEGUIARGUMENTS_HPP
+#ifndef QCSAFILEVIEWARGUMENTS_HPP
+#define QCSAFILEVIEWARGUMENTS_HPP
 
 #include <QStringList>
 
 class QGuiApplication;
 class QCommandLineParser;
-class QCSAFileGuiArguments{
+class QCSAFileViewArguments{
 
 public:
-    QCSAFileGuiArguments(const QGuiApplication& app, const QString& applicationDescription);
-    ~QCSAFileGuiArguments();
+    QCSAFileViewArguments(const QGuiApplication& app, const QString& applicationDescription);
+    ~QCSAFileViewArguments();
 
     const QStringList& files() const;
     const QStringList& fileErrors() const;
@@ -47,8 +47,8 @@ public:
     const QString& projectDir() const;
 
 private:
-    QCSAFileGuiArguments(const QCSAFileGuiArguments& other);
-    QCSAFileGuiArguments& operator =(const QCSAFileGuiArguments& other);
+    QCSAFileViewArguments(const QCSAFileViewArguments& other);
+    QCSAFileViewArguments& operator =(const QCSAFileViewArguments& other);
 
     void initialize(const QGuiApplication& app, const QString& applicationDescription);
 
@@ -73,52 +73,52 @@ private:
     int     m_logLevel;
 };
 
-inline const QStringList& QCSAFileGuiArguments::files() const{
+inline const QStringList& QCSAFileViewArguments::files() const{
     return m_files;
 }
 
-inline const QStringList &QCSAFileGuiArguments::fileErrors() const{
+inline const QStringList &QCSAFileViewArguments::fileErrors() const{
     return m_fileErrors;
 }
 
-inline bool QCSAFileGuiArguments::hasFileErrors() const{
+inline bool QCSAFileViewArguments::hasFileErrors() const{
     return m_fileErrors.size() > 0;
 }
 
-inline bool QCSAFileGuiArguments::isSelectedFunctionSet() const{
+inline bool QCSAFileViewArguments::isSelectedFunctionSet() const{
     return m_functionSet;
 }
 
-inline const QString& QCSAFileGuiArguments::selectedFunction() const{
+inline const QString& QCSAFileViewArguments::selectedFunction() const{
     return m_function;
 }
 
-inline bool QCSAFileGuiArguments::isCursorOffsetSet() const{
+inline bool QCSAFileViewArguments::isCursorOffsetSet() const{
     return m_cursorOffset != -1;
 }
 
-inline int QCSAFileGuiArguments::cursorOffset() const{
+inline int QCSAFileViewArguments::cursorOffset() const{
     return m_cursorOffset;
 }
 
-inline bool QCSAFileGuiArguments::isCursorLineColumnSet() const{
+inline bool QCSAFileViewArguments::isCursorLineColumnSet() const{
     return (m_cursorLine != -1 && m_cursorColumn != -1);
 }
 
-inline int QCSAFileGuiArguments::cursorLine() const{
+inline int QCSAFileViewArguments::cursorLine() const{
     return m_cursorLine;
 }
 
-inline int QCSAFileGuiArguments::cursorColumn() const{
+inline int QCSAFileViewArguments::cursorColumn() const{
     return m_cursorColumn;
 }
 
-inline const QString &QCSAFileGuiArguments::projectDir() const{
+inline const QString &QCSAFileViewArguments::projectDir() const{
     return m_projectDir;
 }
 
-inline int QCSAFileGuiArguments::logLevel() const{
+inline int QCSAFileViewArguments::logLevel() const{
     return m_logLevel;
 }
 
-#endif // QCSAFILEGUIARGUMENTS_HPP
+#endif // QCSAFILEVIEWARGUMENTS_HPP

@@ -31,7 +31,7 @@
 #include "QASTFile.hpp"
 
 #include "QASTCollapsibleModel.hpp"
-#include "QCSAFileGuiArguments.hpp"
+#include "QCSAFileViewArguments.hpp"
 
 using namespace csa;
 using namespace csa::ast;
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]){
     QGuiApplication::setApplicationDisplayName("C++ Snippet Assist - File Gui");
     QGuiApplication::setApplicationVersion("0.3.0");
 
-    QCSAFileGuiArguments commandLineArguments(
+    QCSAFileViewArguments commandLineArguments(
         app,
         "\nA configurable C and C++ code parser that exposes the ast model to javascript for manipulation."
     );

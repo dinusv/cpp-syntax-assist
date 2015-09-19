@@ -36,7 +36,7 @@ Examples and more information on how to create and add plugins is available in t
 ## INDEX
 
  - [PROPERTIES](#properties)
-	 - [nodes()](#nodes)
+	 - [nodes](#nodes)
  - [METHODS](#methods)
 	 - [children()](#children)
 	 - [find(selector, type)](#findselectortype)

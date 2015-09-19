@@ -15,14 +15,14 @@
 ****************************************************************************/
 
 
-#include "QCSAFileGuiArguments.hpp"
+#include "QCSAFileViewArguments.hpp"
 #include "QCSAConsole.hpp"
 
 #include <QGuiApplication>
 #include <QCommandLineParser>
 #include <QFileInfo>
 
-QCSAFileGuiArguments::QCSAFileGuiArguments(
+QCSAFileViewArguments::QCSAFileViewArguments(
         const QGuiApplication& app,
         const QString& applicationDescription)
     : m_commandLineParser(new QCommandLineParser)
@@ -37,11 +37,11 @@ QCSAFileGuiArguments::QCSAFileGuiArguments(
     initialize(app, applicationDescription);
 }
 
-QCSAFileGuiArguments::~QCSAFileGuiArguments(){
+QCSAFileViewArguments::~QCSAFileViewArguments(){
     delete m_commandLineParser;
 }
 
-void QCSAFileGuiArguments::initialize(const QGuiApplication& app, const QString& applicationDescription){
+void QCSAFileViewArguments::initialize(const QGuiApplication& app, const QString& applicationDescription){
 
     // Setup parsing
     // -------------

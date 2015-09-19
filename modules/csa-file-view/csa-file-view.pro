@@ -41,7 +41,7 @@ else:unix: LIBS += -L$$OUT_PWD/../build/ -lcsa
 # Add source files
 # ----------------
 
-include($$PWD/src/csa-file-gui.pri)
+include($$PWD/src/csa-file-view.pri)
 CONFIG(static):include($$PWD/../../3rdparty/libclang.pro)
 
 # Configure name and resources
@@ -50,7 +50,7 @@ CONFIG(static):include($$PWD/../../3rdparty/libclang.pro)
 RESOURCES += \
     $$PWD/resources/resources.qrc
 
-TARGET   = csa-file-gui
+TARGET   = csa-file-view
 TEMPLATE = app
 
 win32{
