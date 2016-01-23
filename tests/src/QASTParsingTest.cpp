@@ -26,6 +26,7 @@
 #include <qqml.h>
 #include "QCodeBase.hpp"
 #include "QCSAPluginLoader.hpp"
+#include "QJsonConvert.hpp"
 
 using namespace csa;
 
@@ -62,7 +63,7 @@ void QASTParsingTest::unknownTypeDeductionTest(){
 
     QJSValue result;
     m_loader->execute("parserplugin();", result);
-    QJsonValue jsonResult = helpers::jsonFromScriptValue(result);
+    QJsonValue jsonResult = QJsonConvert::jsonFromScriptValue(result);
 
     bool parseOk;
     QJsonObject expectedResult = helpers::parseJsonFile(m_parserTestPath + "unknowntype.expect", &parseOk);

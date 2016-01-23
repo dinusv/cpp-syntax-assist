@@ -26,42 +26,6 @@
 
 namespace helpers{
 
-QJsonValue jsonFromScriptValue(const QJSValue& val){
-    if ( val.isArray() ){
-            QJSValueIterator it(val);
-
-            QJsonArray arr;
-            while( it.hasNext() ){
-                it.next();
-
-                QJsonValue itJsonValue = jsonFromScriptValue(it.value());
-                if( !itJsonValue.isNull() )
-                    arr.append(itJsonValue);
-            }
-
-            return QJsonValue(arr);
-    } else if ( val.isObject() ){
-        QJSValueIterator it(val);
-
-        QJsonObject obj;
-        while( it.hasNext() ){
-            it.next();
-            QJsonValue itJsonValue = jsonFromScriptValue(it.value());
-            if( !itJsonValue.isNull() )
-                obj[it.name()] = itJsonValue;
-        }
-
-        return QJsonValue(obj);
-    } else  if ( val.isString() ){
-        return QJsonValue(val.toString());
-    } else if ( val.isBool() ){
-        return QJsonValue(val.toString());
-    } else if ( val.isNumber() ){
-        return QJsonValue(val.toNumber() );
-    }
-    return QJsonValue();
-}
-
 bool compareJsonValues(const QJsonValue& val1, const QJsonValue& val2){
     if ( val1.type() != val2.type() )
         return false;

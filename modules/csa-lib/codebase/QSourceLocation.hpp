@@ -14,7 +14,6 @@
 **
 ****************************************************************************/
 
-
 #ifndef QSOURCELOCATION_HPP
 #define QSOURCELOCATION_HPP
 

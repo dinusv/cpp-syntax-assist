@@ -8,7 +8,8 @@ HEADERS += \
     $$PWD/QCSAPluginLoader.hpp \
     $$PWD/QASTCollapsibleModel.hpp \
     $$PWD/QCSACompletionSet.hpp \
-    $$PWD/QCSACompletionModel.hpp
+    $$PWD/QCSACompletionModel.hpp \
+    $$PWD/QJsonConvert.hpp
 
 SOURCES += \
     $$PWD/QAnnotatedTokenConvert.cpp \
@@ -18,4 +19,5 @@ SOURCES += \
     $$PWD/QCSAPluginLoader.cpp \
     $$PWD/QASTCollapsibleModel.cpp \
     $$PWD/QCSACompletionSet.cpp \
-    $$PWD/QCSACompletionModel.cpp
+    $$PWD/QCSACompletionModel.cpp \
+    $$PWD/QJsonConvert.cpp
