@@ -113,19 +113,22 @@ ApplicationWindow {
                     var quoteFlag       = false;
                     var doubleQuoteFlag = false;
                     var selectionBegin  = -1;
+                    var csposition      = cursorPosition
                     for( var i = 0; i < text.length; ++i ){
                         switch (text[i]){
                         case '\'' :
                             if ( !doubleQuoteFlag )
                                 quoteFlag = !quoteFlag;
-                            if ( quoteFlag && i > cursorPosition )
-                                selectionBegin = i + 1;
+                            if ( quoteFlag )
+                                if ( i > cursorPosition )
+                                    selectionBegin = i + 1;
                             break;
                         case '"'  :
                             if ( !quoteFlag )
                                 doubleQuoteFlag = !doubleQuoteFlag
-                            if ( doubleQuoteFlag && i > cursorPosition )
-                                selectionBegin = i + 1;
+                            if ( doubleQuoteFlag )
+                                if ( i > cursorPosition )
+                                    selectionBegin = i + 1;
                             break;
                         }
                         if(i > cursorPosition && !quoteFlag && !doubleQuoteFlag && selectionBegin !== -1){
@@ -134,7 +137,7 @@ ApplicationWindow {
                         }
                     }
                 }
-                if ( cursorPosition === 0 )
+                if ( cursorPosition === 0 && text.length > 0 )
                     cursorPosition = text.length - 1;
                 else
                     cursorPosition = 0;
