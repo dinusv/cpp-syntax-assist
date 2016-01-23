@@ -2,20 +2,28 @@
 # -------------------------------
 
 PLUGIN_DEPLOY_FROM = $$PWD/../../plugins
+CONFIG_DEPLOY_FROM = $$PWD/../../config
 
-win32:CONFIG(debug, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/../build/debug/plugins
-else:win32:CONFIG(release, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/../build/release/plugins
-else:unix: PLUGIN_DEPLOY_TO = $$OUT_PWD/../build
+win32:CONFIG(debug, debug|release): DEPLOY_TO = $$OUT_PWD/../build/debug
+else:win32:CONFIG(release, debug|release): DEPLOY_TO = $$OUT_PWD/../build/release
+else:unix: DEPLOY_TO = $$OUT_PWD/../build
+
+PLUGIN_DEPLOY_TO = $$DEPLOY_TO/plugins
+CONFIG_DEPLOY_TO = $$DEPLOY_TO/config
 
 win32:PLUGIN_DEPLOY_TO ~= s,/,\\,g
 win32:PLUGIN_DEPLOY_FROM ~= s,/,\\,g
+win32:CONFIG_DEPLOY_TO ~= s,/,\\,g
+win32:CONFIG_DEPLOY_FROM ~= s,/,\\,g
 
 plugincopy.commands = $(COPY_DIR) \"$$PLUGIN_DEPLOY_FROM\" \"$$PLUGIN_DEPLOY_TO\"
-first.depends = $(first) plugincopy
+configcopy.commands = $(COPY_DIR) \"$$CONFIG_DEPLOY_FROM\" \"$$CONFIG_DEPLOY_TO\"
+first.depends = $(first) plugincopy configcopy
 export(first.depends)
 export(plugincopy.commands)
+export(configcopy.commands)
 
-QMAKE_EXTRA_TARGETS += first plugincopy
+QMAKE_EXTRA_TARGETS += first plugincopy configcopy
 
 
 # Enable javascript and console output
@@ -60,9 +68,9 @@ win32{
 # Deployment
 # ----------
 
-win32:CONFIG(debug, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/../build/debug
-else:win32:CONFIG(release, debug|release): PLUGIN_DEPLOY_TO = $$OUT_PWD/release/plugins
-else:unix: PLUGIN_DEPLOY_TO = $$OUT_PWD
+win32:CONFIG(debug, debug|release): DEPLOY_TO = $$OUT_PWD/../build/debug
+else:win32:CONFIG(release, debug|release): DEPLOY_TO = $$OUT_PWD/release/plugins
+else:unix: DEPLOY_TO = $$OUT_PWD
 
 
 win32:CONFIG(release, debug|release): DESTDIR = $$OUT_PWD/../build/release

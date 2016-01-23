@@ -16,3 +16,6 @@ OTHER_FILES += \
     $$PWD/plugins/addclass.js \
     $$PWD/plugins/addconstructor.js \
     $$PWD/plugins/setsingleton.js
+
+
+OTHER_FILES += $$PWD/config/default.json
