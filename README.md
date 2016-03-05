@@ -1,8 +1,15 @@
-# C++ Snippet Assist
-
-Latest Release Version: **0.2.0**
+![c++ Snippet Assist](/doc/csa.png)
 
 A configurable C and C++ code generator that can be used as an external plugin with most IDEs. The tool uses javascript code as a means of manipulating source files.
+
+ * **Version**: 0.2.0
+ * **License**: LPGL
+ * **Website**: [csa.dinusv.com](http://csa.dinusv.com)
+ * **Documentation**: [csa.dinusv.com/documentation](http://csa.dinusv.com/documentation)
+ * **Build Requirements**
+   * Qt 5.3 or higher
+   * Libclang (LLVM 3.6 package or higher)
+
 
 ## How it works
 
