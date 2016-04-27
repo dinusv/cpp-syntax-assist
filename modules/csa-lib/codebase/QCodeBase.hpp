@@ -30,19 +30,19 @@ namespace csa{
 class QTokenClassifier;
 class QSourceLocation;
 
-class QCodeBasePrivate;
-class Q_CSA_EXPORT QCodeBase : public QObject{
+class QCodebasePrivate;
+class Q_CSA_EXPORT QCodebase : public QObject{
 
     Q_OBJECT
 
 public:
-    explicit QCodeBase(
-            const char* const* translationUnitArgs,
-            int                translationUnitNumArgs,
-            const QStringList& entries,
-            const QString&     searchDir = "",
-            QObject*           parent = 0);
-    ~QCodeBase();
+    explicit QCodebase(
+        const char* const* translationUnitArgs,
+        int                translationUnitNumArgs,
+        const QStringList& entries = QStringList(),
+        const QString&     searchDir = "",
+        QObject*           parent = 0);
+    ~QCodebase();
 
     void propagateUserCursor(int offset, const QString& file);
     void propagateUserCursor(int line, int column, const QString& file);
@@ -83,12 +83,12 @@ signals:
 
 private:
     // prevent copy
-    QCodeBase(const QCodeBase& other);
-    QCodeBase& operator=(const QCodeBase& other);
+    QCodebase(const QCodebase& other);
+    QCodebase& operator=(const QCodebase& other);
 
     // d ptr
-    QCodeBasePrivate* const d_ptr;
-    Q_DECLARE_PRIVATE(QCodeBase)
+    QCodebasePrivate* const d_ptr;
+    Q_DECLARE_PRIVATE(QCodebase)
 
 
     csa::QTokenClassifier* classifierForFile(const QString& file);
@@ -110,11 +110,11 @@ private:
 };
 
 
-inline QList<QObject*> QCodeBase::files() const{
+inline QList<QObject*> QCodebase::files() const{
     return QObject::children();
 }
 
-inline csa::ast::QASTNode* QCodeBase::selectedNode(){
+inline csa::ast::QASTNode* QCodebase::selectedNode(){
     return m_current;
 }
 

@@ -29,7 +29,7 @@ class QAnnotatedToken;
 class QAnnotatedTokenSet;
 class QSourceLocation;
 class QASTSearch;
-class QCodeBase;
+class QCodebase;
 
 namespace ast{
 
@@ -175,7 +175,7 @@ private:
 
     NodeList     m_children;
     QASTNode*    m_parent;
-    QCodeBase*   m_codeBase;
+    QCodebase*   m_codeBase;
 
 };
 

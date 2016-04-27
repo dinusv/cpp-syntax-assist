@@ -29,6 +29,47 @@
 #include <QJSValue>
 #include <QJSValueIterator>
 
+//TODO
+
+//NodeCollection.obExtend = function(options){
+//  for ( var name in options ){
+//    if ( !options.hasOwnProperty(name) || options[name] === undefined )
+//      continue;
+//    var src    = options[name];
+//    var target = NodeCollection.prototype;
+//    var dst = target[name];
+//    if ( target == src )
+//      continue;
+//    target[name] = src;
+//  }
+//  return target;
+//}
+
+
+//NodeCollection.obDescribe({
+//  getMyVal : {
+//    'params' : 'asmdlak'
+//  }
+//})
+
+//NodeCollection.obExtend({
+//  data : 2,
+//  getMyVal : function(){
+//    return this.myval;
+//  }
+//})
+
+//var col = new NodeCollection();
+//var col2 = new NodeCollection();
+
+//console.log(col.getMyVal());
+
+//col2.data = 3;
+//console.log(col.data);
+//console.log(col.data2);
+
+
+
 namespace csa{
 
 QCSAPluginLoader::QCSAPluginLoader(QJSEngine* engine, QObject* parent)
@@ -155,15 +196,13 @@ bool QCSAPluginLoader::loadFileFunctions(){
 }
 
 int QCSAPluginLoader::loadPlugins(const QString& path){
-    QJSEngine* engine = m_engine;
-
     QFileInfo fInfo(path);
     if ( !fInfo.exists() ){
         QCSAConsole::logError("Path does not exist: " + path + ".");
         return -1;
     }
 
-    if ( QFileInfo(path).isDir() ){
+    if ( fInfo.isDir() ){
         QDirIterator it(path, QDirIterator::Subdirectories);
         while (it.hasNext()) {
             it.next();
@@ -174,22 +213,36 @@ int QCSAPluginLoader::loadPlugins(const QString& path){
             }
         }
     } else {
-        QFile configScript(path);
-        if ( !configScript.open(QIODevice::ReadOnly) ){
-            QCSAConsole::logError(
-                "Error opening js configuration file. Make sure the file is present in " + path + ".");
-            return 2;
-        }
-
-        QTextStream configStream(&configScript);
-        QJSValue evaluateResult = engine->evaluate(configStream.readAll(), configScript.fileName());
-
-        if ( evaluateResult.isError() ){
-            QCSAConsole::logError("Uncaught javascript exception: " + evaluateResult.toString());
-            return 3;
-        }
+        return loadFile(fInfo);
     }
 
+    return 0;
+}
+
+int QCSAPluginLoader::loadFile(const QString &path){
+    return loadFile(QFileInfo(path));
+}
+
+int QCSAPluginLoader::loadFile(const QFileInfo &file){
+    QFile configScript(file.filePath());
+    if ( !configScript.open(QIODevice::ReadOnly) ){
+        QCSAConsole::logError(
+            "Error opening js configuration file. Make sure the file is present in " + file.filePath() + ".");
+        return 2;
+    }
+
+    QTextStream configStream(&configScript);
+
+    m_engine->globalObject().setProperty("dirname",  file.dir().path());
+    m_engine->globalObject().setProperty("filename", file.fileName());
+    QJSValue evaluateResult = m_engine->evaluate(configStream.readAll(), configScript.fileName());
+    m_engine->globalObject().setProperty("dirname", "");
+    m_engine->globalObject().setProperty("filename", "");
+
+    if ( evaluateResult.isError() ){
+        QCSAConsole::logError("Uncaught javascript exception: " + evaluateResult.toString());
+        return 3;
+    }
     return 0;
 }
 

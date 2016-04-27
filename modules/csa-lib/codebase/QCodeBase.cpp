@@ -32,12 +32,42 @@ namespace csa{
 
 using namespace ast;
 
-class QCodeBasePrivate{
+
+//TODO
+
+//selectNode(file, 20, 30);
+//selectNode(file, 20);
+//NodeCollection.selected = codebase.findNodeAt(file, 20, 20);
+//NodeCollection.selected = codebase.findNodeAt(file, 10);
+//selected().do()
+// when codebase saves content
+// render NodeCollection.selected = undefined
+// connect signal to codebase in order to register update
+// NodeCollection.selected is set when program starts
+
+//TODO
+
+// * Add test cases for simple functions
+// * Add test cases for features to implement
+// * Add test cases for plugins
+
+// * Implement functionality for selected node (use signal to integrate with codebase.save)
+// * Implement functionality to extend NodeCollection
+// * Implement functionality for configurations
+//    * Configuration for compiler
+//    * Configuration for header/cpp files
+//    * Defautl configuration
+//    * Loading configuration
+// * Implement functionality for requires()
+// * Add search by number of parameters for functions
+
+
+class QCodebasePrivate{
 public:
     CXIndex index;
 };
 
-QCodeBase::QCodeBase(
+QCodebase::QCodebase(
         const char* const* translationUnitArgs,
         int                translationUnitNumArgs,
         const QStringList &entries,
@@ -45,12 +75,12 @@ QCodeBase::QCodeBase(
         QObject*           parent)
 
     : QObject(parent)
-    , d_ptr(new QCodeBasePrivate)
+    , d_ptr(new QCodebasePrivate)
     , m_projectDir(searchDir != "" ? QDir(searchDir).path() : "")
     , m_root(0)
     , m_current(0){
 
-    Q_D(QCodeBase);
+    Q_D(QCodebase);
 
     m_sourceSearchPatterns << "*.c" << "*.C" << "*.cxx" << "*.cpp" << "*.c++" << "*.cc" << "*.cp";
     m_headerSearchPatterns << "*.h" << "*.H" << "*.hxx" << "*.hpp" << "*.h++" << "*.hh" << "*.hp";
@@ -81,7 +111,7 @@ QCodeBase::QCodeBase(
     }
 }
 
-QCodeBase::~QCodeBase(){
+QCodebase::~QCodebase(){
     for ( int i = 0; i < m_translationUnitNumArgs; ++i ){
         delete [] m_translationUnitArgs[i];
     }
@@ -89,7 +119,7 @@ QCodeBase::~QCodeBase(){
     delete d_ptr;
 }
 
-void QCodeBase::save(){
+void QCodebase::save(){
     QString currentSelection     = m_current ? m_current->breadcrumbs() : "*";
     QString currentSelectionType = m_current ? m_current->typeName() : "";
 
@@ -105,21 +135,21 @@ void QCodeBase::save(){
     select(currentSelection, currentSelectionType);
 }
 
-void QCodeBase::propagateUserCursor(int offset, const QString &file){
+void QCodebase::propagateUserCursor(int offset, const QString &file){
     CXTranslationUnit transUnit = m_classifiers.first()->translationUnit();
     CXFile cfile = clang_getFile(transUnit, file.toStdString().c_str());
     CXSourceLocation sLocation = clang_getLocationForOffset(transUnit, cfile, offset);
     propagateUserCursor(createSourceLocation(sLocation));
 }
 
-void QCodeBase::propagateUserCursor(int line, int column, const QString &file){
+void QCodebase::propagateUserCursor(int line, int column, const QString &file){
     CXTranslationUnit transUnit = m_classifiers.first()->translationUnit();
     CXFile cfile = clang_getFile(transUnit, file.toStdString().c_str());
     CXSourceLocation sLocation = clang_getLocation(transUnit, cfile, line, column);
     propagateUserCursor(createSourceLocation(sLocation));
 }
 
-void QCodeBase::propagateUserCursor(const QSourceLocation &location){
+void QCodebase::propagateUserCursor(const QSourceLocation &location){
     QASTNode* deepest = m_current->propagateUserCursor(location);
     if ( deepest != 0 ){
         m_current = deepest;
@@ -127,7 +157,7 @@ void QCodeBase::propagateUserCursor(const QSourceLocation &location){
     }
 }
 
-bool QCodeBase::select(const QString &searchData, const QString &type){
+bool QCodebase::select(const QString &searchData, const QString &type){
     for ( QList<ast::QASTFile*>::iterator it = m_files.begin(); it != m_files.end(); ++it ){
         QASTFile* file = *it;
         QASTNode* foundChild = file->findFirst(searchData, type);
@@ -139,7 +169,7 @@ bool QCodeBase::select(const QString &searchData, const QString &type){
     return false;
 }
 
-bool QCodeBase::selectNode(QASTNode* node){
+bool QCodebase::selectNode(QASTNode* node){
     if ( node != 0 ){
         m_current = node;
         emit nodeSelected(node);
@@ -148,7 +178,7 @@ bool QCodeBase::selectNode(QASTNode* node){
     return false;
 }
 
-QList<QObject*> QCodeBase::find(const QString& searchData, const QString& type){
+QList<QObject*> QCodebase::find(const QString& searchData, const QString& type){
     QList<QObject*> foundNodes;
 
     for ( QList<ast::QASTFile*>::iterator it = m_files.begin(); it != m_files.end(); ++it ){
@@ -161,15 +191,15 @@ QList<QObject*> QCodeBase::find(const QString& searchData, const QString& type){
     return foundNodes;
 }
 
-void QCodeBase::setHeaderSearchPattern(const QStringList &pattern){
+void QCodebase::setHeaderSearchPattern(const QStringList &pattern){
     m_headerSearchPatterns = pattern;
 }
 
-void QCodeBase::setSourceSearchPattern(const QStringList &pattern){
+void QCodebase::setSourceSearchPattern(const QStringList &pattern){
     m_sourceSearchPatterns = pattern;
 }
 
-QASTFile *QCodeBase::findSource(const QString &header){
+QASTFile *QCodebase::findSource(const QString &header){
     QString headerBaseName = QFileInfo(header).baseName();
 
     QString searchLocation = m_projectDir;
@@ -190,7 +220,7 @@ QASTFile *QCodeBase::findSource(const QString &header){
     return 0;
 }
 
-QASTFile *QCodeBase::findHeader(const QString &source){
+QASTFile *QCodebase::findHeader(const QString &source){
     QString sourceBaseName = QFileInfo(source).baseName();
 
     QString searchLocation = m_projectDir;
@@ -211,7 +241,7 @@ QASTFile *QCodeBase::findHeader(const QString &source){
     return 0;
 }
 
-QTokenClassifier *QCodeBase::classifierForFile(const QString &file){
+QTokenClassifier *QCodebase::classifierForFile(const QString &file){
     for ( int i = 0; i < m_files.size(); ++i ){
         if ( m_files[i]->identifier() == file ){
             return m_classifiers[i];
@@ -220,7 +250,7 @@ QTokenClassifier *QCodeBase::classifierForFile(const QString &file){
     return 0;
 }
 
-void QCodeBase::reparseIndex(int index){
+void QCodebase::reparseIndex(int index){
 
     QASTFile* root               = m_files[index];
     QTokenClassifier* classifier = m_classifiers[index];
@@ -239,11 +269,11 @@ void QCodeBase::reparseIndex(int index){
     emit fileReparsed(root);
 }
 
-const QList<QASTFile*>& QCodeBase::astFiles() const{
+const QList<QASTFile*>& QCodebase::astFiles() const{
     return m_files;
 }
 
-void QCodeBase::parsePath(const QString& path){
+void QCodebase::parsePath(const QString& path){
     QFileInfo finfo(path);
     if ( !finfo.exists() || finfo.isRelative() ){
         finfo = QFileInfo(m_projectDir + "/" + path);
@@ -264,8 +294,8 @@ void QCodeBase::parsePath(const QString& path){
     }
 }
 
-QASTFile* QCodeBase::parseFile(const QString& file){
-    Q_D(QCodeBase);
+QASTFile* QCodebase::parseFile(const QString& file){
+    Q_D(QCodebase);
 
     QFileInfo finfo(file);
     if (!finfo.exists() || finfo.isRelative()){
@@ -323,7 +353,7 @@ QASTFile* QCodeBase::parseFile(const QString& file){
     return fileRoot;
 }
 
-QASTFile* QCodeBase::reparseFile(QASTFile* file){
+QASTFile* QCodebase::reparseFile(QASTFile* file){
     for ( int i = 0; i < m_files.size(); ++i ){
 
         if ( m_files[i] == file ){
@@ -349,7 +379,7 @@ QASTFile* QCodeBase::reparseFile(QASTFile* file){
     return 0;
 }
 
-QASTFile* QCodeBase::createFile(const QString& filePath){
+QASTFile* QCodebase::createFile(const QString& filePath){
     QFile file(filePath);
     if ( !file.open(QIODevice::WriteOnly) ){
         QCSAConsole::logError("Cannot create file \'" + filePath + "\'.");
@@ -358,7 +388,7 @@ QASTFile* QCodeBase::createFile(const QString& filePath){
     return parseFile(filePath);
 }
 
-bool QCodeBase::makePath(const QString& path){
+bool QCodebase::makePath(const QString& path){
     QDir dir(path);
     if ( dir.isRelative() && m_projectDir == ""){
         QCSAConsole::logError(
@@ -372,7 +402,7 @@ bool QCodeBase::makePath(const QString& path){
     return true;
 }
 
-QASTFile *QCodeBase::findFile(const QString &fileName){
+QASTFile *QCodebase::findFile(const QString &fileName){
     for ( QList<ast::QASTFile*>::const_iterator it = m_files.begin(); it != m_files.end(); ++it ){
         ast::QASTFile* file = *it;
         if ( file->identifier() == fileName )
@@ -381,7 +411,7 @@ QASTFile *QCodeBase::findFile(const QString &fileName){
     return 0;
 }
 
-QSourceLocation* QCodeBase::createLocation(const QString& file, unsigned int lineOrOffset, unsigned int column){
+QSourceLocation* QCodebase::createLocation(const QString& file, unsigned int lineOrOffset, unsigned int column){
     for ( int i = 0; i < m_files.size(); ++i ){
         if ( m_files[i]->identifier() == file ){
             return m_files[i]->createLocation(lineOrOffset, column);
@@ -390,7 +420,7 @@ QSourceLocation* QCodeBase::createLocation(const QString& file, unsigned int lin
     return 0;
 }
 
-void QCodeBase::setProjectDir(const QString& path){
+void QCodebase::setProjectDir(const QString& path){
     QDir dir(path);
     if ( dir.isAbsolute() )
         m_projectDir = dir.path();

@@ -24,10 +24,11 @@
 
 class QJSValue;
 class QJSEngine;
+class QFileInfo;
 
 namespace csa{
 
-class QCodeBase;
+class QCodebase;
 
 class Q_CSA_EXPORT QCSAPluginLoader : public QObject{
 
@@ -43,6 +44,7 @@ public:
     bool loadNodesFunction();
     bool loadFileFunctions();
     int loadPlugins(const QString &path);
+    int loadFile(const QString& path);
 
     bool execute(const QString &jsCode, QJSValue& result);
 
@@ -53,6 +55,8 @@ public slots:
     bool execute(const QString& jsCode);
 
 private:
+    int loadFile(const QFileInfo& file);
+
     QJSEngine*          m_engine;
 };
 

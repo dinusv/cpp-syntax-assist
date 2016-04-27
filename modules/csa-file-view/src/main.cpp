@@ -75,7 +75,7 @@ int main(int argc, char *argv[]){
     //"-include", "/home/dinu/CSADemo/macro.h"
 
     const char* args[] = {"-c", "-x", "c++"};
-    QCodeBase codeBase(args, 3, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
+    QCodebase codeBase(args, 3, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
 
     if ( commandLineArguments.isCursorOffsetSet() ){
         codeBase.propagateUserCursor(
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]){
     qmlRegisterUncreatableType<csa::QCSACompletionModel>(
         "CSA", 1, 0, "PluginCollection", "Only access to the plugins property is allowed.");
 
-    qmlRegisterUncreatableType<csa::QCodeBase>(
+    qmlRegisterUncreatableType<csa::QCodebase>(
         "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
 
     qmlRegisterUncreatableType<csa::QSourceLocation>(
