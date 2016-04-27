@@ -2,8 +2,8 @@ INCLUDEPATH += $$PWD
 
 SOURCES += \
     $$PWD/main.cpp \
-    $$PWD/QCSAFileViewArguments.cpp
+    $$PWD/qcsafileviewarguments.cpp
 
 HEADERS += \
-    $$PWD/QCSAFileViewArguments.hpp
+    $$PWD/qcsafileviewarguments.h
 

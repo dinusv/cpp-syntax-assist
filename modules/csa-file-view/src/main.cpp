@@ -19,19 +19,19 @@
 #include <QQmlContext>
 #include <QQmlApplicationEngine>
 
-#include "QCodeBase.hpp"
-#include "QCSAConsole.hpp"
-#include "QCSAPluginLoader.hpp"
-#include "QCSACompletionSet.hpp"
-#include "QCSACompletionModel.hpp"
+#include "qcodebase.h"
+#include "qcsaconsole.h"
+#include "qcsaengine.h"
+#include "qcsacompletionset.h"
+#include "qcsacompletionmodel.h"
 
-#include "QSourceLocation.hpp"
-#include "QAnnotatedToken.hpp"
-#include "QASTNode.hpp"
-#include "QASTFile.hpp"
+#include "qsourcelocation.h"
+#include "qannotatedtoken.h"
+#include "qastnode.h"
+#include "qastfile.h"
 
-#include "QASTCollapsibleModel.hpp"
-#include "QCSAFileViewArguments.hpp"
+#include "qastcollapsiblemodel.h"
+#include "qcsafileviewarguments.h"
 
 using namespace csa;
 using namespace csa::ast;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]){
     qmlRegisterUncreatableType<QCSAConsole>(
         "CSA", 1, 0, "ConfiguredDebugger", "Only access to the debug property is allowed.");
 
-    qmlRegisterUncreatableType<QCSAPluginLoader>(
+    qmlRegisterUncreatableType<QCSAEngine>(
         "CSA", 1, 0, "ConfiguredEngine", "Only access to the engine property is allowed.");
 
     qmlRegisterUncreatableType<csa::QCSACompletionSet>(
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]){
     QCSACompletionModel pluginCollection(&set);
     set.initDefaultCompletions();
 
-    QCSAPluginLoader scriptEngine(new QJSEngine);
+    QCSAEngine scriptEngine(new QJSEngine);
     scriptEngine.setContextObject("codeBase", &codeBase);
     scriptEngine.setContextObject("plugins",  &pluginCollection);
     scriptEngine.loadNodeCollection();

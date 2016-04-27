@@ -1,7 +1,7 @@
 SOURCES += $$PWD/main.cpp \
-    $$PWD/QCSAConsoleArguments.cpp \
-    $$PWD/QCSAInputHandler.cpp
+    $$PWD/qcsaconsolearguments.cpp \
+    $$PWD/qcsainputhandler.cpp
 
 HEADERS += \
-    $$PWD/QCSAConsoleArguments.hpp \
-    $$PWD/QCSAInputHandler.hpp
+    $$PWD/qcsaconsolearguments.h \
+    $$PWD/qcsainputhandler.h

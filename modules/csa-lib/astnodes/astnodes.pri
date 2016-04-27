@@ -1,25 +1,25 @@
 INCLUDEPATH += $$PWD
 
 HEADERS += \
-    $$PWD/QASTAccessSpecifier.hpp \
-    $$PWD/QASTDestructor.hpp \
-    $$PWD/QASTNode.hpp \
-    $$PWD/QASTNamespace.hpp \
-    $$PWD/QASTMethod.hpp \
-    $$PWD/QASTField.hpp \
-    $$PWD/QASTConstructor.hpp \
-    $$PWD/QASTClass.hpp \
-    $$PWD/QASTFile.hpp \
-    $$PWD/QASTMethodArgument.hpp
+    $$PWD/qastaccessspecifier.h \
+    $$PWD/qastclass.h \
+    $$PWD/qastconstructor.h \
+    $$PWD/qastdestructor.h \
+    $$PWD/qastfield.h \
+    $$PWD/qastfile.h \
+    $$PWD/qastmethod.h \
+    $$PWD/qastmethodargument.h \
+    $$PWD/qastnamespace.h \
+    $$PWD/qastnode.h
 
 SOURCES += \
-    $$PWD/QASTAccessSpecifier.cpp \
-    $$PWD/QASTClass.cpp \
-    $$PWD/QASTConstructor.cpp \
-    $$PWD/QASTDestructor.cpp \
-    $$PWD/QASTField.cpp \
-    $$PWD/QASTNode.cpp \
-    $$PWD/QASTNamespace.cpp \
-    $$PWD/QASTMethod.cpp \
-    $$PWD/QASTFile.cpp \
-    $$PWD/QASTMethodArgument.cpp
+    $$PWD/qastaccessspecifier.cpp \
+    $$PWD/qastclass.cpp \
+    $$PWD/qastconstructor.cpp \
+    $$PWD/qastdestructor.cpp \
+    $$PWD/qastfield.cpp \
+    $$PWD/qastfile.cpp \
+    $$PWD/qastmethod.cpp \
+    $$PWD/qastmethodargument.cpp \
+    $$PWD/qastnamespace.cpp \
+    $$PWD/qastnode.cpp

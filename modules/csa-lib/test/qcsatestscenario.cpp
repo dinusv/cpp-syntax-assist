@@ -1,13 +1,13 @@
 #include "qcsatestscenario.h"
-#include "QCodeBase.hpp"
-#include "QCSAPluginLoader.hpp"
+#include "qcodebase.h"
+#include "qcsaengine.h"
 
 namespace csa{
 
 QCSATestScenario::QCSATestScenario(
         const QString& name,
         const QJSValue& fn,
-        QCSAPluginLoader* scriptEngine,
+        QCSAEngine* scriptEngine,
         QObject *parent)
     : QObject(parent)
     , m_name(name)

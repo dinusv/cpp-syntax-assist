@@ -1,13 +1,13 @@
 #ifndef QCSATEST_H
 #define QCSATEST_H
 
-#include "QCSAGlobal.hpp"
+#include "qcsaglobal.h"
 #include <QObject>
 #include <QJSValue>
 
 namespace csa{
 
-class QCSAPluginLoader;
+class QCSAEngine;
 class QCSATestCase;
 class Q_CSA_EXPORT QCSATest : public QObject{
 
@@ -34,7 +34,7 @@ public slots:
 
 private:
     QList<QCSATestCase*> m_testcases;
-    QCSAPluginLoader*    m_scriptEngine;
+    QCSAEngine*    m_scriptEngine;
 
 };
 

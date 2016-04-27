@@ -3,12 +3,12 @@
 
 #include <QObject>
 #include <QJSValue>
-#include "QCSAGlobal.hpp"
+#include "qcsaglobal.h"
 
 namespace csa{
 
 class QCodebase;
-class QCSAPluginLoader;
+class QCSAEngine;
 
 class Q_CSA_EXPORT QCSATestScenario : public QObject{
 
@@ -18,7 +18,7 @@ public:
     explicit QCSATestScenario(
         const QString& name,
         const QJSValue& fn,
-        QCSAPluginLoader* scriptEngine,
+        QCSAEngine* scriptEngine,
         QObject *parent = 0);
     virtual ~QCSATestScenario();
 
@@ -37,7 +37,7 @@ private:
     QJSValue m_after;
     QJSValue m_test;
 
-    QCSAPluginLoader* m_scriptEngine;
+    QCSAEngine* m_scriptEngine;
     QCodebase* m_codebase;
 
 };

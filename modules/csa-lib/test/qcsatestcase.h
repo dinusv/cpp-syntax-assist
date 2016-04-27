@@ -1,14 +1,14 @@
 #ifndef QCSATESTCASE_H
 #define QCSATESTCASE_H
 
-#include "QCSAGlobal.hpp"
+#include "qcsaglobal.h"
 #include <QObject>
 #include <QJSValue>
 
 namespace csa{
 
 class QCSATestScenario;
-class QCSAPluginLoader;
+class QCSAEngine;
 
 class Q_CSA_EXPORT QCSATestCase : public QObject{
 
@@ -19,7 +19,7 @@ public:
     typedef QList<QCSATestScenario*>::const_iterator ConstIterator;
 
 public:
-    explicit QCSATestCase(const QString& name, QCSAPluginLoader* scriptEngine, QObject *parent = 0);
+    explicit QCSATestCase(const QString& name, QCSAEngine* scriptEngine, QObject *parent = 0);
     ~QCSATestCase();
 
     const QString& name() const;
@@ -39,7 +39,7 @@ private:
     QJSValue m_afterScenario;
     QString  m_name;
     QList<QCSATestScenario*> m_scenarios;
-    QCSAPluginLoader* m_scriptEngine;
+    QCSAEngine* m_scriptEngine;
 
 };
 

@@ -7,6 +7,7 @@ namespace csa{
 class QCSATestScenario;
 }
 
+class QJSValue;
 class TestScenario : public QObject{
 
     Q_OBJECT
@@ -21,6 +22,9 @@ private slots:
     void cleanup();
 
 private:
+    void stripError(const QJSValue& error, QString& message, QString& file, int& line, QString &lineText);
+    QString createErrorMessage(const QJSValue& error);
+
     csa::QCSATestScenario* m_scenario;
     QString m_testcase;
 

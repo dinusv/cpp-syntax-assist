@@ -1,10 +1,10 @@
 # Copy tests to release path
 # --------------------------
 
-TEST_DATA_DEPLOY_FROM = $$PWD/data
+TEST_DATA_DEPLOY_FROM = $$PWD/core
 
-win32:CONFIG(debug, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/debug/data
-else:win32:CONFIG(release, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/release/data
+win32:CONFIG(debug, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/debug/core
+else:win32:CONFIG(release, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/release/core
 else:unix: TEST_DATA_DEPLOY_TO = $$OUT_PWD
 
 win32:TEST_DATA_DEPLOY_TO ~= s,/,\\,g
@@ -42,7 +42,18 @@ else:unix: LIBS += -L$$OUT_PWD/../../modules/build/ -lcsa
 include($$PWD/src/functionaltests.pri)
 include($$PWD/../../3rdparty/libclang.pro)
 
-TARGET   = csa-functional-tests
+TARGET   = csa-script-test
 TEMPLATE = app
 
-#OTHER_FILES +=
+OTHER_FILES += \
+    $$PWD/core/codebase-test.js
+
+DISTFILES += \
+    core/astfile-test.js \
+    core/astnode-test.js \
+    core/astmethod-test.js \
+    core/nodecollection-test.js \
+    core/token-test.js \
+    core/config-test.js \
+    core/codebase-test.in \
+    core/codebase-test.insrc

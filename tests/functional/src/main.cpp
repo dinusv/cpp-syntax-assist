@@ -17,14 +17,13 @@
 
 #include <QCoreApplication>
 #include <QTest>
-#include "QASTSearchTest.hpp"
 
 #include <qqml.h>
-#include "QCodeBase.hpp"
-#include "QASTFile.hpp"
-#include "QASTNode.hpp"
-#include "QAnnotatedToken.hpp"
-#include "QSourceLocation.hpp"
+#include "qcodebase.h"
+#include "qastfile.h"
+#include "qastnode.h"
+#include "qannotatedtoken.h"
+#include "qsourcelocation.h"
 #include "qcsatest.h"
 #include "qcsatestcase.h"
 #include "qcsatestscenario.h"
@@ -58,7 +57,7 @@ int main(int argc, char *argv[])
     app.setAttribute(Qt::AA_Use96Dpi, true);
 
     csa::QCSATest csatest;
-    csatest.loadTestFile("D:/sometest.js");
+    csatest.loadTests(QCoreApplication::applicationDirPath() + "/core");
 
     int code = 0;
 

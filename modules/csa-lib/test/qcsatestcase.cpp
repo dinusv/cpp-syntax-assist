@@ -1,10 +1,10 @@
 #include "qcsatestcase.h"
 #include "qcsatestscenario.h"
-#include "QCSAPluginLoader.hpp"
+#include "qcsaengine.h"
 
 namespace csa{
 
-QCSATestCase::QCSATestCase(const QString &name, QCSAPluginLoader* scriptEngine, QObject *parent)
+QCSATestCase::QCSATestCase(const QString &name, QCSAEngine* scriptEngine, QObject *parent)
     : QObject(parent)
     , m_name(name)
     , m_scriptEngine(scriptEngine)

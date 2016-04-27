@@ -1,10 +1,11 @@
 #include "qcsatest.h"
 #include "qcsatestcase.h"
-#include "QCSAPluginLoader.hpp"
-#include "QCSAConsole.hpp"
+#include "qcsaengine.h"
+#include "qcsaconsole.h"
 #include <QJSValue>
 #include <QJSEngine>
 #include <QDirIterator>
+#include <QDebug>
 
 namespace csa{
 
@@ -12,7 +13,7 @@ namespace csa{
 
 QCSATest::QCSATest(QObject *parent)
     : QObject(parent)
-    , m_scriptEngine(new QCSAPluginLoader(new QJSEngine))
+    , m_scriptEngine(new QCSAEngine(new QJSEngine))
 {
     m_scriptEngine->loadNodeCollection();
     m_scriptEngine->loadNodesFunction();
@@ -21,7 +22,7 @@ QCSATest::QCSATest(QObject *parent)
 
     QJSValue result;
     if ( !m_scriptEngine->execute(
-        "function assert(expr){ if ( !expr ) throw Error(); }",
+        "function assert(expr){ if ( !expr ) throw new Error(\"Assertion failed\"); }",
         result
     ))
     {

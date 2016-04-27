@@ -1,24 +1,24 @@
 INCLUDEPATH += $$PWD
 
 HEADERS += \
-    $$PWD/QCSAGlobal.hpp \
-    $$PWD/QCodeBase.hpp \
-    $$PWD/QASTVisitor.hpp \
-    $$PWD/QAnnotatedTokenSet.hpp \
-    $$PWD/QSourceLocation.hpp \
-    $$PWD/QTokenClassifier.hpp \
-    $$PWD/QAnnotatedToken.hpp \
-    $$PWD/QASTSearch.hpp \
-    $$PWD/QSourceLocation_p.hpp \
-    $$PWD/QAnnotatedToken_p.hpp \
-    $$PWD/QCSAConsole.hpp
+    $$PWD/qcodebase.h \
+    $$PWD/qcsaconsole.h \
+    $$PWD/qcsaglobal.h \
+    $$PWD/qsourcelocation.h \
+    $$PWD/qsourcelocation_p.h \
+    $$PWD/qtokenclassifier.h \
+    $$PWD/qastvisitor.h \
+    $$PWD/qastsearch.h \
+    $$PWD/qannotatedtokenset.h \
+    $$PWD/qannotatedtoken_p.h \
+    $$PWD/qannotatedtoken.h
 
 SOURCES += \
-    $$PWD/QCodeBase.cpp \
-    $$PWD/QASTVisitor.cpp \
-    $$PWD/QAnnotatedTokenSet.cpp \
-    $$PWD/QSourceLocation.cpp \
-    $$PWD/QTokenClassifier.cpp \
-    $$PWD/QAnnotatedToken.cpp \
-    $$PWD/QASTSearch.cpp \
-    $$PWD/QCSAConsole.cpp
+    $$PWD/qannotatedtoken.cpp \
+    $$PWD/qannotatedtokenset.cpp \
+    $$PWD/qastsearch.cpp \
+    $$PWD/qastvisitor.cpp \
+    $$PWD/qcodebase.cpp \
+    $$PWD/qcsaconsole.cpp \
+    $$PWD/qsourcelocation.cpp \
+    $$PWD/qtokenclassifier.cpp
