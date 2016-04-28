@@ -3,6 +3,7 @@
 #include <qqml.h>
 
 #include "qcodebase.h"
+#include "qcodebaseconfig.h"
 #include "qcsaconsole.h"
 #include "qcsaengine.h"
 #include "qcsaconsolearguments.h"
@@ -53,8 +54,12 @@ int main(int argc, char* argv[]){
     // Create Codebase
     // ---------------
 
-    const char* args[] = {"-c", "-x", "c++"};
-    QCodebase codeBase(args, 3, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
+    QCSAEngine scriptEngine(new QJSEngine);
+    QCodebaseConfig* config = new QCodebaseConfig(
+        scriptEngine.engine(),
+        QCoreApplication::applicationDirPath() + "/config", "default"
+    );
+    QCodebase codeBase(config, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
 
     if ( commandLineArguments.isCursorOffsetSet() ){
         codeBase.propagateUserCursor(
@@ -100,7 +105,6 @@ int main(int argc, char* argv[]){
 
     QCSACompletionSet completionSet;
 
-    QCSAEngine scriptEngine(new QJSEngine);
     scriptEngine.setContextObject("codeBase", &codeBase);
     scriptEngine.setContextObject("plugins",  &completionSet);
     scriptEngine.loadNodeCollection();

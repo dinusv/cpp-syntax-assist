@@ -1,3 +1,9 @@
 {
-
+    "clangArgs": [
+        "-c",
+        "-x",
+        "c++"
+    ],
+	"includeFile": "",
+	"includeCode" : ""
 }

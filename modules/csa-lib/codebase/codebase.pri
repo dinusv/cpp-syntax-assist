@@ -2,6 +2,7 @@ INCLUDEPATH += $$PWD
 
 HEADERS += \
     $$PWD/qcodebase.h \
+    $$PWD/qcodebaseconfig.h \
     $$PWD/qcsaconsole.h \
     $$PWD/qcsaglobal.h \
     $$PWD/qsourcelocation.h \
@@ -19,6 +20,7 @@ SOURCES += \
     $$PWD/qastsearch.cpp \
     $$PWD/qastvisitor.cpp \
     $$PWD/qcodebase.cpp \
+    $$PWD/qcodebaseconfig.cpp \
     $$PWD/qcsaconsole.cpp \
     $$PWD/qsourcelocation.cpp \
     $$PWD/qtokenclassifier.cpp
