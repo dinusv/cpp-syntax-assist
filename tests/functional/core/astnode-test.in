@@ -1,0 +1,28 @@
+#include <string>
+
+namespace testnamespace{
+
+class ForwardDeclaredType;
+class TestClass{
+
+public:
+    TestClass(){}
+    TestClass(int value, const std::string& stringType, ForwardDeclaredType* forwardType){}
+
+    virtual void setValue(int value){}
+    void setForwardType(ForwardDeclaredType*){}
+
+    int getValue() const{ return m_value; }
+    ForwardDeclaredType* getForwardType(){ return m_forwardType; }
+    const std::string& getStringType() const{ return stringType;}
+
+    ~TestClass(){}
+
+private:
+    int intValue;
+    std::string stringType;
+    ForwardDeclaredType* m_forwardType;
+
+};
+
+}
