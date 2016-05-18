@@ -28,8 +28,8 @@ include($$PWD/../../3rdparty/libclang.pro)
 # Add Deployment
 # --------------
 
-win32:CONFIG(release, debug|release): DESTDIR = $$OUT_PWD/../build/release
-else:win32:CONFIG(debug, debug|release): DESTDIR = $$OUT_PWD/../build/debug
+win32:CONFIG(release, debug|release): DESTDIR = $$OUT_PWD/../build
+else:win32:CONFIG(debug, debug|release): DESTDIR = $$OUT_PWD/../build
 else:unix: DESTDIR = $$OUT_PWD/../build
 
 include(deployment.pri)

@@ -15,7 +15,7 @@
 ****************************************************************************/
 
 
-#include "QTestRunner.hpp"
+#include "qtestrunner.h"
 #include <QTest>
 
 QList<QSharedPointer<QObject> >* QTestRunner::m_tests = 0;

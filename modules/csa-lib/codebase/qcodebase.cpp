@@ -16,6 +16,7 @@
 
 
 #include "qcodebase.h"
+#include "qcodebaseconfig.h"
 #include "qsourcelocation.h"
 #include "qsourcelocation_p.h"
 #include "qtokenclassifier.h"
@@ -53,11 +54,6 @@ using namespace ast;
 
 // * Implement functionality for selected node (use signal to integrate with codebase.save)
 // * Implement functionality to extend NodeCollection
-// * Implement functionality for configurations
-//    * Configuration for compiler
-//    * Configuration for header/cpp files
-//    * Defautl configuration
-//    * Loading configuration
 // * Implement functionality for requires()
 // * Add search by number of parameters for functions
 
@@ -68,30 +64,19 @@ public:
 };
 
 QCodebase::QCodebase(
-        const char* const* translationUnitArgs,
-        int                translationUnitNumArgs,
+        QCodebaseConfig* config,
         const QStringList &entries,
         const QString&     searchDir,
         QObject*           parent)
 
     : QObject(parent)
     , d_ptr(new QCodebasePrivate)
+    , m_config(config)
     , m_projectDir(searchDir != "" ? QDir(searchDir).path() : "")
     , m_root(0)
     , m_current(0){
 
     Q_D(QCodebase);
-
-    m_sourceSearchPatterns << "*.c" << "*.C" << "*.cxx" << "*.cpp" << "*.c++" << "*.cc" << "*.cp";
-    m_headerSearchPatterns << "*.h" << "*.H" << "*.hxx" << "*.hpp" << "*.h++" << "*.hh" << "*.hp";
-
-    m_translationUnitNumArgs = translationUnitNumArgs;
-    m_translationUnitArgs    = new char*[m_translationUnitNumArgs];
-
-    for ( int i = 0 ;i < m_translationUnitNumArgs; ++i ){
-        m_translationUnitArgs[i] = new char[strlen(translationUnitArgs[i]) + 1];
-        strcpy(m_translationUnitArgs[i], translationUnitArgs[i]);
-    }
 
     if ( m_projectDir == "" ){
         if ( entries.size() > 0 ){
@@ -112,10 +97,7 @@ QCodebase::QCodebase(
 }
 
 QCodebase::~QCodebase(){
-    for ( int i = 0; i < m_translationUnitNumArgs; ++i ){
-        delete [] m_translationUnitArgs[i];
-    }
-    delete[] m_translationUnitArgs;
+    delete m_config;
     delete d_ptr;
 }
 
@@ -191,14 +173,6 @@ QList<QObject*> QCodebase::find(const QString& searchData, const QString& type){
     return foundNodes;
 }
 
-void QCodebase::setHeaderSearchPattern(const QStringList &pattern){
-    m_headerSearchPatterns = pattern;
-}
-
-void QCodebase::setSourceSearchPattern(const QStringList &pattern){
-    m_sourceSearchPatterns = pattern;
-}
-
 QASTFile *QCodebase::findSource(const QString &header){
     QString headerBaseName = QFileInfo(header).baseName();
 
@@ -206,7 +180,7 @@ QASTFile *QCodebase::findSource(const QString &header){
     if ( searchLocation == "" )
         searchLocation = QFileInfo(header).path();
 
-    QDirIterator it(searchLocation, m_sourceSearchPatterns, QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator it(searchLocation, m_config->sourceFilePatterns(), QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()){
         QString file = it.next();
         if ( it.fileInfo().baseName() == headerBaseName ){
@@ -227,7 +201,7 @@ QASTFile *QCodebase::findHeader(const QString &source){
     if ( searchLocation == "" )
         searchLocation = QFileInfo(source).path();
 
-    QDirIterator it(searchLocation, m_headerSearchPatterns, QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator it(searchLocation, m_config->headerFilePatterns(), QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()){
         QString file = it.next();
         if ( it.fileInfo().baseName() == sourceBaseName ){
@@ -283,7 +257,7 @@ void QCodebase::parsePath(const QString& path){
         }
     }
     if ( finfo.isDir()){
-        QStringList searchVals = QStringList() << m_headerSearchPatterns << m_sourceSearchPatterns;
+        QStringList searchVals = QStringList() << m_config->headerFilePatterns() << m_config->sourceFilePatterns();
         QDirIterator it(finfo.filePath(), searchVals, QDir::Files, QDirIterator::Subdirectories);
         while (it.hasNext()){
             it.next();
@@ -315,8 +289,8 @@ QASTFile* QCodebase::parseFile(const QString& file){
     CXTranslationUnit transUnit  = clang_parseTranslationUnit(
                 d->index,
                 filePath.toStdString().c_str(),
-                m_translationUnitArgs,
-                m_translationUnitNumArgs,
+                m_config->translationUnitArgs(),
+                m_config->translationUnitNumArgs(),
                 0,
                 0,
                 CXTranslationUnit_Incomplete | CXTranslationUnit_CXXChainedPCH);

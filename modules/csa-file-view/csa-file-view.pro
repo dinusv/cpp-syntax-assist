@@ -4,8 +4,8 @@
 PLUGIN_DEPLOY_FROM = $$PWD/../../plugins
 CONFIG_DEPLOY_FROM = $$PWD/../../config
 
-win32:CONFIG(debug, debug|release): DEPLOY_TO = $$OUT_PWD/../build/debug
-else:win32:CONFIG(release, debug|release): DEPLOY_TO = $$OUT_PWD/../build/release
+win32:CONFIG(debug, debug|release): DEPLOY_TO = $$OUT_PWD/../build
+else:win32:CONFIG(release, debug|release): DEPLOY_TO = $$OUT_PWD/../build
 else:unix: DEPLOY_TO = $$OUT_PWD/../build
 
 PLUGIN_DEPLOY_TO = $$DEPLOY_TO/plugins
@@ -68,13 +68,13 @@ win32{
 # Deployment
 # ----------
 
-win32:CONFIG(debug, debug|release): DEPLOY_TO = $$OUT_PWD/../build/debug
-else:win32:CONFIG(release, debug|release): DEPLOY_TO = $$OUT_PWD/release/plugins
+win32:CONFIG(debug, debug|release): DEPLOY_TO = $$OUT_PWD/../build
+else:win32:CONFIG(release, debug|release): DEPLOY_TO = $$OUT_PWD/../build
 else:unix: DEPLOY_TO = $$OUT_PWD
 
 
-win32:CONFIG(release, debug|release): DESTDIR = $$OUT_PWD/../build/release
-else:win32:CONFIG(debug, debug|release): DESTDIR = $$OUT_PWD/../build/debug
+win32:CONFIG(release, debug|release): DESTDIR = $$OUT_PWD/../build
+else:win32:CONFIG(debug, debug|release): DESTDIR = $$OUT_PWD/../build
 else:unix: DESTDIR = $$OUT_PWD/../build
 
 

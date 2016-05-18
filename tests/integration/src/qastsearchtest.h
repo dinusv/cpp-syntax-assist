@@ -2,7 +2,7 @@
 #define QASTSEARCHTEST_HPP
 
 #include <QObject>
-#include "QTestRunner.hpp"
+#include "qtestrunner.h"
 
 class QASTSearchTest : public QObject{
 
@@ -12,8 +12,6 @@ class QASTSearchTest : public QObject{
 public:
     explicit QASTSearchTest(QObject *parent = 0);
     virtual ~QASTSearchTest();
-
-signals:
 
 private slots:
     void initTestCase();

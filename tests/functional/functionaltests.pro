@@ -3,8 +3,8 @@
 
 TEST_DATA_DEPLOY_FROM = $$PWD/core
 
-win32:CONFIG(debug, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/debug/core
-else:win32:CONFIG(release, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/release/core
+win32:CONFIG(debug, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/core
+else:win32:CONFIG(release, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/core
 else:unix: TEST_DATA_DEPLOY_TO = $$OUT_PWD
 
 win32:TEST_DATA_DEPLOY_TO ~= s,/,\\,g
@@ -32,8 +32,8 @@ INCLUDEPATH += $$PWD/../../modules/csa-lib/codebase
 DEPENDPATH  += $$PWD/../../modules/csa-lib/codebase
 INCLUDEPATH += $$PWD/../../modules/csa-lib/script
 DEPENDPATH  += $$PWD/../../modules/csa-lib/script
-INCLUDEPATH += $$PWD/../../modules/csa-lib/test
-DEPENDPATH  += $$PWD/../../modules/csa-lib/test
+INCLUDEPATH += $$PWD/../../modules/csa-lib/testing
+DEPENDPATH  += $$PWD/../../modules/csa-lib/testing
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../modules/csa-lib/release/ -lcsa
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../modules/csa-lib/debug/ -lcsa
@@ -42,8 +42,12 @@ else:unix: LIBS += -L$$OUT_PWD/../../modules/build/ -lcsa
 include($$PWD/src/functionaltests.pri)
 include($$PWD/../../3rdparty/libclang.pro)
 
-TARGET   = csa-script-test
+TARGET   = csa-test-script
 TEMPLATE = app
+
+win32:CONFIG(release, debug|release): DESTDIR = $$OUT_PWD/../build
+else:win32:CONFIG(debug, debug|release): DESTDIR = $$OUT_PWD/../build
+else:unix: DESTDIR = $$OUT_PWD/../build
 
 OTHER_FILES += \
     $$PWD/core/codebase-test.js

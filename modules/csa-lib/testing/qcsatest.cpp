@@ -1,7 +1,11 @@
 #include "qcsatest.h"
 #include "qcsatestcase.h"
+#include "qcsatestscenario.h"
+
 #include "qcsaengine.h"
 #include "qcsaconsole.h"
+
+#include <qqml.h>
 #include <QJSValue>
 #include <QJSEngine>
 #include <QDirIterator>
@@ -61,9 +65,20 @@ int QCSATest::loadTests(const QString &path){
     return 0;
 }
 
+void QCSATest::registerTestingTypes(){
+    qmlRegisterUncreatableType<csa::QCSATest>(
+        "CSA", 1, 0, "Test", "CSATest is available only as a property.");
+    qmlRegisterUncreatableType<csa::QCSATestCase>(
+        "CSA", 1, 0, "TestCase", "CSATestCase is available only as a property.");
+    qmlRegisterUncreatableType<csa::QCSATestScenario>(
+        "CSA", 1, 0, "TestScenario", "CSATestScenario is available only as a property.");
+}
+
 void QCSATest::describe(const QString &str, QJSValue val){
-    if ( !val.isCallable() )
-        return; //TODO: Manage error
+    if ( !val.isCallable() ){
+        QCSAConsole::logError("Description \'" + str + "\' is not a function.");
+        return;
+    }
 
     QCSATestCase* description = new QCSATestCase(str, m_scriptEngine, this);
     QJSValue arg = m_scriptEngine->engine()->newQObject(description);

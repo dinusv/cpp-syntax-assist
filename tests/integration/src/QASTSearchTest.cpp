@@ -1,10 +1,8 @@
-#include "QASTSearchTest.hpp"
-#include "QASTSearch.hpp"
-#include "QASTNode.hpp"
+#include "qastsearchtest.h"
+#include "qastsearch.h"
+#include "qastnode.h"
 
 #include <QtTest/QtTest>
-
-#include <QDebug>
 
 using namespace csa;
 using namespace csa::ast;

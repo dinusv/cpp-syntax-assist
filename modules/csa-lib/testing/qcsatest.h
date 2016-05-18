@@ -29,6 +29,8 @@ public:
     int loadTestFile(const QString& path);
     int loadTests(const QString& path);
 
+    static void registerTestingTypes();
+
 public slots:
     void describe(const QString& str, QJSValue val);
 

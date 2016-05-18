@@ -30,6 +30,7 @@ namespace csa{
 class QTokenClassifier;
 class QSourceLocation;
 
+class QCodebaseConfig;
 class QCodebasePrivate;
 class Q_CSA_EXPORT QCodebase : public QObject{
 
@@ -37,8 +38,7 @@ class Q_CSA_EXPORT QCodebase : public QObject{
 
 public:
     explicit QCodebase(
-        const char* const* translationUnitArgs,
-        int                translationUnitNumArgs,
+        QCodebaseConfig*   config,
         const QStringList& entries = QStringList(),
         const QString&     searchDir = "",
         QObject*           parent = 0);
@@ -47,9 +47,6 @@ public:
     void propagateUserCursor(int offset, const QString& file);
     void propagateUserCursor(int line, int column, const QString& file);
     void propagateUserCursor(const csa::QSourceLocation& location);
-
-    void setHeaderSearchPattern(const QStringList& pattern);
-    void setSourceSearchPattern(const QStringList& pattern);
 
     const QList<csa::ast::QASTFile*>& astFiles() const;
 
@@ -112,16 +109,13 @@ private:
     void reparseIndex(int index);
 
 private:
+    QCodebaseConfig*       m_config;
+
     QList<ast::QASTFile*>  m_files;
     QString                m_projectDir;
-    QStringList            m_headerSearchPatterns;
-    QStringList            m_sourceSearchPatterns;
 
     csa::ast::QASTFile*    m_root;
     csa::ast::QASTNode*    m_current;
-
-    int                    m_translationUnitNumArgs;
-    char**                 m_translationUnitArgs;
 
     QList<csa::QTokenClassifier*> m_classifiers;
 };

@@ -4,6 +4,25 @@
         "-x",
         "c++"
     ],
-	"includeFile": "",
+    "headerFilePatterns" : [
+        "*.h",
+        "*.H",
+        "*.hxx",
+        "*.hpp",
+        "*.h++",
+        "*.hh",
+        "*.hp"
+    ],
+    "sourceFilePatterns" : [
+        "*.c",
+        "*.C",
+        "*.cxx",
+        "*.cpp",
+        "*.c++",
+        "*.cc",
+        "*.cp"
+    ],
+    "includeFiles": [
+    ],
 	"includeCode" : ""
 }

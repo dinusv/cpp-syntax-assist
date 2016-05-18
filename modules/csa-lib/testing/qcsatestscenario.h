@@ -1,9 +1,9 @@
 #ifndef QCSATESTSCENARIO_H
 #define QCSATESTSCENARIO_H
 
+#include "qcsaglobal.h"
 #include <QObject>
 #include <QJSValue>
-#include "qcsaglobal.h"
 
 namespace csa{
 

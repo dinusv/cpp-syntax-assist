@@ -18,4 +18,5 @@ OTHER_FILES += \
     $$PWD/plugins/setsingleton.js
 
 
-OTHER_FILES += $$PWD/config/default.json
+OTHER_FILES += \
+    $$PWD/config/default.json

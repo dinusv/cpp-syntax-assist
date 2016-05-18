@@ -10,8 +10,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-#include <QDebug>
-
 namespace csa{
 
 QCodebaseConfig::QCodebaseConfig(
@@ -124,9 +122,31 @@ void QCodebaseConfig::freeTranslationUnitArgs(){
     }
 }
 
+QStringList QCodebaseConfig::listFromJsArray(const QJSValue &array){
+    QStringList base;
+
+    QJSValueIterator it(array);
+    while( it.hasNext() ){
+        it.next();
+        base << it.value().toString();
+    }
+
+    return base;
+}
+
 void QCodebaseConfig::update(const QJSValue& val){
     if ( val.hasProperty("clangArgs") )
         parseTranslationUnitArgs(val.property("clangArgs"));
+    if ( val.hasProperty("headerFilePatterns") )
+        m_headerFilePatterns = listFromJsArray(val.property("headerFilePatterns"));
+    if ( val.hasProperty("sourceFilePatterns") )
+        m_sourceFilePatterns = listFromJsArray(val.property("sourceFilePatterns"));
+    if ( val.hasProperty("includeFiles") )
+        m_includeFiles = listFromJsArray(val.property("includeFiles"));
+    if ( val.hasProperty("includeCode") )
+        m_includeCode = val.property("includeCode").toString();
+
+    emit dataChanged();
 }
 
 }// namespace

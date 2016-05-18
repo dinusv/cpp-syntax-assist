@@ -50,6 +50,8 @@ public:
     void setContextObject(const QString& name, QObject* object);
     void setContextOwnedObject(const QString& name, QObject* object);
 
+    static void registerBaseTypes();
+
 public slots:
     bool execute(const QString& jsCode);
 

@@ -17,37 +17,23 @@
 
 #include <QCoreApplication>
 #include <QTest>
-#include "QTestRunner.hpp"
-#include "QASTParsingTest.hpp"
-#include "QASTInsertionTest.hpp"
-#include "QASTSearchTest.hpp"
+#include "qtestrunner.h"
+#include "qastsearchtest.h"
+#include "qcsatestingtest.h"
 
 #include <qqml.h>
-#include "QCodeBase.hpp"
-#include "QASTFile.hpp"
-#include "QASTNode.hpp"
-#include "QAnnotatedToken.hpp"
-#include "QSourceLocation.hpp"
+#include "qcsaengine.h"
+#include "qcsatest.h"
+#include "qcsatestcase.h"
+#include "qcsatestscenario.h"
 
 int main(int argc, char *argv[])
 {
-    qmlRegisterUncreatableType<csa::QSourceLocation>(
-        "CSA", 1, 0, "SourceLocation", "Source locations can be created from the codeBase or ASTFiles.");
-
-    qmlRegisterUncreatableType<csa::QAnnotatedToken>(
-        "CSA", 1, 0, "Token", "Only access to Token properties of nodes is allowed.");
-
-    qmlRegisterUncreatableType<csa::QCodeBase>(
-        "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
-
-    qmlRegisterUncreatableType<csa::ast::QASTFile>(
-        "CSA", 1, 0, "ASTFile", "ASTFile is available only as a property.");
-
-    qmlRegisterUncreatableType<csa::ast::QASTNode>(
-        "CSA", 1, 0, "ASTNode", "ASTNode is available only as a property.");
-
     QCoreApplication app(argc, argv);
     app.setAttribute(Qt::AA_Use96Dpi, true);
+
+    csa::QCSAEngine::registerBaseTypes();
+    csa::QCSATest::registerTestingTypes();
 
     return QTestRunner::runTests(argc, argv);
 }
