@@ -140,23 +140,71 @@ CSATest.describe('ASTNode properties', function(test){
 
 CSATest.describe('ASTNode Traversal', function(test){
 
+    test.scenario('neighbor based traversal', function(){
+        var file = codebase.parseFile('core/astnode-test.in')
+        var namespaceNode = file.firstChild('testnamespace')
+        assert(namespaceNode !== null)
+        assert(namespaceNode.identifier() === 'testnamespace')
+        var namespaceNotFound = file.firstChild('testnamespace', 'class')
+        assert(namespaceNotFound === null)
 
+        assert(namespaceNode.children().length === 1)
+        assert(namespaceNode.children()[0].typeName() === 'class')
+
+        var classNode = namespaceNode.firstChild()
+        assert(classNode.children('method').length === 5)
+        assert(classNode.children('constructor').length === 2)
+        assert(classNode.firstChild().typeName() === 'constructor')
+        assert(classNode.lastChild().typeName() === 'destructor')
+        assert(classNode.firstChild('getValue') === 'method')
+
+        var getValueNode = classNode.firstChild('getValue')
+        assert(getValueNode.prev().identifier() === 'setForwardType')
+        assert(getValueNode.next().identifier() === 'getForwardType')
+        assert(getValueNode.astParent().identifier() === 'TestClass')
+    })
+
+    test.scenario('search based traversal', function(){
+        var file = codebase.parseFile('core/astnode-test.in')
+        var namespaceNode = file.firstChild('testnamespace')
+        assert(namespaceNode !== null)
+
+        var classNode = namespaceNode.firstChild()
+        assert(namespaceNode.findNode(classNode) !== null)
+        assert(namespaceNode.findNode(namespaceNode.parent()) === null)
+
+        assert(namespaceNode.find('setValue').length === 1)
+        assert(namespaceNode.find('void*Value')[0].identifier() === 'setValue')
+        assert(namespaceNode.find('setValue[1]')[0].identifier() === 'setValue')
+        assert(namespaceNode.find('*int value*')[0].identifier() === 'setValue')
+        assert(namespaceNode.find('*Value').length === 2)
+        assert(namespaceNode.find('[3]').length === 1)
+        assert(namespaceNode.find('[1]').length === 2)
+        assert(namespaceNode.find('[0]', 'method').length === 3)
+        assert(namespaceNode.find('*', 'destructor').length === 1)
+        assert(namespaceNode.find('int *Value').length === 2)
+        assert(namespaceNode.find('(int)'))
+        assert(namespaceNode.find('(int,*string*)')[0].typeName() === 'constructor')
+
+        assert(namespaceNode.find('intValue').parentFind('namespace').identifier() === 'testnamespace')
+    })
 
 })
 
 CSATest.describe('ASTNode Modifiers', function(test){
 
-
+    //TODO
 
 })
 
 CSATest.describe('ASTNode Locations', function(test){
 
+    //TODO
 
 })
 
 CSATest.describe('ASTNode Breadcrumbs', function(test){
 
-
+    //TODO
 
 })
