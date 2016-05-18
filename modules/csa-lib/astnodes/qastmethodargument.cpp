@@ -29,7 +29,7 @@ QASTMethodArgument::QASTMethodArgument(
         QSourceLocation* rangeStartLocation,
         QSourceLocation* rangeEndLocation,
         QASTNode* parent)
-    : QASTNode("methodArgument", tokenSet, cursorLocation, rangeStartLocation, rangeEndLocation, parent)
+    : QASTNode("argument", tokenSet, cursorLocation, rangeStartLocation, rangeEndLocation, parent)
 {
 
     // Get Identifier

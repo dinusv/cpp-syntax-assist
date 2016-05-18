@@ -60,4 +60,5 @@ DISTFILES += \
     core/token-test.js \
     core/config-test.js \
     core/codebase-test.in \
-    core/codebase-test.insrc
+    core/codebase-test.insrc \
+    core/astnode-test.in
