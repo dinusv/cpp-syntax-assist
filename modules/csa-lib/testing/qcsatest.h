@@ -26,6 +26,8 @@ public:
     Iterator end();
     ConstIterator end() const;
 
+    QCSATestCase* findTestCase(const QString& name);
+
     int loadTestFile(const QString& path);
     int loadTests(const QString& path);
 

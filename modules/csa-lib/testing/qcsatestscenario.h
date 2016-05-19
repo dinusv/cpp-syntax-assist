@@ -31,11 +31,18 @@ public:
     QJSValue runTest();
     QJSValue cleanup();
 
+    static void stripError(const QJSValue& error, QString& message, QString& file, int& line, QString &lineText);
+
+    bool hasError();
+    const QJSValue& lastError() const;
+
 private:
     QString  m_name;
     QJSValue m_before;
     QJSValue m_after;
     QJSValue m_test;
+
+    QJSValue m_lastError;
 
     QCSAEngine* m_scriptEngine;
     QCodebase* m_codebase;
@@ -44,6 +51,14 @@ private:
 
 inline const QString &QCSATestScenario::name() const{
     return m_name;
+}
+
+inline bool QCSATestScenario::hasError(){
+    return m_lastError.isError();
+}
+
+inline const QJSValue &QCSATestScenario::lastError() const{
+    return m_lastError;
 }
 
 }// namespace

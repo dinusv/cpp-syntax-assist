@@ -13,8 +13,6 @@
 
 namespace csa{
 
-//TODO add assertException
-
 QCSATest::QCSATest(QObject *parent)
     : QObject(parent)
     , m_scriptEngine(new QCSAEngine(new QJSEngine))
@@ -26,7 +24,12 @@ QCSATest::QCSATest(QObject *parent)
 
     QJSValue result;
     if ( !m_scriptEngine->execute(
-        "function assert(expr){ if ( !expr ) throw new Error(\"Assertion failed\"); }",
+        "function assert(expr){ if ( !expr ) throw new Error(\"Assertion failed\"); }\n"
+        "function assertThrows(block, errorType){\n"
+            "var setErrorType = errorType || Error, assertion = false;\n"
+            "try{ block() } catch ( error ){ if ( error instanceof setErrorType ) assertion = true; }\n"
+            "if ( !assertion ) throw new Error(\"Throws assertion failed.\");\n"
+        "}",
         result
     ))
     {
@@ -35,6 +38,16 @@ QCSATest::QCSATest(QObject *parent)
 }
 
 QCSATest::~QCSATest(){
+    for ( QCSATest::Iterator it = m_testcases.begin(); it != m_testcases.end(); ++it )
+        delete *it;
+    m_testcases.clear();
+}
+
+QCSATestCase *QCSATest::findTestCase(const QString &name){
+    for ( QCSATest::Iterator it = m_testcases.begin(); it != m_testcases.end(); ++it )
+        if ( (*it)->name() == name )
+            return *it;
+    return 0;
 }
 
 int QCSATest::loadTestFile(const QString &path){

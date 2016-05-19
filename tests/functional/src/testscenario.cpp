@@ -40,42 +40,10 @@ void TestScenario::cleanup(){
     }
 }
 
-void TestScenario::stripError(const QJSValue &error, QString &message, QString &file, int &line, QString& lineText){
-    message  = error.property("message").toString();
-    file     = "";
-    line     = 1;
-    lineText = "";
-
-    QString stackTrace = error.property("stack").toString();
-    QStringList stackTraceList = stackTrace.split("@");
-    if ( stackTraceList.length() > 0 ){
-        QString lastStackTrace = stackTraceList.last();
-        int splitIndex = lastStackTrace.lastIndexOf(":");
-        if ( splitIndex != -1 ){
-            file = lastStackTrace.mid(0, splitIndex);
-            line = lastStackTrace.mid(splitIndex + 1).toInt();
-            QFile inputFile(file);
-            if ( inputFile.open(QIODevice::ReadOnly) ){
-                QTextStream in(&inputFile);
-                int currentLine = 1;
-                while ( !in.atEnd() ){
-                    if ( currentLine == line ){
-                        lineText = in.readLine().trimmed();
-                        return;
-                    } else {
-                        in.readLine();
-                    }
-                    ++currentLine;
-                }
-            }
-        }
-    }
-}
-
 QString TestScenario::createErrorMessage(const QJSValue &error){
     QString message, file, lineText;
     int line;
 
-    stripError(error, message, file, line, lineText);
+    QCSATestScenario::stripError(error, message, file, line, lineText);
     return message + ": " + lineText + (lineText.isEmpty() ? "" : "\n") + file + ":" + QString::number(line);
 }

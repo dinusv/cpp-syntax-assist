@@ -29,6 +29,8 @@ public:
     Iterator end();
     ConstIterator end() const;
 
+    QCSATestScenario* findScenario(const QString& name);
+
 public slots:
     void beforeScenario(const QJSValue& fn);
     void afterScenario(const QJSValue& fn);

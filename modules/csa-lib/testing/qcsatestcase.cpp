@@ -14,11 +14,16 @@ QCSATestCase::QCSATestCase(const QString &name, QCSAEngine* scriptEngine, QObjec
 QCSATestCase::~QCSATestCase(){
 }
 
+QCSATestScenario *QCSATestCase::findScenario(const QString &name){
+    for ( QList<QCSATestScenario*>::iterator it = m_scenarios.begin(); it != m_scenarios.end(); ++it ){
+        if ( (*it)->name() == name )
+            return *it;
+    }
+    return 0;
+}
+
 
 void QCSATestCase::beforeScenario(const QJSValue& fn){
-    if ( !fn.isCallable() ){
-        return; //TODO: Error
-    }
     m_beforeScenario = fn;
     for ( QList<QCSATestScenario*>::iterator it = m_scenarios.begin(); it != m_scenarios.end(); ++it ){
         (*it)->setBeforeCall(m_beforeScenario);
@@ -26,20 +31,13 @@ void QCSATestCase::beforeScenario(const QJSValue& fn){
 }
 
 void QCSATestCase::afterScenario(const QJSValue &fn){
-    if ( !fn.isCallable() ){
-        return; // TOOD: Error
-    }
     m_afterScenario = fn;
     for ( QList<QCSATestScenario*>::iterator it = m_scenarios.begin(); it != m_scenarios.end(); ++it ){
-        (*it)->setAfterCall(m_beforeScenario);
+        (*it)->setAfterCall(m_afterScenario);
     }
 }
 
 void QCSATestCase::scenario(const QString &name, const QJSValue &fn){
-    if ( !fn.isCallable() ){
-        return;
-    }
-
     QCSATestScenario* scn = new QCSATestScenario(name, fn, m_scriptEngine, this);
     scn->setBeforeCall(m_beforeScenario);
     scn->setAfterCall(m_afterScenario);
