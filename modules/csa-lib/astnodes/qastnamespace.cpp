@@ -67,15 +67,4 @@ QASTNamespace::QASTNamespace(
 QASTNamespace::~QASTNamespace(){
 }
 
-
-QASTNode *QASTNamespace::propagateUserCursor(const QSourceLocation &location){
-    QASTNode* base = this;
-    if ( rangeStartLocation()->offset() <= location.offset() && rangeEndLocation()->offset() >= location.offset() ){
-        QASTNode* result = QASTNode::propagateUserCursor(location);
-        if ( result != 0 )
-            base = result;
-    }
-    return base;
-}
-
 }}

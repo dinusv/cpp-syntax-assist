@@ -8,8 +8,8 @@
 #include <qqml.h>
 #include <QJSValue>
 #include <QJSEngine>
+#include <QTextStream>
 #include <QDirIterator>
-#include <QDebug>
 
 namespace csa{
 
@@ -24,12 +24,24 @@ QCSATest::QCSATest(QObject *parent)
 
     QJSValue result;
     if ( !m_scriptEngine->execute(
-        "function assert(expr){ if ( !expr ) throw new Error(\"Assertion failed\"); }\n"
+        "function assert(expr){ \n"
+             "if ( !expr ) throw new Error(\"Assertion failed\"); \n"
+        "}\n"
         "function assertThrows(block, errorType){\n"
             "var setErrorType = errorType || Error, assertion = false;\n"
             "try{ block() } catch ( error ){ if ( error instanceof setErrorType ) assertion = true; }\n"
             "if ( !assertion ) throw new Error(\"Throws assertion failed.\");\n"
-        "}",
+        "}\n"
+        "function backup(file){ \n"
+             "if ( !CSATest.backup(file) ){\n"
+                "CSATest.restore(); throw new Error(\"Failed to backup file: \" + file);\n"
+             "}\n"
+        "}\n"
+        "function restore(){ \n"
+          "if ( !CSATest.restore() ){\n"
+             "throw new Error(\"Failed to restore files.\");\n"
+          "}\n"
+        "}\n",
         result
     ))
     {
@@ -41,6 +53,9 @@ QCSATest::~QCSATest(){
     for ( QCSATest::Iterator it = m_testcases.begin(); it != m_testcases.end(); ++it )
         delete *it;
     m_testcases.clear();
+    for ( QList<QCSATest::RestorePoint*>::Iterator it = m_restorePoints.begin(); it != m_restorePoints.end(); ++it )
+        delete *it;
+    m_restorePoints.clear();
 }
 
 QCSATestCase *QCSATest::findTestCase(const QString &name){
@@ -61,7 +76,7 @@ int QCSATest::loadTests(const QString &path){
         return -1;
     }
 
-    if ( QFileInfo(path).isDir() ){
+    if ( fInfo.isDir() ){
         QDirIterator it(path, QDirIterator::Subdirectories);
         while (it.hasNext()) {
             it.next();
@@ -99,6 +114,39 @@ void QCSATest::describe(const QString &str, QJSValue val){
     val.call(QJSValueList() << arg);
 
     m_testcases.append(description);
+}
+
+bool QCSATest::backup(const QString &path){
+    QString absolutePath = QDir::cleanPath(QDir::currentPath() + "/" + path);
+    QFile file(absolutePath);
+    if ( !file.open(QFile::ReadOnly) ){
+        QCSAConsole::logError("Failed to open backup point: " + absolutePath);
+        return false;
+    }
+    RestorePoint* rp = new RestorePoint;
+    rp->file     = absolutePath;
+    rp->contents = file.readAll();
+
+    m_restorePoints.append(rp);
+    file.close();
+    return true;
+}
+
+bool QCSATest::restore(){
+    bool restoreSuccess = true;
+    for ( QList<RestorePoint*>::Iterator it = m_restorePoints.begin(); it != m_restorePoints.end(); ++it ){
+        RestorePoint* rp = *it;
+        QFile file(rp->file);
+        if ( file.open(QFile::WriteOnly | QFile::Truncate) ){
+            file.write(rp->contents);
+        } else {
+            QCSAConsole::logError("Failed to restore point: " + rp->file);
+            restoreSuccess = false;
+        }
+        delete rp;
+    }
+    m_restorePoints.clear();
+    return restoreSuccess;
 }
 
 }// namespace

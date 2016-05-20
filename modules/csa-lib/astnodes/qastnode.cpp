@@ -73,7 +73,7 @@ QString QASTNode::breadcrumbs() const{
     return identifier().replace('/', "\\/");
 }
 
-QString QASTNode::description() const{
+QString QASTNode::declaration() const{
     return identifier();
 }
 
@@ -161,7 +161,7 @@ void QASTNode::dump(QString& out, int depth) const{
     for ( int i = 0; i < depth * dumpIndentation; ++i )
         space.append(" ");
 
-    out.append(space + description() + "\n");
+    out.append(space + declaration() + "\n");
     for ( NodeList::const_iterator it = m_children.begin(); it != m_children.end(); ++it ){
         (*it)->dump(out, depth + 1);
     }
@@ -243,12 +243,12 @@ void QASTNode::setAstParent(QASTNode* parent){
     setParent(parent);
 }
 
-QASTNode *QASTNode::propagateUserCursor(const QSourceLocation &location){
+QASTNode *QASTNode::nodeAt(const QSourceLocation &location){
     QASTNode* base = 0;
     if ( m_rangeStartLocation->offset() <= location.offset() && m_rangeEndLocation->offset() >= location.offset() ){
         base = this;
         for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
-            QASTNode* result = (*it)->propagateUserCursor(location);
+            QASTNode* result = (*it)->nodeAt(location);
             if ( result != 0 )
                 base = result;
         }

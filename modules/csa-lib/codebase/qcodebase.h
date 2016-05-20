@@ -44,16 +44,10 @@ public:
         QObject*           parent = 0);
     ~QCodebase();
 
-    void propagateUserCursor(int offset, const QString& file);
-    void propagateUserCursor(int line, int column, const QString& file);
-    void propagateUserCursor(const csa::QSourceLocation& location);
-
     const QList<csa::ast::QASTFile*>& astFiles() const;
 
-public slots:    
-    bool select(const QString &searchData, const QString &type = "");
-    bool selectNode(csa::ast::QASTNode* node);
-    csa::ast::QASTNode* selectedNode();
+public slots:
+    csa::ast::QASTNode* nodeAt(const QString& file, int lineOrOffset, int column = 0);
 
     // Parsing
     // -------
@@ -61,6 +55,7 @@ public slots:
     void parsePath(const QString& path);
     csa::ast::QASTFile* parseFile(const QString& file);
     csa::ast::QASTFile* reparseFile(csa::ast::QASTFile* file);
+    void reparse();
 
     // Location
     // --------
@@ -81,7 +76,7 @@ public slots:
     // -------------------------
 
     csa::ast::QASTFile* createFile(const QString& filePath);
-    bool removeFile(csa::ast::QASTFile* file);
+    bool deleteFile(csa::ast::QASTFile* file);
     bool makePath(const QString& path);
 
     // Save
@@ -93,6 +88,7 @@ signals:
     void fileAdded(csa::ast::QASTFile* file);
     void fileAboutToBeReparsed(csa::ast::QASTFile* file);
     void fileReparsed(csa::ast::QASTFile* file);
+    void fileAboutToBeDeleted(csa::ast::QASTFile* file);
     void nodeSelected(csa::ast::QASTNode* node);
 
 private:
@@ -114,19 +110,12 @@ private:
     QList<ast::QASTFile*>  m_files;
     QString                m_projectDir;
 
-    csa::ast::QASTFile*    m_root;
-    csa::ast::QASTNode*    m_current;
-
     QList<csa::QTokenClassifier*> m_classifiers;
 };
 
 
 inline QList<QObject*> QCodebase::files() const{
     return QObject::children();
-}
-
-inline csa::ast::QASTNode* QCodebase::selectedNode(){
-    return m_current;
 }
 
 } // namespace

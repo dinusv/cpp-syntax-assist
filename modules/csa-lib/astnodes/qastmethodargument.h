@@ -37,7 +37,7 @@ public:
             QASTNode* parent = 0);
     virtual ~QASTMethodArgument();
 
-    virtual QString description() const;
+    virtual QString declaration() const;
     virtual QString prop(const QString &key) const;
 
 signals:

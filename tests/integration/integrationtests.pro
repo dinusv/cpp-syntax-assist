@@ -1,10 +1,10 @@
 # Copy tests to release path
 # --------------------------
 
-TEST_DATA_DEPLOY_FROM = $$PWD/data
+TEST_DATA_DEPLOY_FROM = $$PWD/internaltests
 
-win32:CONFIG(debug, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/core
-else:win32:CONFIG(release, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/core
+win32:CONFIG(debug, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/internaltests
+else:win32:CONFIG(release, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/internaltests
 else:unix: TEST_DATA_DEPLOY_TO = $$OUT_PWD
 
 win32:TEST_DATA_DEPLOY_TO ~= s,/,\\,g
@@ -53,10 +53,8 @@ else:win32:CONFIG(debug, debug|release): DESTDIR = $$OUT_PWD/../build
 else:unix: DESTDIR = $$OUT_PWD/../build
 
 OTHER_FILES += \
-    $$PWD/data/csa-assertions-test.js \
-    $$PWD/data/csa-before-after-scenario-test.js \
-    $$PWD/data/csa-invalid-params-test.js
-
-DISTFILES += \
-    data/csa-restore-test.js \
-    data/csa-restore-test.in
+    $$PWD/internaltests/csa-assertions-test.js \
+    $$PWD/internaltests/csa-before-after-scenario-test.js \
+    $$PWD/internaltests/csa-invalid-params-test.js \
+    $$PWD/internaltests/csa-restore-test.js \
+    $$PWD/internaltests/csa-restore-test.in

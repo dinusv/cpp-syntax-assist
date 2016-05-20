@@ -33,9 +33,7 @@ public:
             QASTNode* parent = 0);
     virtual ~QASTClass();
 
-    QString description() const;
-
-    virtual QASTNode* propagateUserCursor(const QSourceLocation &location);
+    QString declaration() const;
 
     virtual QSourceLocation* bodyStartLocation();
     virtual QSourceLocation* bodyEndLocation();
@@ -48,7 +46,7 @@ private:
     bool m_bodyStartSet;
 };
 
-inline QString QASTClass::description() const{
+inline QString QASTClass::declaration() const{
     return typeName() + " " + identifier();
 }
 

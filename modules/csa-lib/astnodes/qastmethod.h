@@ -38,7 +38,7 @@ public:
             QSourceLocation* rangeEndLocation,
             QASTNode* parent = 0);
 
-    virtual QString description() const;
+    virtual QString declaration() const;
 
 public slots:
     virtual QList<QObject*> arguments() const;

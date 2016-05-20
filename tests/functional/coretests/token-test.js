@@ -1,0 +1,47 @@
+CSATest.describe('Token', function(test){
+
+    test.scenario('namespace token', function(){
+        var file = codebase.parseFile('coretests/token-test.in')
+        assert(file !== null)
+        var namespaceNode = file.firstChild()
+        var tokens = namespaceNode.associatedTokens()
+        assert(tokens.length === 5)
+        assert(tokens[0].name() === 'namespace')
+        assert(tokens[1].name() === 'token_test')
+        assert(tokens[2].name() === '{')
+        assert(tokens[3].name() === ';')
+        assert(tokens[4].name() === '}')
+    })
+
+    test.scenario('class token', function(){
+        var file = codebase.parseFile('coretests/token-test.in')
+        assert(file !== null)
+        var classNode = file.firstChild().firstChild()
+        var tokens = classNode.associatedTokens()
+        assert(tokens.length === 4)
+        assert(tokens[0].name() === 'class')
+        assert(tokens[1].name() === 'Token')
+        assert(tokens[2].name() === '{')
+        assert(tokens[3].name() === '}')
+    })
+
+    test.scenario('token modifiers', function(){
+        backup('coretests/token-test.in')
+        var file = codebase.parseFile('coretests/token-test.in')
+        assert(file !== null)
+        var classNode = file.firstChild().firstChild()
+        var tokens = classNode.associatedTokens()
+        assert(tokens.length === 4)
+        assert(tokens[0].name() === 'class')
+        tokens[0].before('class FirstToken{};\n')
+        tokens[3].afterln('class ThirdToken{};')
+        codebase.save()
+        var classNodes = file.firstChild().children()
+        assert(classNodes.length === 3)
+        assert(classNodes[0].identifier() === 'FirstToken')
+        assert(classNodes[1].identifier() === 'Token')
+        assert(classNodes[2].identifier() === 'ThirdToken')
+        restore()
+    })
+
+})

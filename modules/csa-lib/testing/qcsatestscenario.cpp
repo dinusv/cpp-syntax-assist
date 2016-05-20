@@ -58,7 +58,7 @@ QJSValue QCSATestScenario::init(){
     }
 
     QCodebaseConfig* cbconfig = new QCodebaseConfig(m_scriptEngine->engine(), QDir::currentPath());
-    QJSValue configRoot;
+    QJSValue configRoot = m_scriptEngine->engine()->newObject();
 
     QJSValue configClangArgs = m_scriptEngine->engine()->newArray(3);
     configClangArgs.setProperty(0, "-c");

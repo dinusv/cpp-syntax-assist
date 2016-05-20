@@ -1,10 +1,10 @@
 # Copy tests to release path
 # --------------------------
 
-TEST_DATA_DEPLOY_FROM = $$PWD/core
+TEST_DATA_DEPLOY_FROM = $$PWD/coretests
 
-win32:CONFIG(debug, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/core
-else:win32:CONFIG(release, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/core
+win32:CONFIG(debug, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/coretests
+else:win32:CONFIG(release, debug|release): TEST_DATA_DEPLOY_TO = $$OUT_PWD/../build/coretests
 else:unix: TEST_DATA_DEPLOY_TO = $$OUT_PWD
 
 win32:TEST_DATA_DEPLOY_TO ~= s,/,\\,g
@@ -49,16 +49,17 @@ win32:CONFIG(release, debug|release): DESTDIR = $$OUT_PWD/../build
 else:win32:CONFIG(debug, debug|release): DESTDIR = $$OUT_PWD/../build
 else:unix: DESTDIR = $$OUT_PWD/../build
 
-OTHER_FILES += \
-    $$PWD/core/codebase-test.js
-
 DISTFILES += \
-    core/astfile-test.js \
-    core/astnode-test.js \
-    core/astmethod-test.js \
-    core/nodecollection-test.js \
-    core/token-test.js \
-    core/config-test.js \
-    core/codebase-test.in \
-    core/codebase-test.insrc \
-    core/astnode-test.in
+    $$PWD/coretests/astfile-test.js \
+    $$PWD/coretests/astnode-test.js \
+    $$PWD/coretests/astmethod-test.js \
+    $$PWD/coretests/nodecollection-test.js \
+    $$PWD/coretests/token-test.js \
+    $$PWD/coretests/config-test.js \
+    $$PWD/coretests/codebase-test.js \
+    $$PWD/coretests/codebase-test.in \
+    $$PWD/coretests/codebase-test.insrc \
+    $$PWD/coretests/astnode-test.in \
+    $$PWD/coretests/nodecollection-test.in \
+    $$PWD/coretests/token-test.in \
+    coretests/requires-test.js

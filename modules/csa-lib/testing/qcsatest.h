@@ -13,6 +13,13 @@ class Q_CSA_EXPORT QCSATest : public QObject{
 
     Q_OBJECT
 
+private:
+    class RestorePoint{
+    public:
+        QString    file;
+        QByteArray contents;
+    };
+
 public:
     typedef QList<QCSATestCase*>::iterator Iterator;
     typedef QList<QCSATestCase*>::const_iterator ConstIterator;
@@ -26,6 +33,8 @@ public:
     Iterator end();
     ConstIterator end() const;
 
+    int totalTests() const;
+
     QCSATestCase* findTestCase(const QString& name);
 
     int loadTestFile(const QString& path);
@@ -36,9 +45,14 @@ public:
 public slots:
     void describe(const QString& str, QJSValue val);
 
+    bool backup(const QString& path);
+    bool restore();
+
 private:
     QList<QCSATestCase*> m_testcases;
-    QCSAEngine*    m_scriptEngine;
+    QCSAEngine*          m_scriptEngine;
+
+    QList<RestorePoint*> m_restorePoints;
 
 };
 
@@ -56,6 +70,10 @@ inline QCSATest::Iterator QCSATest::end(){
 
 inline QCSATest::ConstIterator QCSATest::end() const{
     return m_testcases.end();
+}
+
+inline int QCSATest::totalTests() const{
+    return m_testcases.size();
 }
 
 }// namespace

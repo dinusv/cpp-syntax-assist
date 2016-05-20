@@ -164,15 +164,10 @@ void QCSACompletionSet::initDefaultCompletions(){
     registerItem(QCSACompletionItem::Object, "remove()", "remove()", "");
 }
 
-void QCSACompletionSet::registerPlugin(const QVariantMap &pluginData){
-    if ( !pluginData.contains("name") ){
-        QCSAConsole::logError("Cannot find \'name\' property in given arguments.");
-        return;
-    }
-
+void QCSACompletionSet::registerPlugin(const QString &name, const QVariantMap &pluginData){
     QCSACompletionItem* newItem = new QCSACompletionItem(
         QCSACompletionItem::Global | QCSACompletionItem::Object,
-        pluginData["name"].toString(),
+        name,
         pluginData.contains("usage") ? pluginData["usage"].toString() : "",
         pluginData.contains("description") ? pluginData["description"].toString() : ""
     );

@@ -61,20 +61,19 @@ int main(int argc, char* argv[]){
     );
     QCodebase codeBase(config, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
 
-    if ( commandLineArguments.isCursorOffsetSet() ){
-        codeBase.propagateUserCursor(
-            commandLineArguments.cursorOffset(),
-            commandLineArguments.files().first()
-        );
-    } else if ( commandLineArguments.isCursorLineColumnSet() ){
-        codeBase.propagateUserCursor(
-            commandLineArguments.cursorLine(),
-            commandLineArguments.cursorColumn(),
-            commandLineArguments.files().first()
-        );
-    } else {
-        codeBase.propagateUserCursor(0, commandLineArguments.files().first());
-    }
+    //TODO
+//    if ( commandLineArguments.isCursorOffsetSet() ){
+//        codeBase.nodeAt(
+//            commandLineArguments.cursorOffset(),
+//            commandLineArguments.files().first()
+//        );
+//    } else if ( commandLineArguments.isCursorLineColumnSet() ){
+//        codeBase.nodeAt(
+//            commandLineArguments.cursorLine(),
+//            commandLineArguments.cursorColumn(),
+//            commandLineArguments.files().first()
+//        );
+//    }
 
     // Configure Engine
     // ----------------

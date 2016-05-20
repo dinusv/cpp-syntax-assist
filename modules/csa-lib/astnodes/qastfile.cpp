@@ -157,7 +157,9 @@ bool QASTFile::insert(const QString& value, QSourceLocation* location){
          m_modifiers.append(new QModifierElementPrivate(value, *location));
         return true;
     } else {
-        QCSAConsole::logError("Cannot insert :\'" +  value + "'. Incompatible file location.");
+        QCSAConsole::logError(
+            "Cannot insert :\'" +  value + "'. Incompatible file location: " + QString::number(location->offset())
+        );
         return false;
     }
 }

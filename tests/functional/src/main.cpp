@@ -20,6 +20,7 @@
 
 #include <qqml.h>
 #include "qcsaengine.h"
+#include "qcsaconsole.h"
 #include "qcsatest.h"
 #include "qcsatestcase.h"
 #include "qcsatestscenario.h"
@@ -34,7 +35,27 @@ int main(int argc, char *argv[])
     csa::QCSATest::registerTestingTypes();
 
     csa::QCSATest csatest;
-    csatest.loadTests(QCoreApplication::applicationDirPath() + "/core");
+
+    QString applicationPath = QCoreApplication::applicationDirPath();
+
+    QStringList appArgs = app.arguments();
+    if ( appArgs.size() > 1 ){
+        for ( int i = 1; i < appArgs.size(); ++i ){
+            QString& arg = appArgs[i];
+            csa::QCSAConsole::log(csa::QCSAConsole::General, "Loading tests from " + arg);
+            if ( QFileInfo(arg).isRelative() )
+                csatest.loadTests(QDir::cleanPath(applicationPath + "/" + arg));
+            else
+                csatest.loadTests(arg);
+        }
+    } else {
+        if ( QDir(applicationPath + "/coretests").exists() )
+            csatest.loadTests(applicationPath + "/coretests");
+        if ( QDir(applicationPath + "/plugintests").exists() )
+            csatest.loadTests(applicationPath + "/plugintests");
+    }
+
+    csa::QCSAConsole::log(csa::QCSAConsole::General, "Loaded " + QString::number(csatest.totalTests()) + " tests.");
 
     int code = 0;
 
@@ -42,7 +63,7 @@ int main(int argc, char *argv[])
         csa::QCSATestCase* testcase = *it;
         for ( csa::QCSATestCase::Iterator tcit = testcase->begin(); tcit != testcase->end(); ++tcit ){
             TestScenario scenario(testcase->name(), *tcit);
-            code += QTest::qExec(&scenario, argc, argv);
+            code += QTest::qExec(&scenario, 1, argv);
         }
     }
 

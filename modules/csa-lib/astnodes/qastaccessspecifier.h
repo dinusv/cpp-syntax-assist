@@ -33,10 +33,10 @@ public:
             QSourceLocation* rangeEndLocation,
             QASTNode* parent = 0);
 
-    QString description() const;
+    QString declaration() const;
 };
 
-inline QString QASTAccessSpecifier::description() const{
+inline QString QASTAccessSpecifier::declaration() const{
     return identifier() + ":";
 }
 

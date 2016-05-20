@@ -72,7 +72,7 @@ public:
     void initDefaultCompletions();
 
 public slots:
-    void registerPlugin(const QVariantMap& pluginData);
+    void registerPlugin(const QString& name, const QVariantMap& pluginData);
 
 private:
     QList<QCSACompletionItem*> m_items;

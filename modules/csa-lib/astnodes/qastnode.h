@@ -73,7 +73,7 @@ public slots:
 
     QString breadcrumbs() const;
 
-    virtual QString description() const;
+    virtual QString declaration() const;
     virtual QString prop(const QString& key) const;
 
     QString text();
@@ -122,7 +122,7 @@ public:
     // Initializers
     // ------------
 
-    virtual QASTNode* propagateUserCursor(const QSourceLocation& location);
+    virtual QASTNode* nodeAt(const QSourceLocation& location);
 
     // Children Handlers
     // -----------------

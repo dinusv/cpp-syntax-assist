@@ -71,9 +71,9 @@ void QCSACompletionModel::filter(const QString& text){
     }
 }
 
-void QCSACompletionModel::registerPlugin(const QVariantMap &pluginData){
+void QCSACompletionModel::registerPlugin(const QString& name, const QVariantMap &pluginData){
     Q_D(QCSACompletionModel);
-    d->completion->registerPlugin(pluginData);
+    d->completion->registerPlugin(name, pluginData);
 }
 
 }// namespace

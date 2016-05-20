@@ -35,7 +35,7 @@ signals:
 
 public slots:
     void filter(const QString& name);
-    void registerPlugin(const QVariantMap& pluginData);
+    void registerPlugin(const QString& name, const QVariantMap& pluginData);
 
 private:
     QCSACompletionModel(const QCSACompletionModel& other);

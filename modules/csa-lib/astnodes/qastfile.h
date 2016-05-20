@@ -36,7 +36,7 @@ public:
     bool hasModifiers();
     void clearModifiers();
     void save();
-    QString description() const;
+    QString declaration() const;
 
     void reparseSize();
 
@@ -61,7 +61,7 @@ private:
 
 };
 
-inline QString QASTFile::description() const{
+inline QString QASTFile::declaration() const{
     return QString("file \"") + identifier() + "\"";
 }
 

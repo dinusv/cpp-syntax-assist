@@ -28,47 +28,6 @@
 #include <QJSValue>
 #include <QJSValueIterator>
 
-//TODO
-
-//NodeCollection.obExtend = function(options){
-//  for ( var name in options ){
-//    if ( !options.hasOwnProperty(name) || options[name] === undefined )
-//      continue;
-//    var src    = options[name];
-//    var target = NodeCollection.prototype;
-//    var dst = target[name];
-//    if ( target == src )
-//      continue;
-//    target[name] = src;
-//  }
-//  return target;
-//}
-
-
-//NodeCollection.obDescribe({
-//  getMyVal : {
-//    'params' : 'asmdlak'
-//  }
-//})
-
-//NodeCollection.obExtend({
-//  data : 2,
-//  getMyVal : function(){
-//    return this.myval;
-//  }
-//})
-
-//var col = new NodeCollection();
-//var col2 = new NodeCollection();
-
-//console.log(col.getMyVal());
-
-//col2.data = 3;
-//console.log(col.data);
-//console.log(col.data2);
-
-
-
 namespace csa{
 
 QCSAEngine::QCSAEngine(QJSEngine* engine, QObject* parent)
@@ -87,6 +46,23 @@ bool QCSAEngine::loadNodeCollection(){
     QJSValue evaluateResult = m_engine->evaluate(
         "function NodeCollection(nodes){this.nodes = nodes ? nodes : [];} \n"
 
+        "NodeCollection.prototype.size = function(){ \n"
+        "    return this.nodes.length;\n"
+        "}\n"
+
+        "NodeCollection.prototype.each = function(eachcall){ \n"
+        "    this.nodes.forEach(eachcall);\n"
+        "}\n"
+
+        "NodeCollection.prototype.append = function(node){ \n"
+        "    if( node instanceof NodeCollection){ \n"
+        "        for ( var i = 0; i < node.size(); ++i ) \n"
+        "            this.nodes.push(node.nodes[i]); \n"
+        "    } else {\n"
+        "        this.nodes.push(node);\n"
+        "    }\n"
+        "}\n"
+
         "NodeCollection.prototype.children = function(){ \n"
         "    var newCollection = new NodeCollection(); \n"
         "    for ( var i = 0; i < this.nodes.length; ++i ){ \n"
@@ -95,42 +71,61 @@ bool QCSAEngine::loadNodeCollection(){
         "            newCollection.nodes.push(nodeChildren[j]); \n"
         "    } \n"
         "    return newCollection; \n"
-        "} \n"
+        "}\n"
 
         "NodeCollection.prototype.find = function(selector, typeName){ \n"
         "    if ( selector.indexOf('/', selector.length - 1) === -1 )\n"
         "       selector += '/';\n"
-        "    var newCollection = new NodeCollection(); \n"
-        "    for ( var i = 0; i < this.nodes.length; ++i ){ \n"
+        "    var newCollection = new NodeCollection();\n"
+        "    for ( var i = 0; i < this.nodes.length; ++i ){\n"
         "        var foundChildren = this.nodes[i].find(selector,(typeof typeName === 'undefined' ? '' : typeName)); \n"
-        "        for ( var j = 0; j < foundChildren.length; ++j ) \n"
-        "            newCollection.nodes.push(foundChildren[j]); \n"
-        "    } \n"
-        "    return newCollection; \n"
-        "} \n"
+        "        for ( var j = 0; j < foundChildren.length; ++j )\n"
+        "            newCollection.nodes.push(foundChildren[j]);\n"
+        "    }\n"
+        "    return newCollection;\n"
+        "}\n"
 
         "NodeCollection.prototype.remove = function(){ \n"
         "    for ( var i = 0; i < this.nodes.length; ++i ){\n"
         "        this.nodes[i].remove();\n"
         "    }\n"
-        "    codeBase.save()\n"
-        "} \n"
+        "}\n"
 
         "NodeCollection.prototype.toString = function(){ \n"
         "    var ret = 'NodeCollection['; \n"
         "    for ( var i = 0; i < this.nodes.length; ++i ){ \n"
         "        if ( i !== 0 ) \n"
         "            ret += ', '; \n"
-        "        ret += '\\'' + this.nodes[i].description() + '\\''; \n"
+        "        ret += '\\'' + this.nodes[i].declaration() + '\\''; \n"
         "    } \n"
         "    return ret + ']'; \n"
-        "} \n"
+        "}\n"
 
-        "NodeCollection.registerPlugin = function(properties){ \n"
-        "    if( typeof plugins !== 'undefined' ) \n"
-        "        plugins.registerPlugin(properties); \n"
-        "    return NodeCollection; \n"
-        "} \n"
+        "NodeCollection.extend = function(options){\n"
+        "    var target = NodeCollection.prototype;\n"
+        "    for ( var name in options ){\n"
+        "        if ( !options.hasOwnProperty(name) || options[name] === undefined )\n"
+        "            continue;\n"
+        "        var src = options[name];\n"
+        "        var dst = target[name];\n"
+        "        if ( target == src )\n"
+        "            continue;\n"
+        "        target[name] = src;\n"
+        "    }\n"
+        "    return NodeCollection;\n"
+        "}\n"
+
+        "NodeCollection.describe = function(options){\n"
+        "    if( typeof plugins === 'undefined' ) \n"
+        "        return;\n"
+        "    var target = NodeCollection.prototype;\n"
+        "    for ( var name in options ){\n"
+        "        if ( !options.hasOwnProperty(name) || options[name] === undefined )\n"
+        "            continue;\n"
+        "        plugins.registerPlugin(name, options[name])\n"
+        "    }\n"
+        "    return NodeCollection;\n"
+        "}\n"
     );
 
     if ( evaluateResult.isError() ){
@@ -144,10 +139,20 @@ bool QCSAEngine::loadNodesFunction(){
 
     QJSValue evaluateResult = m_engine->evaluate(
         "function nodes(selector, type){ \n"
-        "    if ( selector.indexOf('/', selector.length - 1) === -1 )\n"
-        "       selector += '/';\n"
-        "    return new NodeCollection(codeBase.find(selector, type ? type : '')); \n"
-        "} \n"
+        "    if ( selector instanceof String || typeof(selector) === 'string' ){\n"
+        "       if ( selector.indexOf('/', selector.length - 1) === -1 )\n"
+        "           selector += '/';\n"
+        "       return new NodeCollection(codebase.find(selector, type || ''));\n"
+        "    } else if ( selector instanceof Array ){\n"
+        "       return new NodeCollection(selector)\n"
+        "    } else {\n"
+        "       return new NodeCollection([selector])\n"
+        "    }\n"
+        "}\n"
+
+        "function selected(){"
+        "   return nodes(NodeCollection.selectedPath || '')"
+        "}"
     );
 
     if ( evaluateResult.isError() ){
@@ -161,11 +166,11 @@ bool QCSAEngine::loadFileFunctions(){
 
     QJSValue evaluateResult = m_engine->evaluate(
         "function createFile(file){ \n"
-        "    return new NodeCollection(codeBase.createFile(file)); \n"
+        "    return new NodeCollection(codebase.createFile(file)); \n"
         "}\n"
 
         "function parse(file){\n"
-        "    var astFile = codeBase.parseFile(file);\n"
+        "    var astFile = codebase.parseFile(file);\n"
         "    if (astFile)\n"
         "        return new NodeCollection(astFile);\n"
         "    return new NodeCollection();\n"
@@ -174,15 +179,15 @@ bool QCSAEngine::loadFileFunctions(){
         "function reparse(selector){ \n"
         "    if ( selector.indexOf('/', selector.length - 1) === -1 )\n"
         "       selector += '/';\n"
-        "    var astFiles = codeBase.find(selector, 'file');\n"
+        "    var astFiles = codebase.find(selector, 'file');\n"
         "    var ncollect = new NodeCollection();\n"
         "    for (var i = 0; i < astFiles.length; ++i )\n"
-        "        ncollect.nodes.push(codeBase.reparseFile(astFiles[i]));\n"
+        "        ncollect.nodes.push(codebase.reparseFile(astFiles[i]));\n"
         "    return ncollect; \n"
         "}\n"
 
         "function makePath(path){ \n"
-        "    codeBase.makePath(path); \n"
+        "    codebase.makePath(path); \n"
         "}\n"
     );
 
@@ -232,11 +237,7 @@ int QCSAEngine::loadFile(const QFileInfo &file){
 
     QTextStream configStream(&configScript);
 
-    m_engine->globalObject().setProperty("dirname",  file.path());
-    m_engine->globalObject().setProperty("filename", file.fileName());
     QJSValue evaluateResult = m_engine->evaluate(configStream.readAll(), configScript.fileName());
-    m_engine->globalObject().setProperty("dirname", "");
-    m_engine->globalObject().setProperty("filename", "");
 
     if ( evaluateResult.isError() ){
         QCSAConsole::logError("Uncaught javascript exception: " + evaluateResult.toString());
@@ -269,11 +270,11 @@ void QCSAEngine::setContextOwnedObject(const QString &name, QObject *object){
 
 void QCSAEngine::registerBaseTypes(){
     qmlRegisterUncreatableType<csa::QSourceLocation>(
-        "CSA", 1, 0, "SourceLocation", "Source locations can be created from the codeBase or ASTFiles.");
+        "CSA", 1, 0, "SourceLocation", "Source locations can be created from the codebase or ASTFiles.");
     qmlRegisterUncreatableType<csa::QAnnotatedToken>(
         "CSA", 1, 0, "Token", "Only access to Token properties of nodes is allowed.");
     qmlRegisterUncreatableType<csa::QCodebase>(
-        "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
+        "CSA", 1, 0, "Codebase", "Codebase is available only as a property.");
     qmlRegisterUncreatableType<csa::ast::QASTFile>(
         "CSA", 1, 0, "ASTFile", "ASTFile is available only as a property.");
     qmlRegisterUncreatableType<csa::ast::QASTNode>(

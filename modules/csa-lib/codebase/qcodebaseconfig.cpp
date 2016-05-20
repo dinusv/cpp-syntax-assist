@@ -96,7 +96,8 @@ void QCodebaseConfig::parseTranslationUnitArgs(const QJSValue& val){
     QJSValueIterator countIt(val);
     while( countIt.hasNext() ){
         countIt.next();
-        ++m_translationUnitNumArgs;
+        if ( countIt.name() != "length" )
+            ++m_translationUnitNumArgs;
     }
 
     m_translationUnitArgs = new char*[m_translationUnitNumArgs];
@@ -105,10 +106,12 @@ void QCodebaseConfig::parseTranslationUnitArgs(const QJSValue& val){
     QJSValueIterator it(val);
     while( it.hasNext() ){
         it.next();
-        QByteArray arg = it.value().toString().toUtf8();
-        m_translationUnitArgs[i] = new char[arg.length() + 1];
-        strcpy(m_translationUnitArgs[i], arg.constData());
-        m_translationUnitArgs[i][arg.length()] = '\0';
+        if ( it.name() != "length" ){
+            QByteArray arg = it.value().toString().toUtf8();
+            m_translationUnitArgs[i] = new char[arg.length() + 1];
+            strcpy(m_translationUnitArgs[i], arg.constData());
+            m_translationUnitArgs[i][arg.length()] = '\0';
+        }
         ++i;
     }
 }

@@ -63,7 +63,7 @@ CSATest.describe('codebase file searching', function(test){
 })
 
 CSATest.describe('codebase file creation and removal', function(test){
-    test.scenario('create and remove file', function(){
+    test.scenario('create and delete file', function(){
         var file = codebase.createFile('core/codebase-test-create.in')
         file.insert('class CreatedClass{};', file.createLocation(0))
         codebase.save()

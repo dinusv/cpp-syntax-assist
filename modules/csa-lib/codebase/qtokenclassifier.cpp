@@ -29,6 +29,7 @@ QTokenClassifier::QTokenClassifier(const CXTranslationUnit &transUnit, const cha
 
 QTokenClassifier::~QTokenClassifier(){
     disposeTokenSets();
+    clang_disposeTranslationUnit(m_translationUnit);
 }
 
 QAnnotatedTokenSet *QTokenClassifier::findTokenSet(const CXCursor &cursor){

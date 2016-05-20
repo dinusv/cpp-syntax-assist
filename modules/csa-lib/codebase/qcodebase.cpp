@@ -33,30 +33,11 @@ namespace csa{
 
 using namespace ast;
 
-
 //TODO
 
-//selectNode(file, 20, 30);
-//selectNode(file, 20);
-//NodeCollection.selected = codebase.findNodeAt(file, 20, 20);
-//NodeCollection.selected = codebase.findNodeAt(file, 10);
-//selected().do()
-// when codebase saves content
-// render NodeCollection.selected = undefined
-// connect signal to codebase in order to register update
-// NodeCollection.selected is set when program starts
-
-//TODO
-
-// * Add test cases for simple functions
-// * Add test cases for features to implement
-// * Add test cases for plugins
-
-// * Implement functionality for selected node (use signal to integrate with codebase.save)
-// * Implement functionality to extend NodeCollection
 // * Implement functionality for requires()
 // * Add search by number of parameters for functions
-
+// * Standardize breadcrumbs
 
 class QCodebasePrivate{
 public:
@@ -73,9 +54,7 @@ QCodebase::QCodebase(
     , d_ptr(new QCodebasePrivate)
     , m_config(config)
     , m_projectDir(searchDir != "" ? QDir(searchDir).path() : "")
-    , m_root(0)
-    , m_current(0){
-
+{
     Q_D(QCodebase);
 
     if ( m_projectDir == "" ){
@@ -99,12 +78,12 @@ QCodebase::QCodebase(
 QCodebase::~QCodebase(){
     delete m_config;
     delete d_ptr;
+    for ( QList<csa::QTokenClassifier*>::Iterator it = m_classifiers.begin(); it != m_classifiers.end(); ++it )
+        delete *it;
+    m_classifiers.clear();
 }
 
 void QCodebase::save(){
-    QString currentSelection     = m_current ? m_current->breadcrumbs() : "*";
-    QString currentSelectionType = m_current ? m_current->typeName() : "";
-
     for ( int i = 0; i < m_files.size(); ++i ){
         QASTFile* root = m_files[i];
         if ( root->hasModifiers() ){
@@ -113,51 +92,19 @@ void QCodebase::save(){
             reparseIndex(i);
         }
     }
-
-    select(currentSelection, currentSelectionType);
 }
 
-void QCodebase::propagateUserCursor(int offset, const QString &file){
-    CXTranslationUnit transUnit = m_classifiers.first()->translationUnit();
-    CXFile cfile = clang_getFile(transUnit, file.toStdString().c_str());
-    CXSourceLocation sLocation = clang_getLocationForOffset(transUnit, cfile, offset);
-    propagateUserCursor(createSourceLocation(sLocation));
-}
-
-void QCodebase::propagateUserCursor(int line, int column, const QString &file){
-    CXTranslationUnit transUnit = m_classifiers.first()->translationUnit();
-    CXFile cfile = clang_getFile(transUnit, file.toStdString().c_str());
-    CXSourceLocation sLocation = clang_getLocation(transUnit, cfile, line, column);
-    propagateUserCursor(createSourceLocation(sLocation));
-}
-
-void QCodebase::propagateUserCursor(const QSourceLocation &location){
-    QASTNode* deepest = m_current->propagateUserCursor(location);
-    if ( deepest != 0 ){
-        m_current = deepest;
-        emit nodeSelected(m_current);
-    }
-}
-
-bool QCodebase::select(const QString &searchData, const QString &type){
-    for ( QList<ast::QASTFile*>::iterator it = m_files.begin(); it != m_files.end(); ++it ){
-        QASTFile* file = *it;
-        QASTNode* foundChild = file->findFirst(searchData, type);
-        if ( foundChild ){
-            selectNode(foundChild);
-            return true;
+QASTNode *QCodebase::nodeAt(const QString &file, int lineOrOffset, int column){
+    for ( int i = 0; i < m_files.size(); ++i ){
+        QASTFile* root = m_files[i];
+        if ( root->identifier() == file ){
+            QSourceLocation* location = root->createLocation(lineOrOffset, column);
+            QASTNode* node = root->nodeAt(*location);
+            delete location;
+            return node;
         }
     }
-    return false;
-}
-
-bool QCodebase::selectNode(QASTNode* node){
-    if ( node != 0 ){
-        m_current = node;
-        emit nodeSelected(node);
-        return true;
-    }
-    return false;
+    return 0;
 }
 
 QList<QObject*> QCodebase::find(const QString& searchData, const QString& type){
@@ -295,6 +242,11 @@ QASTFile* QCodebase::parseFile(const QString& file){
                 0,
                 CXTranslationUnit_Incomplete | CXTranslationUnit_CXXChainedPCH);
 
+    if ( transUnit == 0 ){
+        QCSAConsole::logError("Failed to parse translation unit on file: " + finfo.filePath());
+        return 0;
+    }
+
     CXCursor startCursor  = clang_getTranslationUnitCursor(transUnit);
     CXFile   clangFile    = clang_getFile(transUnit, filePath.toStdString().c_str());
 
@@ -321,36 +273,22 @@ QASTFile* QCodebase::parseFile(const QString& file){
     QCSAConsole::log(QCSAConsole::Info1, "Parsed: " + fileRoot->identifier());
     emit fileAdded(fileRoot);
 
-    if ( !m_current )
-        selectNode(fileRoot);
-
     return fileRoot;
 }
 
 QASTFile* QCodebase::reparseFile(QASTFile* file){
     for ( int i = 0; i < m_files.size(); ++i ){
-
         if ( m_files[i] == file ){
-
-            QASTNode* currentFile = m_current;
-            while ( currentFile->astParent() )
-                currentFile = currentFile->astParent();
-
-            QString currentSelection = "", currentSelectionType = "";
-            if ( qobject_cast<QASTFile*>(currentFile) == file ){
-                currentSelection     = m_current ? m_current->breadcrumbs() : "*";
-                currentSelectionType = m_current ? m_current->typeName() : "";
-            }
-
             reparseIndex(i);
-
-            if ( currentFile == file )
-                select(currentSelection, currentSelectionType);
-
             return file;
         }
     }
     return 0;
+}
+
+void QCodebase::reparse(){
+    for ( int i = 0; i < m_files.size(); ++i )
+        reparseIndex(i);
 }
 
 QASTFile* QCodebase::createFile(const QString& filePath){
@@ -362,8 +300,21 @@ QASTFile* QCodebase::createFile(const QString& filePath){
     return parseFile(filePath);
 }
 
-bool QCodebase::removeFile(QASTFile *file){
-    //TODO
+bool QCodebase::deleteFile(QASTFile *file){
+    for ( int i = 0; i < m_files.size(); ++i ){
+        if ( m_files[i] == file ){
+            emit fileAboutToBeDeleted(file);
+            delete m_classifiers[i];
+            m_classifiers.removeAt(i);
+            m_files.removeAt(i);
+            file->deleteLater();
+            if ( QFile(file->identifier()).remove() ){
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
     return false;
 }
 
