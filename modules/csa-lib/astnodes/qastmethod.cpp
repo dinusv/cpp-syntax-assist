@@ -48,58 +48,63 @@ QASTMethod::QASTMethod(
     // Get Return Type
     // ---------------
 
-    CXType type           = clang_getCursorResultType(tokenSet->cursor());
-    CXString typeSpelling = clang_getTypeSpelling(type);
+    CXType returnType     = clang_getCursorResultType(tokenSet->cursor());
+    CXString typeSpelling = clang_getTypeSpelling(returnType);
     m_returnType          = clang_getCString(typeSpelling);
     clang_disposeString(typeSpelling);
 
-    // If unknown, determine type from tokens
-    // --------------------------------------
-
-    QAnnotatedTokenSet::Iterator it = tokenSet->begin();
-    if ( type.kind == CXType_Unexposed || type.kind == CXType_Invalid || m_returnType.contains("int") ){
-        m_returnType = "";
-
-        bool doubleColonFlag = false;
-
-        while ( it != tokenSet->end() ){
-            CXToken t              = (*it)->token().token;
-            CXString tSpelling     = clang_getTokenSpelling(tokenSet->translationUnit(), t);
-            const char* tCSpelling = clang_getCString(tSpelling);
-            CXTokenKind tKind      = clang_getTokenKind(t);
-
-            if ( tKind == CXToken_Identifier && std::string(clang_getCString(id)) == tCSpelling ){
-                clang_disposeString(tSpelling);
-                break;
-            } else if ( tKind == CXToken_Keyword && std::string("inline") == tCSpelling ){
-                m_isInline = true;
-            } else if ( tKind == CXToken_Keyword && std::string("static") == tCSpelling ){
-                m_isStatic = true;
-            } else if ( tKind == CXToken_Keyword && std::string("virtual") == tCSpelling ){
-                m_isVirtual = true;
-            } else if ( tKind == CXToken_Keyword && std::string("operator") == tCSpelling ){
-                clang_disposeString(tSpelling);
-                break;
-            } else if ( tKind == CXToken_Punctuation && std::string("::") == tCSpelling ){
-                doubleColonFlag = true;
-                m_returnType   += tCSpelling;
-            } else if (( tKind == CXToken_Identifier || tKind == CXToken_Keyword ) &&
-                       !m_returnType.isEmpty() && !doubleColonFlag ){
-                m_returnType   += QString(" ") + tCSpelling;
-            } else {
-                m_returnType   += tCSpelling;
-                doubleColonFlag = false;
-            }
-
-            ++it;
-            clang_disposeString(tSpelling);
-        }
-    }
-
-    // Check Static
-    // ------------
+    // Check kind
+    // ----------
 
     m_isStatic = clang_CXXMethod_isStatic(tokenSet->cursor());
+    m_isConst  = clang_CXXMethod_isConst(tokenSet->cursor());
+
+    // Iterate Tokens
+    // --------------
+
+    QAnnotatedTokenSet::Iterator it = tokenSet->begin();
+
+    bool deductReturnType = returnType.kind == CXType_Invalid || m_returnType.contains("int");
+    if ( deductReturnType )
+        m_returnType = "";
+
+    bool doubleColonFlag = false;
+
+    while (it != tokenSet->end()){
+        CXToken t              = (*it)->token().token;
+        CXString tSpelling     = clang_getTokenSpelling(tokenSet->translationUnit(), t);
+        const char* tCSpelling = clang_getCString(tSpelling);
+        CXTokenKind tKind      = clang_getTokenKind(t);
+
+        if ( tKind == CXToken_Identifier && std::string(clang_getCString(id)) == tCSpelling ){
+            clang_disposeString(tSpelling);
+            break;
+        } else if ( tKind == CXToken_Keyword && std::string("inline") == tCSpelling ){
+            m_isInline = true;
+        } else if ( tKind == CXToken_Keyword && std::string("static") == tCSpelling ){
+            m_isStatic = true;
+        } else if ( tKind == CXToken_Keyword && std::string("virtual") == tCSpelling ){
+            m_isVirtual = true;
+        } else if ( tKind == CXToken_Keyword && std::string("operator") == tCSpelling ){
+            clang_disposeString(tSpelling);
+            break;
+        } else if ( tKind == CXToken_Punctuation && std::string("::") == tCSpelling ){
+            doubleColonFlag = true;
+            m_returnType   += deductReturnType ? tCSpelling : "";
+        } else if ( deductReturnType &&
+                    (tKind == CXToken_Identifier || tKind == CXToken_Keyword ) &&
+                   !m_returnType.isEmpty() &&
+                    !doubleColonFlag
+        ){
+            m_returnType   += deductReturnType ? QString(" ") + tCSpelling : "";
+        } else {
+            m_returnType   += deductReturnType ? tCSpelling : "";
+            doubleColonFlag = false;
+        }
+
+        ++it;
+        clang_disposeString(tSpelling);
+    }
 
     // Get Arguments
     // -------------
@@ -213,6 +218,15 @@ QString QASTMethod::declaration() const{
     base += m_isPureVirtual ? " = 0" : "";
 
     return base;
+}
+
+void QASTMethod::addChild(QASTNode *node){
+    QASTNode::addChild(node);
+    if ( node->typeName() == "compoundStatement"){
+        if ( astParent() )
+            if ( astParent()->typeName() == "class" )
+                m_isInline = true;
+    }
 }
 
 }}// namespace

@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
     app.setAttribute(Qt::AA_Use96Dpi, true);
 
     csa::QCSAEngine::registerBaseTypes();
+    csa::QCSAEngine::registerASTTypes();
     csa::QCSATest::registerTestingTypes();
 
     csa::QCSATest csatest;
@@ -58,13 +59,23 @@ int main(int argc, char *argv[])
     csa::QCSAConsole::log(csa::QCSAConsole::General, "Loaded " + QString::number(csatest.totalTests()) + " tests.");
 
     int code = 0;
+    QStringList testLog;
 
     for ( csa::QCSATest::Iterator it = csatest.begin(); it != csatest.end(); ++it ){
         csa::QCSATestCase* testcase = *it;
         for ( csa::QCSATestCase::Iterator tcit = testcase->begin(); tcit != testcase->end(); ++tcit ){
             TestScenario scenario(testcase->name(), *tcit);
-            code += QTest::qExec(&scenario, 1, argv);
+            int scenarioCode = QTest::qExec(&scenario, 1, argv);
+            code += scenarioCode;
+            if ( scenarioCode == 0 )
+                testLog.append("PASS: " + testcase->name() + " -> " + scenario.name());
+            else
+                testLog.append("FAIL: " + testcase->name() + " -> " + scenario.name());
         }
+    }
+    csa::QCSAConsole::log(csa::QCSAConsole::General, "\nSummary\n-------");
+    for ( QStringList::iterator it = testLog.begin(); it != testLog.end(); ++it ){
+        csa::QCSAConsole::log(csa::QCSAConsole::General, *it);
     }
 
     return code;

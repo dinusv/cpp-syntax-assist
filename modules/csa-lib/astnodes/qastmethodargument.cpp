@@ -21,6 +21,8 @@
 #include "qannotatedtokenset.h"
 #include "clang-c/Index.h"
 
+#include <QDebug>
+
 namespace csa{ namespace ast{
 
 QASTMethodArgument::QASTMethodArgument(
@@ -82,10 +84,10 @@ QASTMethodArgument::~QASTMethodArgument(){
 }
 
 QString QASTMethodArgument::declaration() const{
-    return m_type + " " + identifier();
+    return m_type;
 }
 
-QString QASTMethodArgument::prop(const QString& key) const{
+QVariant QASTMethodArgument::prop(const QString& key) const{
     if ( key == "type" ){
         return m_type;
     }

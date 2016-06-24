@@ -10,7 +10,8 @@ HEADERS += \
     $$PWD/qastmethod.h \
     $$PWD/qastmethodargument.h \
     $$PWD/qastnamespace.h \
-    $$PWD/qastnode.h
+    $$PWD/qastnode.h \
+    $$PWD/qastcompoundstatement.h
 
 SOURCES += \
     $$PWD/qastaccessspecifier.cpp \
@@ -22,4 +23,5 @@ SOURCES += \
     $$PWD/qastmethod.cpp \
     $$PWD/qastmethodargument.cpp \
     $$PWD/qastnamespace.cpp \
-    $$PWD/qastnode.cpp
+    $$PWD/qastnode.cpp \
+    $$PWD/qastcompoundstatement.cpp

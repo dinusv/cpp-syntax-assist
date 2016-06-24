@@ -40,9 +40,11 @@ public:
 
     virtual QString declaration() const;
 
+    virtual void addChild(QASTNode* node);
+
 public slots:
     virtual QList<QObject*> arguments() const;
-    virtual QString prop(const QString& key) const;
+    virtual QVariant prop(const QString& key) const;
 
 private:
     QString m_returnType;
@@ -56,9 +58,19 @@ private:
     QList<csa::ast::QASTNode*> m_arguments;
 };
 
-inline QString QASTMethod::prop(const QString& key) const{
+inline QVariant QASTMethod::prop(const QString& key) const{
     if ( key == "returnType" )
         return m_returnType;
+    else if ( key == "numArgs")
+        return m_arguments.size();
+    else if ( key == "static" )
+        return m_isStatic;
+    else if( key == "virtual" )
+        return m_isVirtual;
+    else if( key == "const" )
+        return m_isConst;
+    else if ( key == "inline" )
+        return m_isInline;
     return QASTNode::prop(key);
 }
 

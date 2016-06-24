@@ -1,8 +1,9 @@
 #include <string>
 
+class ForwardDeclaredType;
+
 namespace testnamespace{
 
-class ForwardDeclaredType;
 class TestClass{
 
 public:

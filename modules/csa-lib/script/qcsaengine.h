@@ -20,6 +20,7 @@
 #include "qcsaglobal.h"
 #include <QString>
 #include <QObject>
+#include <QLinkedList>
 
 class QJSValue;
 class QJSEngine;
@@ -28,6 +29,7 @@ class QFileInfo;
 namespace csa{
 
 class QCodebase;
+class QCSAModule;
 
 class Q_CSA_EXPORT QCSAEngine : public QObject{
 
@@ -42,8 +44,10 @@ public:
     bool loadNodeCollection();
     bool loadNodesFunction();
     bool loadFileFunctions();
+
     int loadPlugins(const QString &path);
-    int loadFile(const QString& path);
+    int loadFile(const QString& path, QCSAModule* from = 0);
+    QJSValue loadFile(const QFileInfo& file, QCSAModule* from = 0);
 
     bool execute(const QString &jsCode, QJSValue& result);
 
@@ -51,14 +55,18 @@ public:
     void setContextOwnedObject(const QString& name, QObject* object);
 
     static void registerBaseTypes();
+    static void registerASTTypes();
 
 public slots:
     bool execute(const QString& jsCode);
 
 private:
-    int loadFile(const QFileInfo& file);
+    QJSValue generateError(const QString& message, int number);
 
-    QJSEngine*          m_engine;
+    QLinkedList<QCSAModule*> m_trace;
+    QList<QCSAModule*>       m_loadedModules;
+
+    QJSEngine*  m_engine;
 };
 
 inline QJSEngine* QCSAEngine::engine(){

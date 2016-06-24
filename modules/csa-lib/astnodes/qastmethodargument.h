@@ -38,7 +38,7 @@ public:
     virtual ~QASTMethodArgument();
 
     virtual QString declaration() const;
-    virtual QString prop(const QString &key) const;
+    virtual QVariant prop(const QString &key) const;
 
 signals:
 

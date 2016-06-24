@@ -34,7 +34,7 @@ public:
             QASTNode* parent = 0);
 
     virtual QString declaration() const;
-    virtual QString prop(const QString &key) const;
+    virtual QVariant prop(const QString &key) const;
 
 private:
     QString m_fieldType;

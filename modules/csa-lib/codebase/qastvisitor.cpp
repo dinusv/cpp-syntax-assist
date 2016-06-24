@@ -28,6 +28,9 @@
 #include "qastmethod.h"
 #include "qastconstructor.h"
 #include "qastdestructor.h"
+#include "qastcompoundstatement.h"
+
+#include <QDebug>
 
 namespace csa{
 using namespace ast;
@@ -141,6 +144,14 @@ CXChildVisitResult QASTVisitor::callback(CXCursor cursor, CXCursor, CXClientData
         csanode = new QASTMethod(
                     cursorTokenSet,
                     classifier,
+                    new QSourceLocation(createSourceLocation(loc)),
+                    new QSourceLocation(createSourceLocation(locStart)),
+                    new QSourceLocation(createSourceLocation(locEnd)),
+                    csanode);
+        break;
+    case CXCursor_CompoundStmt :
+        csanode = new QASTCompoundStatement(
+                    cursorTokenSet,
                     new QSourceLocation(createSourceLocation(loc)),
                     new QSourceLocation(createSourceLocation(locStart)),
                     new QSourceLocation(createSourceLocation(locEnd)),

@@ -1,17 +1,18 @@
+//TODO
 CSATest.describe('astfile', function(test){
     test.scenario('get path data', function(){
-        //TODO
+        throw new Error('Not implemented')
     })
     test.scenario('create location', function(){
-        //TODO
+        throw new Error('Not implemented')
     })
     test.scenario('insert and read', function(){
-        //TODO
+        throw new Error('Not implemented')
     })
     test.scenario('erase and read', function(){
-        //TODO
+        throw new Error('Not implemented')
     })
     test.scenario('insert, erase and read', function(){
-        //TODO
+        throw new Error('Not implemented')
     })
 })

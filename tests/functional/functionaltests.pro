@@ -62,4 +62,8 @@ DISTFILES += \
     $$PWD/coretests/astnode-test.in \
     $$PWD/coretests/nodecollection-test.in \
     $$PWD/coretests/token-test.in \
-    coretests/requires-test.js
+    coretests/require-test.js \
+    coretests/require-in.js \
+    coretests/require-loop-in.js \
+    coretests/require-loop-multi-1-in.js \
+    coretests/require-loop-multi-2-in.js

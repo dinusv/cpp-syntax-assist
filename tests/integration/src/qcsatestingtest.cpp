@@ -12,16 +12,14 @@ Q_TEST_RUNNER_REGISTER(QCSATestingTest);
 QCSATestingTest::QCSATestingTest(QObject *parent)
     : QObject(parent)
 {
-
 }
 
 QCSATestingTest::~QCSATestingTest(){
-
 }
 
 void QCSATestingTest::assertionsTest(){
     QCSATest assertionTest;
-    assertionTest.loadTestFile(QCoreApplication::applicationDirPath() + "/testing/csa-assertions-test.js");
+    assertionTest.loadTestFile(QCoreApplication::applicationDirPath() + "/internaltests/csa-assertions-test.js");
     QCSATest::Iterator it = assertionTest.begin();
     QVERIFY(it != assertionTest.end());
     QVERIFY(it + 1 == assertionTest.end());
@@ -70,7 +68,7 @@ void QCSATestingTest::assertionsTest(){
 
 void QCSATestingTest::beforeAfterScenarioTest(){
     QCSATest beforeAfterTest;
-    beforeAfterTest.loadTestFile(QCoreApplication::applicationDirPath() + "/testing/csa-before-after-scenario-test.js");
+    beforeAfterTest.loadTestFile(QCoreApplication::applicationDirPath() + "/internaltests/csa-before-after-scenario-test.js");
 
     QCSATest::Iterator it = beforeAfterTest.begin();
     QVERIFY(it != beforeAfterTest.end());
@@ -129,7 +127,7 @@ void QCSATestingTest::beforeAfterScenarioTest(){
 
 void QCSATestingTest::invalidParamsTest(){
     QCSATest invalidParamsTest;
-    invalidParamsTest.loadTestFile(QCoreApplication::applicationDirPath() + "/testing/csa-invalid-params-test.js");
+    invalidParamsTest.loadTestFile(QCoreApplication::applicationDirPath() + "/internaltests/csa-invalid-params-test.js");
 
     QCSATestCase* invalidBeforeTestCase = invalidParamsTest.findTestCase("invalid before scenario");
     QVERIFY(invalidBeforeTestCase != 0);
@@ -170,7 +168,7 @@ void QCSATestingTest::invalidParamsTest(){
 
 void QCSATestingTest::restoreTest(){
     QCSATest restoreTest;
-    restoreTest.loadTestFile(QCoreApplication::applicationDirPath() + "/testing/csa-restore-test.js");
+    restoreTest.loadTestFile(QCoreApplication::applicationDirPath() + "/internaltests/csa-restore-test.js");
 
     QCSATestCase* restoreTestCase = restoreTest.findTestCase("restore");
     QVERIFY(restoreTestCase != 0);
@@ -180,7 +178,7 @@ void QCSATestingTest::restoreTest(){
     QCSATestScenario* removeScenario = restoreTestCase->findScenario("delete file");
     QVERIFY(removeScenario != 0);
 
-    QFile inputFile(QCoreApplication::applicationDirPath() + "/testing/csa-restore-test.in");
+    QFile inputFile(QCoreApplication::applicationDirPath() + "/internaltests/csa-restore-test.in");
     if ( !inputFile.open(QFile::ReadOnly) )
         QFAIL(qPrintable("Failed to open input file: " + inputFile.fileName()));
     QTextStream inputStream(&inputFile);

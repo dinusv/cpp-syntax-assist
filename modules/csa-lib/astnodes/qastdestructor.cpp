@@ -30,36 +30,12 @@ QASTDestructor::QASTDestructor(
         QSourceLocation* rangeEndLocation,
         QASTNode* parent)
 
-    : QASTNode("destructor", tokenSet, cursorLocation, rangeStartLocation, rangeEndLocation, parent){
-
-
-    if ( tokenSet->size() == 0 ){
-        CXType type          = clang_getCursorType(tokenSet->cursor());
-        CXString typeStr     = clang_getTypeSpelling(type);
-        const char* cTypeStr = clang_getCString(typeStr);
-        setIdentifier(cTypeStr);
-        clang_disposeString(typeStr);
-    }
-
-    bool spaceFlag = false;
-    for ( QAnnotatedTokenSet::Iterator it = tokenSet->begin(); it != tokenSet->end(); ++it ){
-        CXToken t = (*it)->token().token;
-        CXString tSpelling = clang_getTokenSpelling(tokenSet->translationUnit(), t);
-        CXTokenKind tKind  = clang_getTokenKind(t);
-        if ( spaceFlag ){
-            setIdentifier(identifier() + " ");
-            spaceFlag = false;
-        }
-        if ( tKind == CXToken_Punctuation ){
-            setIdentifier(identifier() + clang_getCString(tSpelling));
-            spaceFlag    = false;
-        } else {
-            setIdentifier(identifier() + clang_getCString(tSpelling));
-            spaceFlag     = true;
-        }
-        clang_disposeString(tSpelling);
-    }
-
+    : QASTNode("destructor", tokenSet, cursorLocation, rangeStartLocation, rangeEndLocation, parent)
+    , m_isVirtual(clang_CXXMethod_isVirtual(tokenSet->cursor()))
+{
+    CXString id = clang_getCursorSpelling(tokenSet->cursor());
+    setIdentifier(clang_getCString(id));
+    clang_disposeString(id);
 }
 
 }}// namespace

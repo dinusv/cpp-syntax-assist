@@ -45,20 +45,21 @@ CSATest.describe('codebase locations', function(test){
 })
 
 CSATest.describe('codebase file searching', function(test){
+    //TODO: I need config to finish this one
     test.scenario('find header for source', function(){
-        //TODO
+        throw new Error('Not implemented')
     })
     test.scenario('find source for header', function(){
-        //TODO
+        throw new Error('Not implemented')
     })
     test.scenario('find file', function(){
-
+        throw new Error('Not implemented')
     })
     test.scenario('find file using search pattern', function(){
-
+        throw new Error('Not implemented')
     })
     test.scenario('find data in file using search pattern', function(){
-
+        throw new Error('Not implemented')
     })
 })
 
@@ -71,12 +72,12 @@ CSATest.describe('codebase file creation and removal', function(test){
         assert(file !== 0)
         assert(file.firstChild().identifier() === 'CreatedClass')
         assert(file.firstChild().typeName() === 'class')
-        //TODO
-//        codebase.removeFile(file)
-//        assert(codebase.files().length === 0)
+        codebase.removeFile(file)
+        assert(codebase.files().length === 0)
     })
     test.scenario('create, parse and remove file', function(){
-
+        //TODO
+        throw new Error('Not implemented')
     })
 })
 

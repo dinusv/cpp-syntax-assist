@@ -47,7 +47,7 @@ private:
 };
 
 inline QString QASTClass::declaration() const{
-    return typeName() + " " + identifier();
+    return identifier();
 }
 
 inline QSourceLocation* QASTClass::bodyStartLocation(){

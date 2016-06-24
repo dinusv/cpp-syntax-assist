@@ -52,7 +52,7 @@ private:
 };
 
 inline QString QASTNamespace::declaration() const{
-    return typeName() + " " + identifier();
+    return identifier();
 }
 
 inline QSourceLocation* QASTNamespace::bodyStartLocation(){

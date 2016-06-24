@@ -42,6 +42,7 @@ public:
 
 public slots:
     virtual QList<QObject*> arguments() const;
+    virtual QVariant prop(const QString& key) const;
 
 private:
     QList<csa::ast::QASTNode*> m_arguments;
@@ -49,6 +50,12 @@ private:
 
 inline QList<QObject*> QASTConstructor::arguments() const{
     return QASTNode::castNodeListToObjectList(m_arguments);
+}
+
+inline QVariant QASTConstructor::prop(const QString &key) const{
+    if ( key == "numArgs" )
+        return m_arguments.size();
+    return QASTNode::prop(key);
 }
 
 }}// namespace

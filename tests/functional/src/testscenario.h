@@ -16,6 +16,8 @@ public:
     explicit TestScenario(const QString &testcase, csa::QCSATestScenario* scenario, QObject *parent = 0);
     ~TestScenario();
 
+    const QString& name() const;
+
 private slots:
     void init();
     void runTest();

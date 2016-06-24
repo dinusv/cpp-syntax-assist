@@ -33,12 +33,6 @@ namespace csa{
 
 using namespace ast;
 
-//TODO
-
-// * Implement functionality for requires()
-// * Add search by number of parameters for functions
-// * Standardize breadcrumbs
-
 class QCodebasePrivate{
 public:
     CXIndex index;

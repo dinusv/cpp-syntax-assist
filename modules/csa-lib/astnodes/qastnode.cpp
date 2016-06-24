@@ -69,16 +69,16 @@ const QASTNode*QASTNode::astParent() const{
 
 QString QASTNode::breadcrumbs() const{
     if ( astParent() )
-        return astParent()->breadcrumbs() + "/" + identifier().replace('/', "\\/");
-    return identifier().replace('/', "\\/");
+        return astParent()->breadcrumbs() + "/" + declaration().replace('/', "\\/");
+    return declaration().replace('/', "\\/");
 }
 
 QString QASTNode::declaration() const{
     return identifier();
 }
 
-QString QASTNode::prop(const QString &) const{
-    return "";
+QVariant QASTNode::prop(const QString &) const{
+    return QVariant();
 }
 
 QString QASTNode::text(){
@@ -142,10 +142,10 @@ void QASTNode::afterln(const QString& value){
         after(value);
 
     CXSourceLocation cxAfterLocation = clang_getLocation(
-                m_tokenSet->translationUnit(),
-                clang_getFile(m_tokenSet->translationUnit(), rangeEndLocation()->filePath().toUtf8()),
-                rangeEndLocation()->line() + 1,
-                1); // location will be automatically truncated to max lines
+        m_tokenSet->translationUnit(),
+        clang_getFile(m_tokenSet->translationUnit(), rangeEndLocation()->filePath().toUtf8()),
+        rangeEndLocation()->line() + 1,
+        1); // location will be automatically truncated to max lines
 
     QSourceLocation* afterLocation = new QSourceLocation(createSourceLocation(cxAfterLocation));
     insert(value, afterLocation);
@@ -168,7 +168,7 @@ void QASTNode::dump(QString& out, int depth) const{
 }
 
 QASTNode* QASTNode::findFirst(const QASTSearch& searchPattern, const QString& type){
-    QASTSearch::MatchResult result = searchPattern.matchCurrentSegment(identifier());
+    QASTSearch::MatchResult result = searchPattern.matchCurrentSegment(this);
     if ( result == QASTSearch::FullMatch && ( type == "" || type == typeName() ) )
         return this;
     else if ( result == QASTSearch::SegmentMatch ){
@@ -193,7 +193,7 @@ QASTNode* QASTNode::findFirst(const QASTSearch& searchPattern, const QString& ty
 QList<QObject*> QASTNode::find(const QASTSearch& searchPattern, const QString& type){
     QList<QObject*> foundChildren;
 
-    QASTSearch::MatchResult result = searchPattern.matchCurrentSegment(identifier());
+    QASTSearch::MatchResult result = searchPattern.matchCurrentSegment(this);
     if ( result == QASTSearch::FullMatch && ( type == "" || type == typeName() ) ){
         foundChildren.append(this);
     } else if ( result == QASTSearch::SegmentMatch ){

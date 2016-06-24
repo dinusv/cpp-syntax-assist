@@ -65,31 +65,20 @@ void QASTSearchTest::initTestCase(){
 }
 
 void QASTSearchTest::segmentMatchTest(){
-    QCOMPARE(QASTSearch::matchSegment("abc", "abc"), true);
-    QCOMPARE(QASTSearch::matchSegment("abc2", "abc"), false);
-    QCOMPARE(QASTSearch::matchSegment("abc23", "abc23"), true);
-    QCOMPARE(QASTSearch::matchSegment("abc*", "abc23"), true);
-    QCOMPARE(QASTSearch::matchSegment("abc*3", "abc23"), true);
-    QCOMPARE(QASTSearch::matchSegment("*3", "abc23"), true);
-    QCOMPARE(QASTSearch::matchSegment("*34", "abc23"), false);
-    QCOMPARE(QASTSearch::matchSegment("2*23", "abc23"), false);
-    QCOMPARE(QASTSearch::matchSegment("*", "abc23"), true);
-    QCOMPARE(QASTSearch::matchSegment("", "abc23"), false);
-    QCOMPARE(QASTSearch::matchSegment("*abc", "abc"), true);
-    QCOMPARE(QASTSearch::matchSegment("*", ""), true);
-    QCOMPARE(QASTSearch::matchSegment("*", "*"), true);
-    QCOMPARE(QASTSearch::matchSegment("", "*"), false);
-}
-
-void QASTSearchTest::segmentPositionTest(){
-    QASTSearch search("first/segment/test");
-    QCOMPARE(search.matchCurrentSegment("first"), QASTSearch::SegmentMatch);
-    QCOMPARE(search.nextPosition().matchCurrentSegment("segment"), QASTSearch::SegmentMatch);
-    QCOMPARE(search.nextPosition().matchCurrentSegment("test"), QASTSearch::FullMatch);
-
-    QASTSearch search2("*/*");
-    QCOMPARE(search2.matchCurrentSegment("abc"), QASTSearch::SegmentMatch);
-    QCOMPARE(search2.nextPosition().matchCurrentSegment("abc"), QASTSearch::FullMatch);
+    QCOMPARE(QASTSearch::wildcardMatch("abc", "abc"), true);
+    QCOMPARE(QASTSearch::wildcardMatch("abc2", "abc"), false);
+    QCOMPARE(QASTSearch::wildcardMatch("abc23", "abc23"), true);
+    QCOMPARE(QASTSearch::wildcardMatch("abc*", "abc23"), true);
+    QCOMPARE(QASTSearch::wildcardMatch("abc*3", "abc23"), true);
+    QCOMPARE(QASTSearch::wildcardMatch("*3", "abc23"), true);
+    QCOMPARE(QASTSearch::wildcardMatch("*34", "abc23"), false);
+    QCOMPARE(QASTSearch::wildcardMatch("2*23", "abc23"), false);
+    QCOMPARE(QASTSearch::wildcardMatch("*", "abc23"), true);
+    QCOMPARE(QASTSearch::wildcardMatch("", "abc23"), false);
+    QCOMPARE(QASTSearch::wildcardMatch("*abc", "abc"), true);
+    QCOMPARE(QASTSearch::wildcardMatch("*", ""), true);
+    QCOMPARE(QASTSearch::wildcardMatch("*", "*"), true);
+    QCOMPARE(QASTSearch::wildcardMatch("", "*"), false);
 }
 
 void QASTSearchTest::nodeSearchTest(){

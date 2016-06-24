@@ -2,13 +2,28 @@
 #define QASTSEARCH_HPP
 
 #include "qcsaglobal.h"
-#include <QStringList>
+#include <QList>
 
 namespace csa{
+
+namespace ast{
+class QASTNode;
+}
 
 class Q_CSA_EXPORT QASTSearch{
 
 public:
+    class SearchSegment{
+    public:
+        SearchSegment(const QString& searchPattern);
+        bool match(ast::QASTNode* node) const;
+
+        QString identifier;
+        QString declaration;
+        QString property;
+        QString propertyValue;
+    };
+
     enum MatchResult{
         FullMatch = 0,
         SegmentMatch,
@@ -23,10 +38,10 @@ public:
     bool isFirst() const;
     bool isLast() const;
 
-    MatchResult matchCurrentSegment(const QString& matchData) const;
+    MatchResult matchCurrentSegment(ast::QASTNode* node) const;
     QASTSearch& nextPosition();
 
-    static bool matchSegment(const QString& segment, const QString& matchData);
+    static bool wildcardMatch(const QString& wildcard, const QString& matchData);
     static bool isPattern(const QString& data);
 
 private:
@@ -39,8 +54,8 @@ private:
         const QString::const_iterator& matchDataItEnd
     );
 
-    QStringList m_searchSegments;
-    int         m_lastMatchPosition;
+    QList<SearchSegment> m_searchSegments;
+    int                  m_lastMatchPosition;
 
 };
 

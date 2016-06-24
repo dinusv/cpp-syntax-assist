@@ -50,7 +50,7 @@ QASTField::QASTField(
     // Determine field type
     // --------------------
 
-    if ( type.kind == CXType_Unexposed || type.kind == CXType_Invalid || m_fieldType.contains("int") ){
+    if ( type.kind == CXType_Invalid || m_fieldType.contains("int") ){
         m_fieldType = "";
 
         bool doubleColonFlag = false;
@@ -79,7 +79,7 @@ QASTField::QASTField(
     clang_disposeString(id);
 }
 
-QString QASTField::prop(const QString &key) const{
+QVariant QASTField::prop(const QString &key) const{
     if ( key == "type" )
         return m_fieldType;
     return QASTNode::prop(key);

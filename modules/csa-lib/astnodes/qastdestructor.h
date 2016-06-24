@@ -27,17 +27,30 @@ class Q_CSA_EXPORT QASTDestructor : public QASTNode{
 
 public:
     QASTDestructor(
-            QAnnotatedTokenSet* tokenSet,
-            QSourceLocation* cursorLocation,
-            QSourceLocation* rangeStartLocation,
-            QSourceLocation* rangeEndLocation,
-            QASTNode* parent = 0);
+        QAnnotatedTokenSet* tokenSet,
+        QSourceLocation* cursorLocation,
+        QSourceLocation* rangeStartLocation,
+        QSourceLocation* rangeEndLocation,
+        QASTNode* parent = 0
+    );
 
     QString declaration() const;
+
+public slots:
+    virtual QVariant prop(const QString& key) const;
+
+private:
+    bool m_isVirtual;
 };
 
 inline QString QASTDestructor::declaration() const{
     return identifier();
+}
+
+inline QVariant QASTDestructor::prop(const QString &key) const{
+    if ( key == "virtual" )
+        return m_isVirtual ? "true" : "false";
+    return QASTNode::prop(key);
 }
 
 }}// namespace

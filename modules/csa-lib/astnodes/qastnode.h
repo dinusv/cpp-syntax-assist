@@ -74,7 +74,7 @@ public slots:
     QString breadcrumbs() const;
 
     virtual QString declaration() const;
-    virtual QString prop(const QString& key) const;
+    virtual QVariant prop(const QString& key) const;
 
     QString text();
 
@@ -127,7 +127,7 @@ public:
     // Children Handlers
     // -----------------
 
-    void addChild(QASTNode* node);
+    virtual void addChild(QASTNode* node);
 
     Iterator childrenBegin();
     Iterator childrenEnd();
@@ -209,20 +209,15 @@ inline QList<QASTNode*> QASTNode::astChildren(const QString &type) const{
 }
 
 inline QASTNode* QASTNode::firstChild(const QString &identif, const QString &typeString){
-    if ( identif == "" ){
+    if ( identif == "" && typeString == "" ){
         if ( m_children.size() > 0 )
             return m_children.first();
-
-    } else if ( typeString == "" ){
-        for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
-            if ( (*it)->identifier() == identif )
-                return *it;
-        }
-
     } else {
         for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
-            if ( (*it)->identifier() == identif && (*it)->typeName() == typeString )
+            if ( (identif == "" || (*it)->identifier() == identif) &&
+                 (typeString == "" || (*it)->typeName() == typeString)){
                 return *it;
+            }
         }
     }
 
@@ -230,22 +225,15 @@ inline QASTNode* QASTNode::firstChild(const QString &identif, const QString &typ
 }
 
 inline QASTNode *QASTNode::lastChild(const QString &identif, const QString &typeString){
-    if ( identif == "" ){
+    if ( identif == "" && typeString == "" ){
         if ( m_children.size() > 0 )
             return m_children.last();
-
-    } else if ( typeString == "" ){
-        for( int i = m_children.size() - 1; i >= 0; --i ){
-            QASTNode* node = m_children[i];
-            if ( node->identifier() == identif)
-                return node;
-        }
-
     } else {
-        for( int i = m_children.size() - 1; i >= 0; --i ){
-            QASTNode* node = m_children[i];
-            if ( node->identifier() == identif && node->typeName() == typeString)
-                return node;
+        for ( NodeList::reverse_iterator it = m_children.rbegin(); it != m_children.rend(); ++it ){
+            if ( (identif == "" || (*it)->identifier() == identif) &&
+                 (typeString == "" || (*it)->typeName() == typeString)){
+                return *it;
+            }
         }
     }
 

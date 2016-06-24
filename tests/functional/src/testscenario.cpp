@@ -47,3 +47,7 @@ QString TestScenario::createErrorMessage(const QJSValue &error){
     QCSATestScenario::stripError(error, message, file, line, lineText);
     return message + ": " + lineText + (lineText.isEmpty() ? "" : "\n") + file + ":" + QString::number(line);
 }
+
+const QString &TestScenario::name() const{
+    return m_scenario->name();
+}

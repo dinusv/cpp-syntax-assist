@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
     app.setAttribute(Qt::AA_Use96Dpi, true);
 
     csa::QCSAEngine::registerBaseTypes();
+    csa::QCSAEngine::registerASTTypes();
     csa::QCSATest::registerTestingTypes();
 
     return QTestRunner::runTests(argc, argv);

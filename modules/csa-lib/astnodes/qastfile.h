@@ -62,7 +62,7 @@ private:
 };
 
 inline QString QASTFile::declaration() const{
-    return QString("file \"") + identifier() + "\"";
+    return identifier();
 }
 
 }}//namespace csa, ast

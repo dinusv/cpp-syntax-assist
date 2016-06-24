@@ -19,6 +19,7 @@
 #include "qcodebase.h"
 #include "qsourcelocation.h"
 #include "qannotatedtoken.h"
+#include "qcsamodule.h"
 
 #include <qqml.h>
 #include <QList>
@@ -217,33 +218,87 @@ int QCSAEngine::loadPlugins(const QString& path){
             }
         }
     } else {
-        return loadFile(fInfo);
+        return loadFile(fInfo.absoluteFilePath());
     }
 
     return 0;
 }
 
-int QCSAEngine::loadFile(const QString &path){
-    return loadFile(QFileInfo(path));
+int QCSAEngine::loadFile(const QString &path, QCSAModule *from){
+    QJSValue result = loadFile(QFileInfo(path), from);
+    bool loadSuccess = result.isBool() ? result.toBool() : false;
+    if ( !loadSuccess ){
+        if ( result.isError() ){
+            QCSAConsole::logError(
+                "Failed to load module: \'" + path + "\'. Exception: " + result.property("message").toString()
+            );
+            return -1;
+        } else if ( result.hasProperty("type") && result.property("type").toString() == "error"){
+            QCSAConsole::logError(result.property("message").toString());
+            return result.property("number").toInt();
+        }
+    }
+    return 0;
 }
 
-int QCSAEngine::loadFile(const QFileInfo &file){
-    QFile configScript(file.filePath());
+QJSValue QCSAEngine::loadFile(const QFileInfo &finfo, QCSAModule *){
+    if ( !finfo.exists() || finfo.isDir() )
+        return generateError("Failed to load module: " + finfo.absoluteFilePath() + ". No such module found.", 1);
+
+    QString filename = finfo.fileName();
+    QString filepath = finfo.absolutePath();
+
+    QCSAModule* module = 0;
+    for ( QList<QCSAModule*>::ConstIterator it = m_loadedModules.begin(); it != m_loadedModules.end(); ++it ){
+        if ( (*it)->filename() == filename && (*it)->dirname() == filepath )
+            module = *it;
+    }
+    if( module )
+        return module->exports();
+
+    for ( QLinkedList<QCSAModule*>::iterator it = m_trace.begin(); it != m_trace.end(); ++it ){
+        if ( filename == (*it)->filename() && filepath == (*it)->dirname() ){
+            QString requireTrace;
+            for ( QLinkedList<QCSAModule*>::iterator cit = m_trace.begin(); cit != m_trace.end(); ++cit )
+                requireTrace += (*cit)->filename() + " -> ";
+            return generateError("Loop detected on requiring: " + filename + ". Trace: " + requireTrace + filename, 2);
+        }
+    }
+
+    QFile configScript(finfo.absoluteFilePath());
     if ( !configScript.open(QIODevice::ReadOnly) ){
         QCSAConsole::logError(
-            "Error opening js configuration file. Make sure the file is present in " + file.filePath() + ".");
+            "Error opening file. Make sure the file is present in " + finfo.filePath() + ".");
         return 2;
     }
-
     QTextStream configStream(&configScript);
 
-    QJSValue evaluateResult = m_engine->evaluate(configStream.readAll(), configScript.fileName());
+    module = new QCSAModule(filename, filepath, this);
+    QString moduleHeader =
+        "(function(exports, module, __filename, __dirname){"
+        "   var require = function(name){ var exports = module.load(name);"
+        "       if ( exports.hasOwnProperty(\'type\') && exports.hasOwnProperty(\'message\') && exports['type'] === \'error\')"
+        "           throw new Error(exports[\'message\']); return exports;"
+        "   }\n";
+    QString moduleFooter =
+        "});";
 
-    if ( evaluateResult.isError() ){
-        QCSAConsole::logError("Uncaught javascript exception: " + evaluateResult.toString());
-        return 3;
+    QJSValue evaluateResult =
+        m_engine->evaluate(moduleHeader + configStream.readAll() + moduleFooter, configScript.fileName(), 0);
+    if ( evaluateResult.isError() )
+        return generateError(evaluateResult.property("message").toString(), 3);
+
+    m_trace.append(module);
+
+    QJSValue callResult = module->evaluateExports(evaluateResult);
+    if ( callResult.isError() ){
+        delete m_trace.takeLast();
+        return generateError(callResult.property("message").toString(), 4);
     }
-    return 0;
+
+    m_loadedModules.append(module);
+    m_trace.removeLast();
+    return module->exports();
 }
 
 bool QCSAEngine::execute(const QString& jsCode, QJSValue& result){
@@ -269,6 +324,11 @@ void QCSAEngine::setContextOwnedObject(const QString &name, QObject *object){
 }
 
 void QCSAEngine::registerBaseTypes(){
+    qmlRegisterUncreatableType<csa::QCSAModule>(
+        "CSA", 1, 0, "Module", "Module constructor is private.");
+}
+
+void QCSAEngine::registerASTTypes(){
     qmlRegisterUncreatableType<csa::QSourceLocation>(
         "CSA", 1, 0, "SourceLocation", "Source locations can be created from the codebase or ASTFiles.");
     qmlRegisterUncreatableType<csa::QAnnotatedToken>(
@@ -284,6 +344,14 @@ void QCSAEngine::registerBaseTypes(){
 bool QCSAEngine::execute(const QString& jsCode){
     QJSValue result;
     return execute(jsCode, result);
+}
+
+QJSValue QCSAEngine::generateError(const QString &message, int number){
+    QJSValue error = m_engine->newObject();
+    error.setProperty("number", number );
+    error.setProperty("type", "error");
+    error.setProperty("message", message);
+    return error;
 }
 
 }// namespace
