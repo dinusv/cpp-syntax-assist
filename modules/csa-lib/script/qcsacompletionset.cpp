@@ -1,6 +1,8 @@
- #include "qcsacompletionset.h"
+#include "qcsacompletionset.h"
 #include "qcsaconsole.h"
 #include <QVariantMap>
+
+#include <QDebug>
 
 namespace csa{
 
@@ -150,23 +152,23 @@ QList<QCSACompletionItem *> QCSACompletionSet::getCompletionItems(
 
 void QCSACompletionSet::initDefaultCompletions(){
     registerItem(QCSACompletionItem::Global, "quit()", "quit()", "");
-    registerItem(QCSACompletionItem::Global, "console()", "console()", "");
+    registerItem(QCSACompletionItem::Global, "console()", "console.log()", "");
     registerItem(QCSACompletionItem::Global, "cl", "console.log()", "");
     registerItem(QCSACompletionItem::Global, "nodes(selector)", "nodes('*')", "");
     registerItem(QCSACompletionItem::Global, "createFile(file)", "createFile('name')", "");
     registerItem(QCSACompletionItem::Global, "reparse(file)", "reparse('file')", "");
     registerItem(QCSACompletionItem::Global, "parse(file)", "parse('file')", "");
     registerItem(QCSACompletionItem::Global, "makePath(path)", "makePath('path')", "");
-    registerItem(QCSACompletionItem::Global, "codeBase", "codeBase", "");
+    registerItem(QCSACompletionItem::Global, "codebase", "codebase", "");
 
-    registerItem(QCSACompletionItem::Object, "children()", "codeBase", "");
+    registerItem(QCSACompletionItem::Object, "children()", "codebase", "");
     registerItem(QCSACompletionItem::Object, "find(selector, typeName)", "find(\'*\')", "");
     registerItem(QCSACompletionItem::Object, "remove()", "remove()", "");
 }
 
 void QCSACompletionSet::registerPlugin(const QString &name, const QVariantMap &pluginData){
     QCSACompletionItem* newItem = new QCSACompletionItem(
-        QCSACompletionItem::Global | QCSACompletionItem::Object,
+        QCSACompletionItem::Object,
         name,
         pluginData.contains("usage") ? pluginData["usage"].toString() : "",
         pluginData.contains("description") ? pluginData["description"].toString() : ""

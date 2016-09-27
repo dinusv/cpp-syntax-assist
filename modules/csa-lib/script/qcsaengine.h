@@ -59,6 +59,7 @@ public:
 
 public slots:
     bool execute(const QString& jsCode);
+    void selectNode(const QString& breadCrumbs);
 
 private:
     QJSValue generateError(const QString& message, int number);

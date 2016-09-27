@@ -229,7 +229,9 @@ inline QASTNode *QASTNode::lastChild(const QString &identif, const QString &type
         if ( m_children.size() > 0 )
             return m_children.last();
     } else {
-        for ( NodeList::reverse_iterator it = m_children.rbegin(); it != m_children.rend(); ++it ){
+        NodeList::Iterator it = m_children.end();
+        while ( it != m_children.begin() ){
+            --it;
             if ( (identif == "" || (*it)->identifier() == identif) &&
                  (typeString == "" || (*it)->typeName() == typeString)){
                 return *it;

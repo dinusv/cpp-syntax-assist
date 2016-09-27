@@ -20,10 +20,19 @@ QASTSearch::QASTSearch(const QASTSearch& other)
 
 void QASTSearch::initSearchPattern(const QString &pattern){
     m_searchSegments.clear();
+    m_isAbsolute = false;
 
     bool isEscapeFlag      = false;
     QString currentSegment = "";
-    for ( QString::const_iterator it = pattern.begin(); it != pattern.end(); ++it ){
+    QString::const_iterator it = pattern.begin();
+    if ( it == pattern.end() )
+        return;
+    if ( *it == QChar('/') ){
+        ++it;
+        m_isAbsolute = true;
+    }
+
+    while( it != pattern.end()){
         const QChar& c = *it;
         if ( c == QChar('\\') ){
             if (isEscapeFlag)
@@ -38,10 +47,14 @@ void QASTSearch::initSearchPattern(const QString &pattern){
                     currentSegment.clear();
                 }
             } else {
+                if ( isEscapeFlag )
+                    currentSegment.append('\\');
                 currentSegment.append(c);
             }
             isEscapeFlag = false;
         }
+
+        ++it;
     }
 
     if ( !currentSegment.isEmpty() )
@@ -78,6 +91,7 @@ QASTSearch& QASTSearch::nextPosition(){
 
 
 bool QASTSearch::wildcardMatch(const QString& wildcard, const QString& matchData){
+    qDebug() << "wildcardMatch" << wildcard << matchData;
     QString::const_iterator expressionIt = wildcard.begin();
     QString::const_iterator matchIt      = matchData.begin();
 
@@ -124,39 +138,70 @@ bool QASTSearch::matchHere(
 
 QASTSearch::SearchSegment::SearchSegment(const QString &searchPattern){
     QString* accumulator = &declaration;
+    bool escapeFlag      = false;
     for ( QString::const_iterator it = searchPattern.begin(); it != searchPattern.end(); ++it ){
         const QChar& c = *it;
-        if ( c == QChar('#') ){
-            if ( !identifier.isEmpty() ){
-                QCSAConsole::log(
-                    QCSAConsole::Warning,
-                    "Multiple \'#\' symbols defined in pattern \"" + searchPattern + "\". Search might not work."
-                );
+        if ( c == QChar('\\') ){
+            if ( escapeFlag ){
+                *accumulator += QChar('\\');
+                escapeFlag = false;
+            } else
+                escapeFlag = true;
+        } else if ( c == QChar('#') ){
+            if ( escapeFlag ){
+                *accumulator += c;
+                escapeFlag = false;
+            } else {
+                if ( !identifier.isEmpty() ){
+                    QCSAConsole::log(
+                        QCSAConsole::Warning,
+                        "Multiple \'#\' symbols defined in pattern \"" + searchPattern + "\". Search might not work."
+                    );
+                }
+                identifier  = "";
+                accumulator = &identifier;
             }
-            identifier  = "";
-            accumulator = &identifier;
         } else if ( c == QChar(':') ){
-            accumulator = &property;
-            if ( !property.isEmpty() ){
-                QCSAConsole::log(
-                    QCSAConsole::Warning,
-                    "Multiple \':\' symbols defined in pattern \"" + searchPattern + "\". Search might not work."
-                );
+            if ( escapeFlag ){
+                *accumulator += c;
+                escapeFlag = false;
+            } else {
+                accumulator = &property;
+                if ( !property.isEmpty() ){
+                    QCSAConsole::log(
+                        QCSAConsole::Warning,
+                        "Multiple \':\' symbols defined in pattern \"" + searchPattern + "\". Search might not work."
+                    );
+                }
+                property    = "";
+                accumulator = &property;
             }
-            property    = "";
-            accumulator = &property;
         } else if ( c == QChar('[') ){
-            if ( !propertyValue.isEmpty() ){
-                QCSAConsole::log(
-                    QCSAConsole::Warning,
-                    "Multiple \'[\' symbols defined in pattern \"" + searchPattern + "\". Search might not work."
-                );
+            if ( escapeFlag ){
+                *accumulator += c;
+                escapeFlag = false;
+            } else {
+                if ( !propertyValue.isEmpty() ){
+                    QCSAConsole::log(
+                        QCSAConsole::Warning,
+                        "Multiple \'[\' symbols defined in pattern \"" + searchPattern + "\". Search might not work."
+                    );
+                }
+                propertyValue = "";
+                accumulator   = &propertyValue;
             }
-            propertyValue = "";
-            accumulator   = &propertyValue;
         } else if ( c == QChar(']') ){
-            accumulator = &declaration;
+            if ( escapeFlag ){
+                *accumulator += c;
+                escapeFlag = false;
+            } else {
+                accumulator = &declaration;
+            }
         } else {
+            if ( escapeFlag ){
+                *accumulator += QChar('\\');
+                escapeFlag = false;
+            }
             *accumulator += c;
         }
     }

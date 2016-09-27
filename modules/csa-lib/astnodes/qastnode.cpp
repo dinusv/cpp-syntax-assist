@@ -69,8 +69,8 @@ const QASTNode*QASTNode::astParent() const{
 
 QString QASTNode::breadcrumbs() const{
     if ( astParent() )
-        return astParent()->breadcrumbs() + "/" + declaration().replace('/', "\\/");
-    return declaration().replace('/', "\\/");
+        return astParent()->breadcrumbs() + "/" + declaration().replace('/', "\\/").replace(':', "\\:");
+    return "/" + declaration().replace('/', "\\/").replace(':', "\\:");
 }
 
 QString QASTNode::declaration() const{
@@ -168,6 +168,9 @@ void QASTNode::dump(QString& out, int depth) const{
 }
 
 QASTNode* QASTNode::findFirst(const QASTSearch& searchPattern, const QString& type){
+    if ( searchPattern.isAbsoluteMatch() && astParent() != 0 )
+        return 0;
+
     QASTSearch::MatchResult result = searchPattern.matchCurrentSegment(this);
     if ( result == QASTSearch::FullMatch && ( type == "" || type == typeName() ) )
         return this;
@@ -180,18 +183,22 @@ QASTNode* QASTNode::findFirst(const QASTSearch& searchPattern, const QString& ty
                 return foundChild;
         }
     }
-
-    for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
-        QASTNode* child = *it;
-        QASTNode* foundChild = child->findFirst(searchPattern, type);
-        if ( foundChild )
-            return foundChild;
+    if ( !searchPattern.isAbsolute() && searchPattern.isFirst() ){
+        for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
+            QASTNode* child = *it;
+            QASTNode* foundChild = child->findFirst(searchPattern, type);
+            if ( foundChild )
+                return foundChild;
+        }
     }
     return 0;
 }
 
 QList<QObject*> QASTNode::find(const QASTSearch& searchPattern, const QString& type){
     QList<QObject*> foundChildren;
+
+    if ( searchPattern.isAbsoluteMatch() && astParent() != 0 )
+        return foundChildren;
 
     QASTSearch::MatchResult result = searchPattern.matchCurrentSegment(this);
     if ( result == QASTSearch::FullMatch && ( type == "" || type == typeName() ) ){
@@ -206,11 +213,13 @@ QList<QObject*> QASTNode::find(const QASTSearch& searchPattern, const QString& t
         }
     }
 
-    for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
-        QASTNode* child = *it;
-        QList<QObject*> foundNodes = child->find(searchPattern, type);
-        if ( foundNodes.size() > 0 )
-            foundChildren << foundNodes;
+    if ( !searchPattern.isAbsolute() && searchPattern.isFirst() ){
+        for ( NodeList::iterator it = m_children.begin(); it != m_children.end(); ++it ){
+            QASTNode* child = *it;
+            QList<QObject*> foundNodes = child->find(searchPattern, type);
+            if ( foundNodes.size() > 0 )
+                foundChildren << foundNodes;
+        }
     }
 
     return foundChildren;

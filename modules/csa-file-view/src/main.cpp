@@ -44,8 +44,8 @@ int main(int argc, char *argv[]){
 
     QGuiApplication app(argc, argv);
     QGuiApplication::setApplicationName("csa-file-gui");
-    QGuiApplication::setApplicationDisplayName("C++ Snippet Assist - File Gui");
-    QGuiApplication::setApplicationVersion("0.3.0");
+    QGuiApplication::setApplicationDisplayName("C++ Syntax Assist - File Gui");
+    QGuiApplication::setApplicationVersion(CSA_VERSION_STRING);
 
     QCSAFileViewArguments commandLineArguments(
         app,
@@ -78,36 +78,31 @@ int main(int argc, char *argv[]){
         scriptEngine.engine(),
         QCoreApplication::applicationDirPath() + "/config", "default"
     );
-    QCodebase codeBase(config, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
+    QCodebase codebase(config, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
+    QASTCollapsibleModel* astTreeModel = new QASTCollapsibleModel(codebase.astFiles());
 
-    //TODO: Fix selection
-//    if ( commandLineArguments.isCursorOffsetSet() ){
-//        codeBase.nodeAt(
-//            commandLineArguments.cursorOffset(),
-//            commandLineArguments.files().first()
-//        );
-//    } else if ( commandLineArguments.isCursorLineColumnSet() ){
-//        codeBase.nodeAt(
-//            commandLineArguments.cursorLine(),
-//            commandLineArguments.cursorColumn(),
-//            commandLineArguments.files().first()
-//        );
-//    }
+    if ( commandLineArguments.isCursorSet() ){
+        csa::ast::QASTNode* node = codebase.nodeAt(
+            commandLineArguments.cursorFile(),
+            commandLineArguments.cursorLineOrOffset(),
+            commandLineArguments.cursorColumn() == -1 ? 0 : commandLineArguments.cursorColumn()
+        );
+        if(node){
+            scriptEngine.selectNode(node->breadcrumbs());
+            astTreeModel->selectNode(node);
+        }
+    }
 
     // Connect Codebase Signals
     // ------------------------
 
-    QASTCollapsibleModel* astTreeModel = new QASTCollapsibleModel(codeBase.astFiles());
-    //TODO: Check selected node
-//    astTreeModel->selectNode(codeBase.selectedNode());
-
-    QObject::connect(&codeBase, SIGNAL(fileAdded(csa::ast::QASTFile*)),
+    QObject::connect(&codebase, SIGNAL(fileAdded(csa::ast::QASTFile*)),
                      astTreeModel, SLOT(addFile(csa::ast::QASTFile*)));
-    QObject::connect(&codeBase, SIGNAL(fileAboutToBeReparsed(csa::ast::QASTFile*)),
+    QObject::connect(&codebase, SIGNAL(fileAboutToBeReparsed(csa::ast::QASTFile*)),
                      astTreeModel, SLOT(collapseFile(csa::ast::QASTFile*)));
-    QObject::connect(&codeBase, SIGNAL(fileReparsed(csa::ast::QASTFile*)),
+    QObject::connect(&codebase, SIGNAL(fileReparsed(csa::ast::QASTFile*)),
                      astTreeModel, SLOT(reparseFile(csa::ast::QASTFile*)));
-    QObject::connect(&codeBase, SIGNAL(nodeSelected(csa::ast::QASTNode*)),
+    QObject::connect(&codebase, SIGNAL(nodeSelected(csa::ast::QASTNode*)),
                      astTreeModel, SLOT(selectNode(csa::ast::QASTNode*)));
 
     // Configure Engine
@@ -147,7 +142,7 @@ int main(int argc, char *argv[]){
     QCSACompletionModel pluginCollection(&set);
     set.initDefaultCompletions();
 
-    scriptEngine.setContextObject("codeBase", &codeBase);
+    scriptEngine.setContextObject("codebase", &codebase);
     scriptEngine.setContextObject("plugins",  &pluginCollection);
     scriptEngine.loadNodeCollection();
     scriptEngine.loadNodesFunction();
@@ -156,7 +151,7 @@ int main(int argc, char *argv[]){
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("syntaxTreeModel",  astTreeModel);
     engine.rootContext()->setContextProperty("configuredEngine", &scriptEngine);
-    engine.rootContext()->setContextProperty("codeBase",         &codeBase);
+    engine.rootContext()->setContextProperty("codeBase",         &codebase);
     engine.rootContext()->setContextProperty("plugins",          &pluginCollection);
     engine.rootContext()->setContextProperty("command",          commandLineArguments.selectedFunction());
 

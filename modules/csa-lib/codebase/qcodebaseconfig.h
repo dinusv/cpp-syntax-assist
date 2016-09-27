@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QJSValue>
+#include <QString>
+#include <QStringList>
 #include "qcsaglobal.h"
 
 namespace csa{

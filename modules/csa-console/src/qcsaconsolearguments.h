@@ -20,6 +20,10 @@ public:
 
     bool  isCursorOffsetSet() const;
     int   cursorOffset() const;
+    bool  isCursorSet() const;
+
+    const QString& cursorFile() const;
+    int   cursorLineOrOffset() const;
 
     bool  isCursorLineColumnSet() const;
     int   cursorLine() const;
@@ -54,6 +58,7 @@ private:
     int     m_cursorOffset;
     int     m_cursorLine;
     int     m_cursorColumn;
+    QString m_cursorFile;
 
     int     m_logLevel;
 
@@ -86,6 +91,18 @@ inline bool QCSAConsoleArguments::isCursorOffsetSet() const{
 
 inline int QCSAConsoleArguments::cursorOffset() const{
     return m_cursorOffset;
+}
+
+inline bool QCSAConsoleArguments::isCursorSet() const{
+    return isCursorLineColumnSet() || isCursorOffsetSet() || m_cursorFile != "";
+}
+
+inline const QString &QCSAConsoleArguments::cursorFile() const{
+    return m_cursorFile;
+}
+
+inline int QCSAConsoleArguments::cursorLineOrOffset() const{
+    return isCursorLineColumnSet() ? m_cursorLine : m_cursorOffset;
 }
 
 inline bool QCSAConsoleArguments::isCursorLineColumnSet() const{

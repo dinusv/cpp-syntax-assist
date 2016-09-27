@@ -2,6 +2,7 @@
 #define QASTSEARCH_HPP
 
 #include "qcsaglobal.h"
+#include <QString>
 #include <QList>
 
 namespace csa{
@@ -38,6 +39,9 @@ public:
     bool isFirst() const;
     bool isLast() const;
 
+    bool isAbsoluteMatch() const;
+    bool isAbsolute() const;
+
     MatchResult matchCurrentSegment(ast::QASTNode* node) const;
     QASTSearch& nextPosition();
 
@@ -56,8 +60,17 @@ private:
 
     QList<SearchSegment> m_searchSegments;
     int                  m_lastMatchPosition;
+    bool                 m_isAbsolute;
 
 };
+
+inline bool QASTSearch::isAbsoluteMatch() const{
+    return m_isAbsolute && isFirst();
+}
+
+inline bool QASTSearch::isAbsolute() const{
+    return m_isAbsolute;
+}
 
 }// namespace
 

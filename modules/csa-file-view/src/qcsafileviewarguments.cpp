@@ -29,11 +29,9 @@ QCSAFileViewArguments::QCSAFileViewArguments(
     , m_cursorOffset(-1)
     , m_cursorLine(-1)
     , m_cursorColumn(-1)
+    , m_cursorFile("")
     , m_logLevel(csa::QCSAConsole::getLogLevel())
 {
-    m_headerSearchPatterns << "*.c" << "*.C" << "*.cxx" << "*.cpp" << "*.c++" << "*.cc" << "*.cp";
-    m_sourceSearchPatterns << "*.h" << "*.H" << "*.hxx" << "*.hpp" << "*.h++" << "*.hh" << "*.hp";
-
     initialize(app, applicationDescription);
 }
 
@@ -50,19 +48,31 @@ void QCSAFileViewArguments::initialize(const QGuiApplication& app, const QString
     m_commandLineParser->addHelpOption();
     m_commandLineParser->addVersionOption();
     m_commandLineParser->addPositionalArgument(
-                "paths", QCoreApplication::translate("main", "Files and directories to parse."));
+        "paths", QCoreApplication::translate("main", "Files and directories to parse."));
 
-    QCommandLineOption cursorOffset("c",
-        QCoreApplication::translate("main", "User cursor offset within the file."),
+    // Setup user cursor
+    // -----------------
+
+    QCommandLineOption selectFile("sf",
+        QCoreApplication::translate("main", "Select a node from the given file."),
         QCoreApplication::translate("main", "offset")
     );
-    m_commandLineParser->addOption(cursorOffset);
-
-    QCommandLineOption cursorLineColumnOffset("lc",
-        QCoreApplication::translate("main", "Line:Column of the user cursor within the file."),
-        QCoreApplication::translate("main", "line:column")
+    m_commandLineParser->addOption(selectFile);
+    QCommandLineOption selectOffset("so",
+        QCoreApplication::translate("main", "Select a node at this offset within a specified file."),
+        QCoreApplication::translate("main", "offset")
     );
-    m_commandLineParser->addOption(cursorLineColumnOffset);
+    m_commandLineParser->addOption(selectOffset);
+    QCommandLineOption selectLine("sl",
+        QCoreApplication::translate("main", "Select a node at this line within a specified file."),
+        QCoreApplication::translate("main", "line")
+    );
+    m_commandLineParser->addOption(selectLine);
+    QCommandLineOption selectColumn("sc",
+        QCoreApplication::translate("main", "Select a node at this column within a specified file."),
+        QCoreApplication::translate("main", "line")
+    );
+    m_commandLineParser->addOption(selectColumn);
 
     QCommandLineOption selectedFunction(QStringList() << "e" << "function",
         QCoreApplication::translate("main", "Selected javascript function from the loaded plugins."),
@@ -111,25 +121,14 @@ void QCSAFileViewArguments::initialize(const QGuiApplication& app, const QString
     if ( m_functionSet )
         m_function = m_commandLineParser->value(selectedFunction);
 
-    m_cursorOffset = m_commandLineParser->isSet(cursorOffset) ? m_commandLineParser->value(cursorOffset).toInt() : -1;
-    if ( m_cursorOffset == -1 ){
-        bool isLineColumnSet = m_commandLineParser->isSet(cursorLineColumnOffset);
-        if ( isLineColumnSet ){
-            QStringList lineColSplit = m_commandLineParser->value(cursorLineColumnOffset).split(":");
-            if ( lineColSplit.size() != 2 )
-                m_commandLineParser->showHelp(2);
 
-            bool lineConvertOk, colConvertOk;
-            m_cursorLine   = lineColSplit[0].toInt(&lineConvertOk);
-            m_cursorColumn = lineColSplit[1].toInt(&colConvertOk);
-            if ( !lineConvertOk || !colConvertOk )
-                m_commandLineParser->showHelp(3);
-
-        } else {
-            m_cursorColumn = -1;
-            m_cursorLine   = -1;
-        }
-    }
+    bool linec = true, offc = true, colc = true;
+    m_cursorOffset = m_commandLineParser->isSet(selectOffset) ? m_commandLineParser->value(selectOffset).toInt(&offc) : -1;
+    m_cursorLine   = m_commandLineParser->isSet(selectLine)   ? m_commandLineParser->value(selectLine).toInt(&linec) : -1;
+    m_cursorColumn = m_commandLineParser->isSet(selectColumn) ? m_commandLineParser->value(selectColumn).toInt(&colc) : -1;
+    m_cursorFile   = m_commandLineParser->isSet(selectFile)   ? m_commandLineParser->value(selectFile) : "";
+    if ( !linec || !offc || !colc )
+        m_commandLineParser->showHelp(3);
 
     m_projectDir = m_commandLineParser->isSet(projectDir) ? m_commandLineParser->value(projectDir) : "";
     m_logLevel   = m_commandLineParser->isSet(logLevel) ? m_commandLineParser->value(logLevel).toInt() : m_logLevel;

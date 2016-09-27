@@ -52,7 +52,6 @@ else:unix: DESTDIR = $$OUT_PWD/../build
 DISTFILES += \
     $$PWD/coretests/astfile-test.js \
     $$PWD/coretests/astnode-test.js \
-    $$PWD/coretests/astmethod-test.js \
     $$PWD/coretests/nodecollection-test.js \
     $$PWD/coretests/token-test.js \
     $$PWD/coretests/config-test.js \
@@ -62,8 +61,8 @@ DISTFILES += \
     $$PWD/coretests/astnode-test.in \
     $$PWD/coretests/nodecollection-test.in \
     $$PWD/coretests/token-test.in \
-    coretests/require-test.js \
-    coretests/require-in.js \
-    coretests/require-loop-in.js \
-    coretests/require-loop-multi-1-in.js \
-    coretests/require-loop-multi-2-in.js
+    $$PWD/coretests/require-test.js \
+    $$PWD/coretests/require-in.js \
+    $$PWD/coretests/require-loop-in.js \
+    $$PWD/coretests/require-loop-multi-1-in.js \
+    $$PWD/coretests/require-loop-multi-2-in.js

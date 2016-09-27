@@ -84,6 +84,8 @@ ApplicationWindow {
                 if ( event.modifiers & Qt.ControlModifier ){
                     event.accepted = true;
                     selectIndexedItem()
+                } else {
+                    event.accepted = false;
                 }
             }
 
@@ -101,7 +103,7 @@ ApplicationWindow {
             }
 
             function selectIndexedItem(){
-                text               = plugins.completionPrefix + pluginList.currentItem.usage
+                text               = plugins.completionPrefix + (pluginList.currentItem ? pluginList.currentItem.usage : '')
                 pluginList.visible = false
 
                 positionCursor()
@@ -271,7 +273,8 @@ ApplicationWindow {
                     MouseArea{
                         anchors.fill: parent
                         onDoubleClicked: {
-                            codeBase.select(model.breadcrumbs)
+                            configuredEngine.selectNode(model.breadcrumbs)
+                            syntaxTreeModel.selected = model.index
                         }
                     }
 

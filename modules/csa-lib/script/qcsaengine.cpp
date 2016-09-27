@@ -120,11 +120,9 @@ bool QCSAEngine::loadNodeCollection(){
         "    if( typeof plugins === 'undefined' ) \n"
         "        return;\n"
         "    var target = NodeCollection.prototype;\n"
-        "    for ( var name in options ){\n"
-        "        if ( !options.hasOwnProperty(name) || options[name] === undefined )\n"
-        "            continue;\n"
-        "        plugins.registerPlugin(name, options[name])\n"
-        "    }\n"
+        "    if ( !options.hasOwnProperty(\'name\') || options[\'name\'] === undefined )\n"
+        "        return;\n"
+        "    plugins.registerPlugin(options[\'name\'], options)\n"
         "    return NodeCollection;\n"
         "}\n"
     );
@@ -234,7 +232,9 @@ int QCSAEngine::loadFile(const QString &path, QCSAModule *from){
             );
             return -1;
         } else if ( result.hasProperty("type") && result.property("type").toString() == "error"){
-            QCSAConsole::logError(result.property("message").toString());
+            QCSAConsole::logError(
+                "Failed to load module: \'" + path + "\'. Exception: " + result.property("message").toString()
+            );
             return result.property("number").toInt();
         }
     }
@@ -243,7 +243,7 @@ int QCSAEngine::loadFile(const QString &path, QCSAModule *from){
 
 QJSValue QCSAEngine::loadFile(const QFileInfo &finfo, QCSAModule *){
     if ( !finfo.exists() || finfo.isDir() )
-        return generateError("Failed to load module: " + finfo.absoluteFilePath() + ". No such module found.", 1);
+        return generateError("No such module found.", 1);
 
     QString filename = finfo.fileName();
     QString filepath = finfo.absolutePath();
@@ -312,6 +312,10 @@ bool QCSAEngine::execute(const QString& jsCode, QJSValue& result){
     }
 
     return true;
+}
+
+void QCSAEngine::selectNode(const QString &breadCrumbs){
+    m_engine->globalObject().property("NodeCollection").setProperty("selectedPath", breadCrumbs);
 }
 
 void QCSAEngine::setContextObject(const QString& name, QObject* object){

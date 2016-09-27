@@ -17,6 +17,8 @@
 
 #include <QCoreApplication>
 #include <QTest>
+#include <QFileInfo>
+#include <QDir>
 
 #include <qqml.h>
 #include "qcsaengine.h"

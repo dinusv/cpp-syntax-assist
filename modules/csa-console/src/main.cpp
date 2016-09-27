@@ -26,7 +26,7 @@ int main(int argc, char* argv[]){
 
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("csa-console");
-    QCoreApplication::setApplicationVersion("0.3.0");
+    QCoreApplication::setApplicationVersion(CSA_VERSION_STRING);
 
     QCSAConsoleArguments commandLineArguments(
         app,
@@ -59,21 +59,16 @@ int main(int argc, char* argv[]){
         scriptEngine.engine(),
         QCoreApplication::applicationDirPath() + "/config", "default"
     );
-    QCodebase codeBase(config, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
-
-    //TODO
-//    if ( commandLineArguments.isCursorOffsetSet() ){
-//        codeBase.nodeAt(
-//            commandLineArguments.cursorOffset(),
-//            commandLineArguments.files().first()
-//        );
-//    } else if ( commandLineArguments.isCursorLineColumnSet() ){
-//        codeBase.nodeAt(
-//            commandLineArguments.cursorLine(),
-//            commandLineArguments.cursorColumn(),
-//            commandLineArguments.files().first()
-//        );
-//    }
+    QCodebase codebase(config, commandLineArguments.files(), commandLineArguments.projectDir(), 0);
+    if ( commandLineArguments.isCursorSet() ){
+        csa::ast::QASTNode* node = codebase.nodeAt(
+            commandLineArguments.cursorFile(),
+            commandLineArguments.cursorLineOrOffset(),
+            commandLineArguments.cursorColumn() == -1 ? 0 : commandLineArguments.cursorColumn()
+        );
+        if(node)
+            scriptEngine.selectNode(node->breadcrumbs());
+    }
 
     // Configure Engine
     // ----------------
@@ -85,7 +80,7 @@ int main(int argc, char* argv[]){
         "CSA", 1, 0, "ConfiguredEngine", "Only access to the engine property is allowed.");
 
     qmlRegisterUncreatableType<QCSACompletionSet>(
-        "CSA", 1, 0, "CompletinoSet", "Only access to the plugins property is allowed.");
+        "CSA", 1, 0, "CompletionSet", "Only access to the plugins property is allowed.");
 
     qmlRegisterUncreatableType<csa::QCodebase>(
         "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
@@ -104,7 +99,7 @@ int main(int argc, char* argv[]){
 
     QCSACompletionSet completionSet;
 
-    scriptEngine.setContextObject("codeBase", &codeBase);
+    scriptEngine.setContextObject("codebase", &codebase);
     scriptEngine.setContextObject("plugins",  &completionSet);
     scriptEngine.loadNodeCollection();
     scriptEngine.loadNodesFunction();

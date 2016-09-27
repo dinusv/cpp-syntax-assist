@@ -30,4 +30,16 @@
 #  define Q_CSA_EXPORT
 #endif
 
+#define CSA_VERSION_MAJOR 0
+#define CSA_VERSION_MINOR 4
+#define CSA_VERSION_PATCH 0
+
+#define CSA_VERSION_STRINGIZE(major, minor, patch)   \
+    #major"."#minor"."#patch
+
+#define CSA_VERSION_STRING CSA_VERSION_STRINGIZE( \
+    CSA_VERSION_MAJOR, \
+    CSA_VERSION_MINOR, \
+    CSA_VERSION_PATCH)
+
 #endif // QCSAGLOBAL_HPP
