@@ -17,6 +17,7 @@
 #include "qcsaengine.h"
 #include "qcsaconsole.h"
 #include "qcodebase.h"
+#include "qcodebaseconfig.h"
 #include "qsourcelocation.h"
 #include "qannotatedtoken.h"
 #include "qcsamodule.h"
@@ -339,6 +340,8 @@ void QCSAEngine::registerASTTypes(){
         "CSA", 1, 0, "Token", "Only access to Token properties of nodes is allowed.");
     qmlRegisterUncreatableType<csa::QCodebase>(
         "CSA", 1, 0, "Codebase", "Codebase is available only as a property.");
+    qmlRegisterUncreatableType<csa::QCodebaseConfig>(
+        "CSA", 1, 0, "CodebaseConfig", "Codebase config is available only as a property");
     qmlRegisterUncreatableType<csa::ast::QASTFile>(
         "CSA", 1, 0, "ASTFile", "ASTFile is available only as a property.");
     qmlRegisterUncreatableType<csa::ast::QASTNode>(
