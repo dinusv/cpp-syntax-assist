@@ -79,6 +79,8 @@ public slots:
     bool deleteFile(csa::ast::QASTFile* file);
     bool makePath(const QString& path);
 
+    csa::QCodebaseConfig* config();
+
     // Save
     // ----
 
@@ -116,6 +118,10 @@ private:
 
 inline QList<QObject*> QCodebase::files() const{
     return QObject::children();
+}
+
+inline QCodebaseConfig *QCodebase::config(){
+    return m_config;
 }
 
 } // namespace

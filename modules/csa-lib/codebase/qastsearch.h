@@ -48,6 +48,8 @@ public:
     static bool wildcardMatch(const QString& wildcard, const QString& matchData);
     static bool isPattern(const QString& data);
 
+    static QString escape(const QString& text);
+
 private:
     void initSearchPattern(const QString& pattern);
 

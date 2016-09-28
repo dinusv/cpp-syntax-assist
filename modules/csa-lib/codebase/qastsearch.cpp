@@ -2,8 +2,6 @@
 #include "qcsaconsole.h"
 #include "qastnode.h"
 
-#include <QDebug>
-
 namespace csa{
 
 QASTSearch::QASTSearch(const QString& searchPattern)
@@ -91,7 +89,6 @@ QASTSearch& QASTSearch::nextPosition(){
 
 
 bool QASTSearch::wildcardMatch(const QString& wildcard, const QString& matchData){
-    qDebug() << "wildcardMatch" << wildcard << matchData;
     QString::const_iterator expressionIt = wildcard.begin();
     QString::const_iterator matchIt      = matchData.begin();
 
@@ -101,6 +98,10 @@ bool QASTSearch::wildcardMatch(const QString& wildcard, const QString& matchData
 
 bool QASTSearch::isPattern(const QString& data){
     return data.indexOf('/') != -1 || data.indexOf('#') != -1;
+}
+
+QString QASTSearch::escape(const QString &text){
+    return QString(text).replace('/', "\\/").replace(':', "\\:").replace('*', "\\*");
 }
 
 bool QASTSearch::matchHere(
