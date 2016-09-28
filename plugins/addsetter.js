@@ -51,17 +51,17 @@ NodeCollection.describe({
             if ( addInline ){
                 fieldClass.afterln(
                     '\n' + 'inline void ' + fieldClass.identifier() + '::' + setterName +
-                            '(' + node.prop("type") + ' ' + argName + '){' +
-                    '\n\t' + node.identifier() + ' = ' + argName + ';' +
+                            '(' + node.prop("type") + ' ' + nodeArgName + '){' +
+                    '\n\t' + node.identifier() + ' = ' + nodeArgName + ';' +
                     '\n}\n'
                 );
             } else {
-                var sourceFileNode = codeBase.findSource(node.parentFind('file').identifier());
+                var sourceFileNode = codebase.findSource(node.parentFind('file').identifier());
                 if ( sourceFileNode === null ){
                     fieldClass.afterln(
                         '\n' + 'inline void ' + fieldClass.identifier() + '::' + setterName +
-                                '(' + node.prop("type") + ' ' + argName + '){' +
-                        '\n\t' + node.identifier() + ' = ' + argName + ';' +
+                                '(' + node.prop("type") + ' ' + nodeArgName + '){' +
+                        '\n\t' + node.identifier() + ' = ' + nodeArgName + ';' +
                         '\n}\n'
                     );
                 } else {
