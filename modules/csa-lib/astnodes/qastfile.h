@@ -50,7 +50,7 @@ public slots:
     csa::QSourceLocation* createLocation(unsigned int lineOrOffset, unsigned int column = 0);
 
     QString fileName();
-    QString fileNameWithouExtension();
+    QString fileNameWithoutExtension();
     QString extension();
 
 protected:

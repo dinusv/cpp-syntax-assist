@@ -58,8 +58,11 @@ private:
 };
 
 bool offsetCompare(QModifierElementPrivate* e1, QModifierElementPrivate* e2){
-    if ( e1->location.filePath() == e2->location.filePath() )
+    if ( e1->location.filePath() == e2->location.filePath() ){
+        if ( e1->location.offset() == e2->location.offset() )
+            return e1->type < e2->type;
         return (e1->location.offset() < e2->location.offset());
+    }
 
     return (e1->location.filePath() < e2->location.filePath());
 }
@@ -221,7 +224,7 @@ QString QASTFile::fileName(){
     return QFileInfo(identifier()).fileName();
 }
 
-QString QASTFile::fileNameWithouExtension(){
+QString QASTFile::fileNameWithoutExtension(){
     return QFileInfo(identifier()).baseName();
 }
 
