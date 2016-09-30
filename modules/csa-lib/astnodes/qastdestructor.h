@@ -44,7 +44,7 @@ private:
 };
 
 inline QString QASTDestructor::declaration() const{
-    return identifier();
+    return (m_isVirtual ? "virtual " : "") + identifier() + "()";
 }
 
 inline QVariant QASTDestructor::prop(const QString &key) const{
