@@ -30,8 +30,6 @@
 #include "qastdestructor.h"
 #include "qastcompoundstatement.h"
 
-#include <QDebug>
-
 namespace csa{
 using namespace ast;
 

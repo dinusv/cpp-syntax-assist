@@ -21,8 +21,6 @@
 #include "qannotatedtokenset.h"
 #include "clang-c/Index.h"
 
-#include <QDebug>
-
 namespace csa{ namespace ast{
 
 QASTMethodArgument::QASTMethodArgument(

@@ -29,7 +29,7 @@ public:
     const QStringList& headerFilePatterns() const;
 
     const QStringList& includeFiles() const;
-    const QStringList& includeCode() const;
+    const QString& includeCode() const;
 
 public slots:
     QJSValue require(const QString& config);
@@ -104,6 +104,10 @@ inline void QCodebaseConfig::includeFile(QString file){
 
 inline const QStringList &QCodebaseConfig::includeFiles() const{
     return m_includeFiles;
+}
+
+inline const QString &QCodebaseConfig::includeCode() const{
+    return m_includeCode;
 }
 
 }// namespace

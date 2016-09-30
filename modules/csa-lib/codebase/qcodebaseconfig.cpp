@@ -51,8 +51,9 @@ void QCodebaseConfig::save(QString filePath){
             filePath = filePath + ".json";
         filePath = QDir::cleanPath(m_configPath + QDir::separator() + filePath);
     }
+//    qDebug() << filePath;
     QFile file(filePath);
-    if ( file.open(QFile::WriteOnly) ){
+    if ( !file.open(QFile::WriteOnly) ){
         QCSAConsole::logError("Failed to open file for writing: " + filePath);
         return;
     }
@@ -68,8 +69,24 @@ QJsonObject QCodebaseConfig::serializeData(){
     QJsonArray clangArgs;
     for ( int i = 0; i < m_translationUnitNumArgs; ++i )
         clangArgs.append(QJsonValue(m_translationUnitArgs[i]));
-
     root["clangArgs"] = clangArgs;
+
+
+    QJsonArray headerFilePatterns;
+    for ( int i = 0; i < m_headerFilePatterns.size(); ++i )
+        headerFilePatterns.append(QJsonValue(m_headerFilePatterns[i]));
+    root["headerFilePatterns"] = headerFilePatterns;
+
+    QJsonArray sourceFilePatterns;
+    for ( int i = 0; i < m_sourceFilePatterns.size(); ++i )
+        sourceFilePatterns.append(QJsonValue(m_sourceFilePatterns[i]));
+    root["sourceFilePatterns"] = sourceFilePatterns;
+
+    QJsonArray includeFiles;
+    for ( int i = 0; i < m_includeFiles.size(); ++i )
+        includeFiles.append(QJsonValue(m_includeFiles[i]));
+    root["includeFiles"] = includeFiles;
+    root["includeCode"]  = m_includeCode;
 
     return root;
 }
@@ -81,6 +98,7 @@ QJSValue QCodebaseConfig::requireFile(const QString& path){
         return QJSValue();
     }
     QByteArray data = file.readAll();
+    file.close();
 
     QJsonParseError jsonerror;
     QJsonDocument jsondoc = QJsonDocument::fromJson(data, &jsonerror);

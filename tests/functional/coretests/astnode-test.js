@@ -194,47 +194,154 @@ CSATest.describe('ASTNode Traversal', function(test){
 CSATest.describe('ASTNode Breadcrumbs', function(test){
 
     test.scenario("constructor breadcrumbs", function(){
+        var file = codebase.parseFile('coretests/astnode-test.in')
+        var classNode = file.firstChild('testnamespace').firstChild()
+        assert(classNode !== null)
 
+        var constructorNode = classNode.firstChild('', 'constructor')
+        assert(constructorNode !== null)
+
+        assert(file.breadcrumbs() + "/testnamespace/TestClass/TestClass()" === constructorNode.breadcrumbs())
     })
 
     test.scenario("destructor breadcrumbs", function(){
+        var file = codebase.parseFile('coretests/astnode-test.in')
+        var classNode = file.firstChild('testnamespace').firstChild()
+        assert(classNode !== null)
 
+        var destructorNode = classNode.firstChild('', 'destructor')
+        assert(destructorNode !== null)
+
+
+        console.log(destructorNode.breadcrumbs())
+        assert(file.breadcrumbs() + "/testnamespace/TestClass/~TestClass()" === destructorNode.breadcrumbs())
     })
 
     test.scenario("method breadcrumbs", function(){
+        var file = codebase.parseFile('coretests/astnode-test.in')
+        var classNode = file.firstChild('testnamespace').firstChild()
+        assert(classNode !== null)
 
+        var setValueMethod = classNode.firstChild('setValue', 'method')
+        assert(classNode.breadcrumbs() + "/virtual void setValue(int)" === setValueMethod.breadcrumbs())
+
+        var setForwardTypeMethod = classNode.firstChild('setForwardType', 'method')
+        assert(classNode.breadcrumbs() + "/void setForwardType(ForwardDeclaredType \\*)" === setForwardTypeMethod.breadcrumbs())
+
+        var getValueMethod = classNode.firstChild('getValue', 'method')
+        assert(classNode.breadcrumbs() + "/int getValue() const" === getValueMethod.breadcrumbs())
+
+        var getForwardTypeMethod = classNode.firstChild('getForwardType', 'method')
+        assert(classNode.breadcrumbs() + "/ForwardDeclaredType \\* getForwardType()" === getForwardTypeMethod.breadcrumbs())
+
+        var getStringTypeMethod = classNode.firstChild('getStringType', 'method')
+        assert(classNode.breadcrumbs() + "/const std\\:\\:string & getStringType() const" === getStringTypeMethod.breadcrumbs())
     })
 
     test.scenario("field breadcrumbs", function(){
+        var file = codebase.parseFile('coretests/astnode-test.in')
+        var classNode = file.firstChild('testnamespace').firstChild()
+        assert(classNode !== null)
 
+        var intValueField = classNode.firstChild('intValue', 'field')
+        assert(classNode.breadcrumbs() + "/int intValue" === intValueField.breadcrumbs())
+
+        var stringTypeField = classNode.firstChild('stringType', 'field')
+        assert(classNode.breadcrumbs() + "/std\\:\\:string stringType" === stringTypeField.breadcrumbs())
+
+        var forwardTypeField = classNode.firstChild('m_forwardType', 'field')
+        assert(classNode.breadcrumbs() + "/ForwardDeclaredType \\* m_forwardType" === forwardTypeField.breadcrumbs())
     })
 })
 
 CSATest.describe('ASTNode Modifiers', function(test){
 
-    test.scenario("appending to a node", function(){
+    test.scenario("appending after a node", function(){
+        backup('coretests/astnode-test.in')
+        var file = codebase.parseFile('coretests/astnode-test.in')
+        var classNode = file.firstChild('testnamespace').firstChild()
+        assert(classNode !== null)
 
+        var intValueField = classNode.firstChild('intValue', 'field')
+        intValueField.afterln('int insert;\n')
+        codebase.save()
+
+        classNode = file.firstChild('testnamespace').firstChild()
+        assert(classNode !== null)
+        var insertedField = classNode.firstChild('insert', 'field')
+        assert(insertedField !== null)
+
+        restore()
     })
 
     test.scenario("prepending to a node", function(){
+        backup('coretests/astnode-test.in')
+        var file = codebase.parseFile('coretests/astnode-test.in')
+        var classNode = file.firstChild('testnamespace').firstChild()
+        assert(classNode !== null)
 
+        var intValueField = classNode.firstChild('intValue', 'field')
+        intValueField.before('int insert;\n')
+        codebase.save()
+
+        classNode = file.firstChild('testnamespace').firstChild()
+        assert(classNode !== null)
+        var insertedField = classNode.firstChild('insert', 'field')
+        assert(insertedField !== null)
+
+        restore()
     })
 
 })
 
 CSATest.describe('ASTNode Locations', function(test){
-    //TODO
 
     test.scenario("namespace locations", function(){
+        var file = codebase.parseFile('coretests/astnode-test.in')
+        var namespaceNode = file.firstChild('testnamespace')
+        assert(namespaceNode !== null)
 
+        assert(namespaceNode.rangeStartLocation().line() === 5)
+        assert(namespaceNode.rangeStartLocation().column() === 1)
+
+        assert(namespaceNode.rangeEndLocation().line() === 29)
+        assert(namespaceNode.rangeEndLocation().column() === 2)
+
+        assert(namespaceNode.bodyStartLocation().line() === 5)
+        assert(namespaceNode.bodyStartLocation().column() === 25)
+
+        assert(namespaceNode.bodyEndLocation().line() === 29)
+        assert(namespaceNode.bodyEndLocation().column() === 1)
     })
 
     test.scenario("class locations", function(){
+        var file = codebase.parseFile('coretests/astnode-test.in')
+        var classNode = file.firstChild('testnamespace').firstChild()
+        assert(classNode !== null)
 
+        assert(classNode.rangeStartLocation().line() === 7)
+        assert(classNode.rangeStartLocation().column() === 1)
+
+        assert(classNode.rangeEndLocation().line() === 27)
+        assert(classNode.rangeEndLocation().column() === 2)
+
+        assert(classNode.bodyStartLocation().line() === 7)
+        assert(classNode.bodyStartLocation().column() === 17)
+
+        assert(classNode.bodyEndLocation().line() === 27)
+        assert(classNode.bodyEndLocation().column() === 1)
     })
 
     test.scenario("method locations", function(){
+        var file = codebase.parseFile('coretests/astnode-test.in')
+        var methodNode = file.firstChild('testnamespace').firstChild().firstChild('getValue');
+        assert(methodNode !== null)
 
+        assert(methodNode.rangeStartLocation().line() === 16)
+        assert(methodNode.rangeStartLocation().column() === 5)
+
+        assert(methodNode.rangeEndLocation().line() === 16)
+        assert(methodNode.rangeEndLocation().column() === 44)
     })
 
 })

@@ -113,6 +113,7 @@ public slots:
 
     csa::QSourceLocation* rangeStartLocation();
     csa::QSourceLocation* rangeEndLocation();
+    //TODO: View functionality
     csa::QSourceLocation* cursorLocation();
 
     virtual csa::QSourceLocation* bodyStartLocation();

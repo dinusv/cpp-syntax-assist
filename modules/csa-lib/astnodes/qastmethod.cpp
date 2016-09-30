@@ -210,7 +210,7 @@ QString QASTMethod::declaration() const{
             base    += (*it)->declaration();
             firstArg = false;
         } else {
-            base    += ", " + (*it)->declaration();
+            base    += "," + (*it)->declaration();
         }
     }
     base += ")";

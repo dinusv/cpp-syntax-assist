@@ -2,8 +2,6 @@
 #include "qcsacompletionset.h"
 #include "qcsaconsole.h"
 
-#include <QDebug>
-
 namespace csa{
 
 class QCSACompletionModelPrivate{
@@ -75,7 +73,6 @@ void QCSACompletionModel::filter(const QString& text){
 
 void QCSACompletionModel::registerPlugin(const QString& name, const QVariantMap &pluginData){
     Q_D(QCSACompletionModel);
-    qDebug() << "Register plugin: " << name;
     d->completion->registerPlugin(name, pluginData);
 }
 

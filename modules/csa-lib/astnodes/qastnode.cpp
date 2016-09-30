@@ -69,8 +69,8 @@ const QASTNode*QASTNode::astParent() const{
 
 QString QASTNode::breadcrumbs() const{
     if ( astParent() )
-        return astParent()->breadcrumbs() + "/" + declaration().replace('/', "\\/").replace(':', "\\:");
-    return "/" + declaration().replace('/', "\\/").replace(':', "\\:");
+        return astParent()->breadcrumbs() + "/" + QASTSearch::escape(declaration());
+    return "/" + QASTSearch::escape(declaration());
 }
 
 QString QASTNode::declaration() const{

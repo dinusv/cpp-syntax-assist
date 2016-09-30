@@ -2,8 +2,6 @@
 #include "qcsaconsole.h"
 #include <QVariantMap>
 
-#include <QDebug>
-
 namespace csa{
 
 QCSACompletionItem::QCSACompletionItem(int type, QString name, QString usage, QString description)
