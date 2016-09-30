@@ -65,4 +65,7 @@ DISTFILES += \
     $$PWD/coretests/require-in.js \
     $$PWD/coretests/require-loop-in.js \
     $$PWD/coretests/require-loop-multi-1-in.js \
-    $$PWD/coretests/require-loop-multi-2-in.js
+    $$PWD/coretests/require-loop-multi-2-in.js \
+    coretests/astfile-test.in \
+    coretests/config-test.json \
+    coretests/config-test.in

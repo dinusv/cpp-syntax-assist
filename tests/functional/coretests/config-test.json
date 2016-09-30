@@ -1,0 +1,15 @@
+{
+    "clangArgs": [
+        "-c",
+        "-x"
+    ],
+    "headerFilePatterns" : [
+        "*config-test.in"
+    ],
+    "sourceFilePatterns" : [
+        "*test.cin"
+    ],
+    "includeFiles": [
+    ],
+    "includeCode" : ""
+}
