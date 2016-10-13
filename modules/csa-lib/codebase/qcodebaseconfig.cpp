@@ -9,6 +9,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTemporaryFile>
 
 namespace csa{
 
@@ -21,13 +22,57 @@ QCodebaseConfig::QCodebaseConfig(
     , m_engine(engine)
     , m_configPath(configPath)
     , m_translationUnitNumArgs(0)
-    , m_translationUnitArgs(0)
+    , m_translationUnitFullArgs(0)
+    , m_translationUnitArgsDirty(false)
+    , m_includeCodeDirty(false)
+    , m_includeFile()
 {
     update(require(configName));
 }
 
 QCodebaseConfig::~QCodebaseConfig(){
     freeTranslationUnitArgs();
+}
+
+void QCodebaseConfig::translationUnitArgsUpdate() const{
+    if ( m_includeCodeDirty ){
+        if ( !m_includeFile.open() )
+            QCSAConsole::logError("Failed to append include code due to inability to open include file.");
+        m_includeFile.write(m_includeCode.toUtf8());
+        m_includeFile.close();
+        m_includeCodeDirty = false;
+        m_translationUnitArgsDirty = true;
+    }
+    if ( m_translationUnitArgsDirty ){
+        freeTranslationUnitArgs();
+
+        m_translationUnitNumArgs = m_translationUnitArgs.size();
+        m_translationUnitNumArgs += m_includeCode.isEmpty() ? 0 : 2;
+
+        m_translationUnitFullArgs = new char*[m_translationUnitNumArgs];
+        for ( int i = 0; i < m_translationUnitArgs.size(); ++i ){
+            QByteArray arg = m_translationUnitArgs[i].toUtf8();
+            m_translationUnitFullArgs[i] = new char[arg.length() + 1];
+            strcpy(m_translationUnitFullArgs[i], arg.constData());
+            m_translationUnitFullArgs[i][arg.length()] = '\0';
+        }
+
+        if ( !m_includeCode.isEmpty() ){
+            const char* includeStr = "-include";
+            int currentIndex = m_translationUnitArgs.size();
+            m_translationUnitFullArgs[currentIndex] = new char[9];
+            strcpy(m_translationUnitFullArgs[currentIndex], includeStr);
+            m_translationUnitFullArgs[currentIndex][8] = '\0';
+
+            ++currentIndex;
+            QByteArray includeFile = m_includeFile.fileName().toUtf8();
+            m_translationUnitFullArgs[currentIndex] = new char[includeFile.length() + 1];
+            strcpy(m_translationUnitFullArgs[currentIndex], includeFile.constData());
+            m_translationUnitFullArgs[currentIndex][includeFile.length()] = '\0';
+        }
+
+        m_translationUnitArgsDirty = false;
+    }
 }
 
 QJSValue QCodebaseConfig::require(const QString& config){
@@ -67,7 +112,7 @@ QJsonObject QCodebaseConfig::serializeData(){
 
     // Translation Unit Args
     QJsonArray clangArgs;
-    for ( int i = 0; i < m_translationUnitNumArgs; ++i )
+    for ( int i = 0; i < m_translationUnitArgs.size(); ++i )
         clangArgs.append(QJsonValue(m_translationUnitArgs[i]));
     root["clangArgs"] = clangArgs;
 
@@ -110,36 +155,22 @@ QJSValue QCodebaseConfig::requireFile(const QString& path){
 }
 
 void QCodebaseConfig::parseTranslationUnitArgs(const QJSValue& val){
-    m_translationUnitNumArgs = 0;
-    QJSValueIterator countIt(val);
-    while( countIt.hasNext() ){
-        countIt.next();
-        if ( countIt.name() != "length" )
-            ++m_translationUnitNumArgs;
-    }
-
-    m_translationUnitArgs = new char*[m_translationUnitNumArgs];
-
-    int i = 0;
+    m_translationUnitArgs.clear();
     QJSValueIterator it(val);
     while( it.hasNext() ){
         it.next();
-        if ( it.name() != "length" ){
-            QByteArray arg = it.value().toString().toUtf8();
-            m_translationUnitArgs[i] = new char[arg.length() + 1];
-            strcpy(m_translationUnitArgs[i], arg.constData());
-            m_translationUnitArgs[i][arg.length()] = '\0';
-        }
-        ++i;
+        if ( it.name() != "length" )
+            m_translationUnitArgs.append(it.value().toString());
     }
+    m_translationUnitArgsDirty = true;
 }
 
-void QCodebaseConfig::freeTranslationUnitArgs(){
-    if ( m_translationUnitArgs ){
+void QCodebaseConfig::freeTranslationUnitArgs() const{
+    if ( m_translationUnitFullArgs ){
         for ( int i = 0; i < m_translationUnitNumArgs; ++i ){
-            delete [] m_translationUnitArgs[i];
+            delete [] m_translationUnitFullArgs[i];
         }
-        delete[] m_translationUnitArgs;
+        delete[] m_translationUnitFullArgs;
     }
 }
 
@@ -164,8 +195,10 @@ void QCodebaseConfig::update(const QJSValue& val){
         m_sourceFilePatterns = listFromJsArray(val.property("sourceFilePatterns"));
     if ( val.hasProperty("includeFiles") )
         m_includeFiles = listFromJsArray(val.property("includeFiles"));
-    if ( val.hasProperty("includeCode") )
+    if ( val.hasProperty("includeCode") ){
+        m_includeCodeDirty = true;
         m_includeCode = val.property("includeCode").toString();
+    }
 
     emit dataChanged();
 }

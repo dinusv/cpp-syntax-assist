@@ -5,6 +5,7 @@
 #include <QJSValue>
 #include <QString>
 #include <QStringList>
+#include <QTemporaryFile>
 #include "qcsaglobal.h"
 
 namespace csa{
@@ -24,6 +25,8 @@ public:
 
     int translationUnitNumArgs() const;
     char** translationUnitArgs();
+
+    void translationUnitArgsUpdate() const;
 
     const QStringList& sourceFilePatterns() const;
     const QStringList& headerFilePatterns() const;
@@ -51,7 +54,7 @@ private:
     QJsonObject serializeData();
     QJSValue requireFile(const QString& path);
     void parseTranslationUnitArgs(const QJSValue& val);
-    void freeTranslationUnitArgs();
+    void freeTranslationUnitArgs() const;
     QStringList listFromJsArray(const QJSValue& array);
 
     // members
@@ -61,22 +64,32 @@ private:
     QString m_configFile;
 
     // configuration members
-    int    m_translationUnitNumArgs;
-    char** m_translationUnitArgs;
+    mutable int    m_translationUnitNumArgs;
+    mutable char** m_translationUnitFullArgs;
+    mutable bool m_translationUnitArgsDirty;
+
+    QStringList m_translationUnitArgs;
 
     QStringList m_sourceFilePatterns;
     QStringList m_headerFilePatterns;
 
+    //QStringList m_translationUnitArgs;
+
     QStringList m_includeFiles;
-    QString m_includeCode;
+    QString     m_includeCode;
+    mutable bool m_includeCodeDirty;
+
+    mutable QTemporaryFile m_includeFile;
 };
 
 inline int QCodebaseConfig::translationUnitNumArgs() const{
+    translationUnitArgsUpdate();
     return m_translationUnitNumArgs;
 }
 
 inline char** QCodebaseConfig::translationUnitArgs(){
-    return m_translationUnitArgs;
+    translationUnitArgsUpdate();
+    return m_translationUnitFullArgs;
 }
 
 inline const QStringList &QCodebaseConfig::sourceFilePatterns() const{
@@ -89,11 +102,13 @@ inline const QStringList &QCodebaseConfig::headerFilePatterns() const{
 
 inline void QCodebaseConfig::include(QString code){
     m_includeCode += code;
+    m_includeCodeDirty = true;
     emit dataChanged();
 }
 
 inline void QCodebaseConfig::includeLine(QString line){
     m_includeCode += line + "\n";
+    m_includeCodeDirty = true;
     emit dataChanged();
 }
 
