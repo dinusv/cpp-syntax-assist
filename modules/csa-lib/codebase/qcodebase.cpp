@@ -48,6 +48,7 @@ QCodebase::QCodebase(
     , d_ptr(new QCodebasePrivate)
     , m_config(config)
     , m_projectDir(searchDir != "" ? QDir(searchDir).path() : "")
+    , m_entries(entries)
 {
     Q_D(QCodebase);
 
@@ -281,8 +282,18 @@ QASTFile* QCodebase::reparseFile(QASTFile* file){
 }
 
 void QCodebase::reparse(){
+    emit aboutToReparse();
+    for ( QList<csa::QTokenClassifier*>::Iterator it = m_classifiers.begin(); it != m_classifiers.end(); ++it )
+        delete *it;
+    m_classifiers.clear();
     for ( int i = 0; i < m_files.size(); ++i )
-        reparseIndex(i);
+        delete m_files[i];
+    m_files.clear();
+
+    for ( QStringList::iterator it = m_entries.begin(); it != m_entries.end(); ++it ){
+        parsePath(*it);
+    }
+    emit reparsed();
 }
 
 QASTFile* QCodebase::createFile(const QString& filePath){

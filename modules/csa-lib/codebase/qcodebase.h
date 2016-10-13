@@ -92,6 +92,8 @@ signals:
     void fileReparsed(csa::ast::QASTFile* file);
     void fileAboutToBeDeleted(csa::ast::QASTFile* file);
     void nodeSelected(csa::ast::QASTNode* node);
+    void aboutToReparse();
+    void reparsed();
 
 private:
     // prevent copy
@@ -111,6 +113,7 @@ private:
 
     QList<ast::QASTFile*>  m_files;
     QString                m_projectDir;
+    QStringList            m_entries;
 
     QList<csa::QTokenClassifier*> m_classifiers;
 };

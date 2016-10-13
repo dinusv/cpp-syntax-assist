@@ -104,12 +104,13 @@ int main(int argc, char *argv[]){
                      astTreeModel, SLOT(reparseFile(csa::ast::QASTFile*)));
     QObject::connect(&codebase, SIGNAL(nodeSelected(csa::ast::QASTNode*)),
                      astTreeModel, SLOT(selectNode(csa::ast::QASTNode*)));
+    QObject::connect(&codebase, SIGNAL(aboutToReparse()), astTreeModel, SLOT(resetFiles()));
 
     // Configure Engine
     // ----------------
 
-    qmlRegisterUncreatableType<QASTCollapsibleModel>(
-        "CSA", 1, 0, "SyntaxTree", "Only access to the SyntaxTree property is allowed.");
+    QCSAEngine::registerBaseTypes();
+    QCSAEngine::registerASTTypes();
 
     qmlRegisterUncreatableType<QCSAConsole>(
         "CSA", 1, 0, "ConfiguredDebugger", "Only access to the debug property is allowed.");
@@ -117,26 +118,15 @@ int main(int argc, char *argv[]){
     qmlRegisterUncreatableType<QCSAEngine>(
         "CSA", 1, 0, "ConfiguredEngine", "Only access to the engine property is allowed.");
 
+    qmlRegisterUncreatableType<QASTCollapsibleModel>(
+        "CSA", 1, 0, "SyntaxTree", "Only access to the SyntaxTree property is allowed.");
+
     qmlRegisterUncreatableType<csa::QCSACompletionSet>(
         "CSA", 1, 0, "CompletionSet", "Only access to the plugins property is allowed.");
 
     qmlRegisterUncreatableType<csa::QCSACompletionModel>(
         "CSA", 1, 0, "PluginCollection", "Only access to the plugins property is allowed.");
 
-    qmlRegisterUncreatableType<csa::QCodebase>(
-        "CSA", 1, 0, "CodeBase", "Codebase is available only as a property.");
-
-    qmlRegisterUncreatableType<csa::QSourceLocation>(
-        "CSA", 1, 0, "SourceLocation", "Source locations can be created from the codeBase or ASTFiles.");
-
-    qmlRegisterUncreatableType<csa::QAnnotatedToken>(
-        "CSA", 1, 0, "Token", "Only access to Token properties of nodes is allowed.");
-
-    qmlRegisterUncreatableType<csa::ast::QASTFile>(
-        "CSA", 1, 0, "ASTFile", "ASTFile is available only as a property.");
-
-    qmlRegisterUncreatableType<csa::ast::QASTNode>(
-        "CSA", 1, 0, "ASTNode", "ASTNode is available only as a property.");
 
     QCSACompletionSet set;
     QCSACompletionModel pluginCollection(&set);

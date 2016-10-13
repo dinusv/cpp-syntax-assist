@@ -68,6 +68,7 @@ public slots:
     void collapseFile(csa::ast::QASTFile* file);
     void reparseFile(csa::ast::QASTFile* file);
     void selectNode(csa::ast::QASTNode* node);
+    void resetFiles();
 
 signals:
     void selectedChanged();

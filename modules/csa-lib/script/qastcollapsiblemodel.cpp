@@ -203,3 +203,9 @@ void QASTCollapsibleModel::selectNode(QASTNode *node){
         }
     }
 }
+
+void QASTCollapsibleModel::resetFiles(){
+    beginRemoveRows(QModelIndex(), 0, m_items.size());
+    clear();
+    endRemoveRows();
+}
